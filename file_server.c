@@ -169,6 +169,7 @@ void *worker_write(void *_args) {
     pthread_cond_signal(args->used);
     pthread_mutex_unlock(args->flock);
 
+    free(args);
 }
 
 
@@ -214,8 +215,9 @@ void *worker_read(void *_args) {
 
     pthread_cond_signal(args->used);
     pthread_mutex_unlock(args->flock);
-}
 
+    free(args);
+}
 
 /**
     MAIN
