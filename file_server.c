@@ -15,9 +15,7 @@
 #define EMPTY 2
 
 #define MAX_INP_SIZE 50
-#define N_GLOCKS 2
-#define READ_LOCK 0
-#define WRITE_LOCK 1
+#define N_GLOCKS 3
 
 pthread_mutex_t glocks[N_GLOCKS];
 
@@ -51,7 +49,7 @@ void queue_init(queue_t *q) {
     pthread_mutex_init(&q->tailLock, NULL);
 }
 
-void queue_enqeue(queue_t *q, command *cmd) {
+void q_put(queue_t *q, command *cmd) {
     node_t *tmp = malloc(sizeof(node_t));
     assert(tmp != NULL);
     tmp->cmd = cmd;
@@ -63,17 +61,25 @@ void queue_enqeue(queue_t *q, command *cmd) {
     pthread_mutex_unlock(&q->tailLock);
 }
 
-int queue_dequeue(queue_t *q, command *cmd_out) {
+int q_peekget(queue_t *q, command *cmd_out, char *action) {
     pthread_mutex_lock(&q->headLock);
     node_t *tmp = q->head;
     node_t *newHead = tmp->next;
+
     if (newHead == NULL) {
         pthread_mutex_unlock(&q->headLock);
         return -1;
     }
+
+    if (strcmp(newHead->cmd->action, action) != 0) {
+        pthread_mutex_unlock(&q->headLock);
+        return 1;
+    }
+
     *cmd_out = *(newHead->cmd);
     q->head = newHead;
     pthread_mutex_unlock(&q->headLock);
+
     free(tmp);
     return 0;
 }
@@ -86,6 +92,8 @@ int queue_peek(queue_t *q) {
         tmp = READ;
     } else if (strcmp(q->head->next->cmd->action, "write") == 0) {
         tmp = WRITE;
+    } else if (strcmp(q->head->next->cmd->action, "empty") == 0) {
+        tmp = EMPTY;
     }
     pthread_mutex_unlock(&q->headLock);
     return tmp;
@@ -145,11 +153,9 @@ void *worker_write(void *_args) {
 
     pthread_mutex_lock(args->flock);
 
-    while(queue_peek(args->q) != WRITE)
-        pthread_cond_wait(args->used, args->flock);
-
     command cmd; // check for race
-    queue_dequeue(args->q, &cmd);
+    while(q_peekget(args->q, &cmd, "write") == 1)
+        pthread_cond_wait(args->used, args->flock);
 
     simulate_access();
     fprintf(stderr, "[START] %s: %s\n", cmd.action, cmd.input);
@@ -178,11 +184,10 @@ void *worker_read(void *_args) {
 
     pthread_mutex_lock(args->flock);
 
-    while(queue_peek(args->q) != READ)
+    command cmd; // check for race
+    while(q_peekget(args->q, &cmd, "read") == 1)
         pthread_cond_wait(args->used, args->flock);
 
-    command cmd;
-    queue_dequeue(args->q, &cmd);
 
     FILE *from_file, *to_file;
 
@@ -191,13 +196,13 @@ void *worker_read(void *_args) {
     from_file = fopen(cmd.path, "r");
 
     if (from_file == NULL) {
-        pthread_mutex_lock(&glocks[READ_LOCK]);
+        pthread_mutex_lock(&glocks[READ]);
         to_file = fopen("/home/derick/acad/cs140/proj2/main/read.txt", "a"); // temporary
         fprintf(to_file, "%s %s: FILE DNE\n", cmd.action, cmd.path);
         fclose(to_file);
-        pthread_mutex_unlock(&glocks[READ_LOCK]);
+        pthread_mutex_unlock(&glocks[READ]);
     } else {
-        pthread_mutex_lock(&glocks[READ_LOCK]);
+        pthread_mutex_lock(&glocks[READ]);
         to_file = fopen("/home/derick/acad/cs140/proj2/main/read.txt", "a"); // temporary
         fprintf(to_file, "%s %s: ", cmd.action, cmd.path);
         int copy;
@@ -209,7 +214,7 @@ void *worker_read(void *_args) {
 
         fclose(from_file);
         fclose(to_file);
-        pthread_mutex_unlock(&glocks[READ_LOCK]);
+        pthread_mutex_unlock(&glocks[READ]);
     }
 
 
@@ -219,6 +224,59 @@ void *worker_read(void *_args) {
     free(args);
 }
 
+
+void *worker_empty(void *_args) {
+    wargs *args = (wargs *)_args;
+
+    pthread_mutex_lock(args->flock);
+
+    command cmd; // check for race
+    while(q_peekget(args->q, &cmd, "empty") == 1)
+        pthread_cond_wait(args->used, args->flock);
+
+    FILE *from_file, *to_file;
+
+    strcpy(cmd.path, "/home/derick/acad/cs140/proj2/main/program.txt"); // temporary
+    from_file = fopen(cmd.path, "r");
+
+    if (from_file == NULL) {
+        pthread_mutex_lock(&glocks[EMPTY]);
+        to_file = fopen("/home/derick/acad/cs140/proj2/main/empty.txt", "a"); // temporary
+        fprintf(to_file, "%s %s: FILE DNE\n", cmd.action, cmd.path);
+        fclose(to_file);
+        pthread_mutex_unlock(&glocks[EMPTY]);
+    } else {
+        pthread_mutex_lock(&glocks[EMPTY]);
+        to_file = fopen("/home/derick/acad/cs140/proj2/main/empty.txt", "a"); // temporary
+        int copy;
+        if ((copy = fgetc(from_file)) == EOF) {
+            fprintf(to_file, "%s %s: FILE DNE\n", cmd.action, cmd.path);
+        } else {
+            fprintf(to_file, "%s %s: ", cmd.action, cmd.path);
+            fputc(copy, to_file); // sleep per character???
+            while ((copy = fgetc(from_file)) != EOF)
+                fputc(copy, to_file);
+
+            // newline
+            fputc(10, to_file);
+        }
+        fclose(to_file);
+        pthread_mutex_unlock(&glocks[EMPTY]);
+
+        // empty
+        fclose(from_file);
+        from_file = fopen(cmd.path, "w");
+        fclose(from_file);
+    }
+
+    pthread_cond_signal(args->used);
+    pthread_mutex_unlock(args->flock);
+
+    rand_sleep(7, 10);
+    free(args);
+}
+
+
 /**
     MAIN
 **/
@@ -226,6 +284,8 @@ int main() {
     for(int i = 0; i < N_GLOCKS; i++)
         pthread_mutex_init(&glocks[i], NULL);
 
+
+    // Unique per file
     queue_t q1;
     queue_init(&q1);
 
@@ -252,7 +312,7 @@ int main() {
 
 
         fprintf(stderr, "Enqueue %s %s\n", cmd->action, cmd->input);
-        queue_enqeue(&q1, cmd);
+        q_put(&q1, cmd);
 
         wargs *args = malloc(sizeof(wargs));
         args->flock = &flock;
@@ -263,8 +323,9 @@ int main() {
             pthread_create(&tid, NULL, worker_write, args);
         } else if (strcmp(cmd->action, "read") == 0) {
             pthread_create(&tid, NULL, worker_read, args);
+        } else if (strcmp(cmd->action, "empty") == 0) {
+            pthread_create(&tid, NULL, worker_empty, args);
         }
-
     }
 
     return 0;
