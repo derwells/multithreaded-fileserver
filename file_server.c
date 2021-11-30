@@ -8,6 +8,11 @@
 #define PATH 1
 #define INPUT 2
 #define MAX_INP_SIZE 50
+#define N_GLOCKS 2
+#define READ_LOCK 0
+#define EMPTY_LOCK 1
+
+pthread_mutex_t glocks[N_GLOCKS];
 
 struct worker_args {
     char cmd[MAX_INP_SIZE + 1];
@@ -78,11 +83,16 @@ void *worker_read(void *_args) {
 
     strcpy(args->path, "/home/derick/acad/cs140/proj2/main/program.txt"); // temporary
     from_file = fopen(args->path, "r");
-    to_file = fopen("/home/derick/acad/cs140/proj2/main/read.txt", "a"); // temporary
 
     if (from_file == NULL) {
+        pthread_mutex_lock(&glocks[READ_LOCK]);
+        to_file = fopen("/home/derick/acad/cs140/proj2/main/read.txt", "a"); // temporary
         fprintf(to_file, "%s %s: FILE DNE\n", args->cmd, args->path);
+        fclose(to_file);
+        pthread_mutex_unlock(&glocks[READ_LOCK]);
     } else {
+        pthread_mutex_lock(&glocks[READ_LOCK]);
+        to_file = fopen("/home/derick/acad/cs140/proj2/main/read.txt", "a"); // temporary
         fprintf(to_file, "%s %s: ", args->cmd, args->path);
         int copy;
         while ((copy = fgetc(from_file)) != EOF)
@@ -90,11 +100,10 @@ void *worker_read(void *_args) {
 
         // newline
         fputc(10, to_file);
+        pthread_mutex_unlock(&glocks[READ_LOCK]);
 
         fclose(from_file);
     }
-
-    fclose(to_file);
 
     free(args);
 }
@@ -109,36 +118,38 @@ void *worker_empty(void *_args) {
 
     strcpy(args->path, "/home/derick/acad/cs140/proj2/main/program.txt"); // temporary
     from_file = fopen(args->path, "r");
-    to_file = fopen("/home/derick/acad/cs140/proj2/main/empty.txt", "a"); // temporary
 
     if (from_file == NULL) {
+        pthread_mutex_lock(&glocks[EMPTY_LOCK]);
+        to_file = fopen("/home/derick/acad/cs140/proj2/main/empty.txt", "a"); // temporary
         fprintf(to_file, "%s %s: FILE DNE\n", args->cmd, args->path);
         fclose(to_file);
-        return 0;
-    }
-
-    int copy;
-    if ((copy = fgetc(from_file)) == EOF) {
-        fprintf(to_file, "%s %s: FILE DNE\n", args->cmd, args->path);
+        pthread_mutex_unlock(&glocks[EMPTY_LOCK]);
     } else {
-        fprintf(to_file, "%s %s: ", args->cmd, args->path);
-        fputc(copy, to_file); // sleep per character???
-        while ((copy = fgetc(from_file)) != EOF)
-            fputc(copy, to_file);
+        pthread_mutex_lock(&glocks[EMPTY_LOCK]);
+        to_file = fopen("/home/derick/acad/cs140/proj2/main/empty.txt", "a"); // temporary
+        int copy;
+        if ((copy = fgetc(from_file)) == EOF) {
+            fprintf(to_file, "%s %s: FILE DNE\n", args->cmd, args->path);
+        } else {
+            fprintf(to_file, "%s %s: ", args->cmd, args->path);
+            fputc(copy, to_file); // sleep per character???
+            while ((copy = fgetc(from_file)) != EOF)
+                fputc(copy, to_file);
 
-        // newline
-        fputc(10, to_file);
+            // newline
+            fputc(10, to_file);
+        }
+        fclose(to_file);
+        pthread_mutex_unlock(&glocks[EMPTY_LOCK]);
+
+        // empty
+        fclose(from_file);
+        from_file = fopen(args->path, "w");
+        fclose(from_file);
     }
-    fclose(from_file);
-
-    // empty
-    from_file = fopen(args->path, "w");
-    fclose(from_file);
-
-    fclose(to_file);
 
     rand_sleep(7, 10);
-
     free(args);
 }
 
@@ -148,6 +159,9 @@ void *worker_empty(void *_args) {
     MAIN
 **/
 int main() {
+    for(int i = 0; i < N_GLOCKS; i++)
+        pthread_mutex_init(&glocks[i], NULL);
+
     char inp[] = "";
     while (1) {
         char **split = malloc(3 * sizeof(char *));
