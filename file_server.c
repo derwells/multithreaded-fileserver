@@ -113,10 +113,20 @@ int q_peek(queue_t *q) {
 
 
 typedef struct __file_sync {
-    pthread_mutex_t *flock;
-    pthread_cond_t *read, *write, *empty;
-    queue_t *q;
+    pthread_mutex_t flock;
+    pthread_cond_t read, write, empty;
+    queue_t q;
 } fconc;
+
+void fconc_init(fconc *f) {
+    queue_init(&f->q);
+
+    pthread_mutex_init(&f->flock, NULL);
+
+    pthread_cond_init(&f->read, NULL);
+    pthread_cond_init(&f->write, NULL);
+    pthread_cond_init(&f->empty, NULL);
+}
 
 
 /** 
@@ -200,18 +210,18 @@ void rand_sleep(int min, int max) {
 
 void flex_cond_signal(fconc *args) {
     // only called within file lock
-    int val = q_peek(args->q);
+    int val = q_peek(&args->q);
 
     if (val == -1) {
         return;
     }
 
-    if (q_peek(args->q) == READ) {
-        pthread_cond_signal(args->read);
-    } else if (q_peek(args->q) == WRITE) {
-        pthread_cond_signal(args->write);
-    } else if (q_peek(args->q) == EMPTY) {
-        pthread_cond_signal(args->empty);
+    if (val == READ) {
+        pthread_cond_signal(&args->read);
+    } else if (val == WRITE) {
+        pthread_cond_signal(&args->write);
+    } else if (val == EMPTY) {
+        pthread_cond_signal(&args->empty);
     }
 }
 
@@ -221,11 +231,11 @@ void flex_cond_signal(fconc *args) {
 void *worker_write(void *_args) {
     fconc *args = (fconc *)_args;
 
-    pthread_mutex_lock(args->flock);
+    pthread_mutex_lock(&args->flock);
 
     command cmd; // check for race
-    while(q_peekget(args->q, &cmd, "write") == 1)
-        pthread_cond_wait(args->write, args->flock);
+    while(q_peekget(&args->q, &cmd, "write") == 1)
+        pthread_cond_wait(&args->write, &args->flock);
 
     simulate_access();
     fprintf(stderr, "[START] %s: %s\n", cmd.action, cmd.input);
@@ -233,7 +243,6 @@ void *worker_write(void *_args) {
     FILE *target_file;
     strcpy(cmd.path, "/home/derick/acad/cs140/proj2/main/program.txt"); // temporary
     target_file = fopen(cmd.path, "a");
-
     if (target_file == NULL) {
         fprintf(stderr, "[ERR] worker_write fopen\n");
         exit(1);
@@ -242,20 +251,20 @@ void *worker_write(void *_args) {
     fclose(target_file);
 
     flex_cond_signal(args);
-    pthread_mutex_unlock(args->flock);
+    pthread_mutex_unlock(&args->flock);
 
-    free(args);
+    fprintf(stderr, "[END] %s: %s\n", cmd.action, cmd.input);
 }
 
 
 void *worker_read(void *_args) {
     fconc *args = (fconc *)_args;
 
-    pthread_mutex_lock(args->flock);
+    pthread_mutex_lock(&args->flock);
 
     command cmd; // check for race
-    while(q_peekget(args->q, &cmd, "read") == 1)
-        pthread_cond_wait(args->read, args->flock);
+    while(q_peekget(&args->q, &cmd, "read") == 1)
+        pthread_cond_wait(&args->read, &args->flock);
 
 
     FILE *from_file, *to_file;
@@ -263,7 +272,6 @@ void *worker_read(void *_args) {
     strcpy(cmd.path, "/home/derick/acad/cs140/proj2/main/program.txt"); // temporary
     fprintf(stderr, "[START] %s %s\n", cmd.action, cmd.path);
     from_file = fopen(cmd.path, "r");
-    printf("fileno: %d\n", fileno(from_file));
 
     if (from_file == NULL) {
         pthread_mutex_lock(&glocks[READ]);
@@ -288,20 +296,20 @@ void *worker_read(void *_args) {
     }
 
     flex_cond_signal(args);
-    pthread_mutex_unlock(args->flock);
+    pthread_mutex_unlock(&args->flock);
 
-    free(args);
+    fprintf(stderr, "[END] %s: %s\n", cmd.action, cmd.input);
 }
 
 
 void *worker_empty(void *_args) {
     fconc *args = (fconc *)_args;
 
-    pthread_mutex_lock(args->flock);
+    pthread_mutex_lock(&args->flock);
 
     command cmd; // check for race
-    while(q_peekget(args->q, &cmd, "empty") == 1)
-        pthread_cond_wait(args->empty, args->flock);
+    while(q_peekget(&args->q, &cmd, "empty") == 1)
+        pthread_cond_wait(&args->empty, &args->flock);
 
     FILE *from_file, *to_file;
     fprintf(stderr, "[START] %s %s\n", cmd.action, cmd.path);
@@ -339,10 +347,10 @@ void *worker_empty(void *_args) {
     }
 
     flex_cond_signal(args);
-    pthread_mutex_unlock(args->flock);
+    pthread_mutex_unlock(&args->flock);
 
     rand_sleep(7, 10);
-    free(args);
+    fprintf(stderr, "[END] %s: %s\n", cmd.action, cmd.input);
 }
 
 
@@ -355,17 +363,8 @@ int main() {
 
 
     // Unique per file
-    queue_t q1;
-    queue_init(&q1);
-
-    pthread_mutex_t flock;
-    pthread_mutex_init(&flock, NULL);
-
-    pthread_cond_t read, write, empty;
-    pthread_cond_init(&read, NULL);
-    pthread_cond_init(&write, NULL);
-    pthread_cond_init(&empty, NULL);
-
+    fconc *args = malloc(sizeof(fconc));
+    fconc_init(args);
     while (1) {
         char **split = malloc(3 * sizeof(char *));
         for (int i = 0; i < 3; i++)
@@ -383,14 +382,8 @@ int main() {
 
 
         fprintf(stderr, "Enqueue %s %s\n", cmd->action, cmd->input);
-        q_put(&q1, cmd);
+        q_put(&args->q, cmd);
 
-        fconc *args = malloc(sizeof(fconc));
-        args->flock = &flock;
-        args->q = &q1;
-        args->read = &read;
-        args->write = &write;
-        args->empty = &empty;
         pthread_t tid; // we don't need to store all tids
         if (strcmp(cmd->action, "write") == 0) {
             pthread_create(&tid, NULL, worker_write, args);
