@@ -112,19 +112,59 @@ int q_peek(queue_t *q) {
 }
 
 
-typedef struct __worker_args {
+typedef struct __file_sync {
     pthread_mutex_t *flock;
     pthread_cond_t *read, *write, *empty;
     queue_t *q;
-} wargs;
+} fconc;
 
 
 /** 
  * HASH TABLE
 **/
 typedef struct __lnode_t {
-    int t;
+    char *key;
+    fconc *value;
+    struct __lnode_t *next;
 } lnode_t;
+
+typedef struct __list_t {
+    lnode_t *head;
+    pthread_mutex_t lock;
+} list_t;
+
+void l_init(list_t *l) {
+    l->head = NULL;
+}
+
+void l_insert(list_t *l, char *key, fconc *value) {
+    lnode_t *new = malloc(sizeof(lnode_t));
+
+    if (new == NULL) {
+        perror("malloc");
+        return;
+    }
+    new->key = key;
+    new->value = value;
+
+    new->next = l->head;
+    l->head = new;
+}
+
+fconc *l_lookup(list_t *l, char *key) {
+    fconc *value = NULL;
+
+    lnode_t *curr = l->head;
+    while (curr) {
+        if (strcmp(curr->key, key) == 0) {
+            value = curr->value;
+            break;
+        }
+        curr = curr->next;
+    }
+
+    return value;
+}
 
 
 /**
@@ -147,7 +187,8 @@ void simulate_access() {
     if (prob < 80) {
         sleep(1);
     } else {
-        sleep(6);
+        // sleep(6);
+        sleep(1);
     }
 }
 
@@ -157,7 +198,7 @@ void rand_sleep(int min, int max) {
     sleep(prob);
 }
 
-void flex_cond_signal(wargs *args) {
+void flex_cond_signal(fconc *args) {
     // only called within file lock
     int val = q_peek(args->q);
 
@@ -178,7 +219,7 @@ void flex_cond_signal(wargs *args) {
     COMMANDS LIB
 **/
 void *worker_write(void *_args) {
-    wargs *args = (wargs *)_args;
+    fconc *args = (fconc *)_args;
 
     pthread_mutex_lock(args->flock);
 
@@ -200,7 +241,6 @@ void *worker_write(void *_args) {
     fprintf(target_file, "%s", cmd.input);
     fclose(target_file);
 
-    fprintf(stderr, "jeff\n");
     flex_cond_signal(args);
     pthread_mutex_unlock(args->flock);
 
@@ -209,7 +249,7 @@ void *worker_write(void *_args) {
 
 
 void *worker_read(void *_args) {
-    wargs *args = (wargs *)_args;
+    fconc *args = (fconc *)_args;
 
     pthread_mutex_lock(args->flock);
 
@@ -223,6 +263,7 @@ void *worker_read(void *_args) {
     strcpy(cmd.path, "/home/derick/acad/cs140/proj2/main/program.txt"); // temporary
     fprintf(stderr, "[START] %s %s\n", cmd.action, cmd.path);
     from_file = fopen(cmd.path, "r");
+    printf("fileno: %d\n", fileno(from_file));
 
     if (from_file == NULL) {
         pthread_mutex_lock(&glocks[READ]);
@@ -254,7 +295,7 @@ void *worker_read(void *_args) {
 
 
 void *worker_empty(void *_args) {
-    wargs *args = (wargs *)_args;
+    fconc *args = (fconc *)_args;
 
     pthread_mutex_lock(args->flock);
 
@@ -344,7 +385,7 @@ int main() {
         fprintf(stderr, "Enqueue %s %s\n", cmd->action, cmd->input);
         q_put(&q1, cmd);
 
-        wargs *args = malloc(sizeof(wargs));
+        fconc *args = malloc(sizeof(fconc));
         args->flock = &flock;
         args->q = &q1;
         args->read = &read;
