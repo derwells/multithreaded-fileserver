@@ -192,7 +192,7 @@ void get_input(char **split) {
 }
 
 void simulate_access() {
-    return;
+    // return;
     int prob = (rand() % 100);
     if (prob < 80) {
         sleep(1);
@@ -241,7 +241,7 @@ void *worker_write(void *_args) {
     fprintf(stderr, "[START] %s: %s\n", cmd.action, cmd.input);
 
     FILE *target_file;
-    strcpy(cmd.path, "/home/derick/acad/cs140/proj2/main/program.txt"); // temporary
+    // strcpy(cmd.path, "/home/derick/acad/cs140/proj2/main/program.txt"); // temporary
     target_file = fopen(cmd.path, "a");
     if (target_file == NULL) {
         fprintf(stderr, "[ERR] worker_write fopen\n");
@@ -269,7 +269,7 @@ void *worker_read(void *_args) {
 
     FILE *from_file, *to_file;
 
-    strcpy(cmd.path, "/home/derick/acad/cs140/proj2/main/program.txt"); // temporary
+    // strcpy(cmd.path, "/home/derick/acad/cs140/proj2/main/program.txt"); // temporary
     fprintf(stderr, "[START] %s %s\n", cmd.action, cmd.path);
     from_file = fopen(cmd.path, "r");
 
@@ -313,7 +313,7 @@ void *worker_empty(void *_args) {
 
     FILE *from_file, *to_file;
     fprintf(stderr, "[START] %s %s\n", cmd.action, cmd.path);
-    strcpy(cmd.path, "/home/derick/acad/cs140/proj2/main/program.txt"); // temporary
+    // strcpy(cmd.path, "/home/derick/acad/cs140/proj2/main/program.txt"); // temporary
     from_file = fopen(cmd.path, "r");
 
     if (from_file == NULL) {
