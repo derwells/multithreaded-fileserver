@@ -130,7 +130,7 @@ void fconc_init(fconc *f) {
 
 
 /** 
- * HASH TABLE
+ * LINKED LIST
 **/
 typedef struct __lnode_t {
     char *key;
@@ -362,9 +362,9 @@ int main() {
         pthread_mutex_init(&glocks[i], NULL);
 
 
-    // Unique per file
-    fconc *args = malloc(sizeof(fconc));
-    fconc_init(args);
+    list_t *flist = malloc(sizeof(list_t));
+    l_init(flist);
+
     while (1) {
         char **split = malloc(3 * sizeof(char *));
         for (int i = 0; i < 3; i++)
@@ -380,17 +380,26 @@ int main() {
             free(split[i]);
         free(split);
 
+        fconc *fc = l_lookup(flist, cmd->path);
+        if (fc == NULL) {
+            // Unique per file
+            fc = malloc(sizeof(fconc));
+            fconc_init(fc);
+
+            l_insert(flist, cmd->path, fc);
+        }
+
 
         fprintf(stderr, "Enqueue %s %s\n", cmd->action, cmd->input);
-        q_put(&args->q, cmd);
+        q_put(&fc->q, cmd);
 
         pthread_t tid; // we don't need to store all tids
         if (strcmp(cmd->action, "write") == 0) {
-            pthread_create(&tid, NULL, worker_write, args);
+            pthread_create(&tid, NULL, worker_write, fc);
         } else if (strcmp(cmd->action, "read") == 0) {
-            pthread_create(&tid, NULL, worker_read, args);
+            pthread_create(&tid, NULL, worker_read, fc);
         } else if (strcmp(cmd->action, "empty") == 0) {
-            pthread_create(&tid, NULL, worker_empty, args);
+            pthread_create(&tid, NULL, worker_empty, fc);
         }
     }
 
