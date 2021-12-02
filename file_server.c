@@ -41,6 +41,7 @@ typedef struct __queue_t {
     pthread_mutex_t tailLock;
 } queue_t;
 
+
 void queue_init(queue_t *q) {
     node_t *tmp = malloc(sizeof(node_t));
     tmp->next = NULL;
@@ -48,6 +49,7 @@ void queue_init(queue_t *q) {
     pthread_mutex_init(&q->headLock, NULL);
     pthread_mutex_init(&q->tailLock, NULL);
 }
+
 
 void q_put(queue_t *q, command *cmd) {
     node_t *tmp = malloc(sizeof(node_t));
@@ -60,6 +62,7 @@ void q_put(queue_t *q, command *cmd) {
     q->tail = tmp;
     pthread_mutex_unlock(&q->tailLock);
 }
+
 
 int q_peekget(queue_t *q, command *cmd_out, char *action) {
     pthread_mutex_lock(&q->headLock);
@@ -84,24 +87,34 @@ int q_peekget(queue_t *q, command *cmd_out, char *action) {
     return 0;
 }
 
-int queue_peek(queue_t *q) {
-    int tmp = -1;
-    pthread_mutex_lock(&q->headLock);
 
-    if (strcmp(q->head->next->cmd->action, "read") == 0) {
-        tmp = READ;
-    } else if (strcmp(q->head->next->cmd->action, "write") == 0) {
-        tmp = WRITE;
-    } else if (strcmp(q->head->next->cmd->action, "empty") == 0) {
-        tmp = EMPTY;
+int q_peek(queue_t *q) {
+    pthread_mutex_lock(&q->headLock);
+    int ret = -1;
+    node_t *top = q->head->next;
+
+    if (top == NULL) {
+        pthread_mutex_unlock(&q->headLock);
+        return -1;
+    }
+
+    char *action = top->cmd->action;
+    if (strcmp(action, "read") == 0) {
+        ret = READ;
+    } else if (strcmp(action, "write") == 0) {
+        ret = WRITE;
+    } else if (strcmp(action, "empty") == 0) {
+        ret = EMPTY;
     }
     pthread_mutex_unlock(&q->headLock);
-    return tmp;
+
+    return ret;
 }
+
 
 typedef struct __worker_args {
     pthread_mutex_t *flock;
-    pthread_cond_t *used;
+    pthread_cond_t *read, *write, *empty;
     queue_t *q;
 } wargs;
 
@@ -119,7 +132,7 @@ typedef struct __lnode_t {
 **/
 void get_input(char **split) {
     char inp[MAX_INP_SIZE*4];
-    if(scanf("%[^\n]%*c", inp) == EOF) { while (1) {} } // FIX THIS
+    if (scanf("%[^\n]%*c", inp) == EOF) { while (1) {} } // FIX THIS
     int i = 0;
     char *ptr = strtok(inp, " ");
     while (ptr != NULL) {
@@ -129,7 +142,7 @@ void get_input(char **split) {
 }
 
 void simulate_access() {
-    // return;
+    return;
     int prob = (rand() % 100);
     if (prob < 80) {
         sleep(1);
@@ -144,6 +157,22 @@ void rand_sleep(int min, int max) {
     sleep(prob);
 }
 
+void flex_cond_signal(wargs *args) {
+    // only called within file lock
+    int val = q_peek(args->q);
+
+    if (val == -1) {
+        return;
+    }
+
+    if (q_peek(args->q) == READ) {
+        pthread_cond_signal(args->read);
+    } else if (q_peek(args->q) == WRITE) {
+        pthread_cond_signal(args->write);
+    } else if (q_peek(args->q) == EMPTY) {
+        pthread_cond_signal(args->empty);
+    }
+}
 
 /**
     COMMANDS LIB
@@ -155,7 +184,7 @@ void *worker_write(void *_args) {
 
     command cmd; // check for race
     while(q_peekget(args->q, &cmd, "write") == 1)
-        pthread_cond_wait(args->used, args->flock);
+        pthread_cond_wait(args->write, args->flock);
 
     simulate_access();
     fprintf(stderr, "[START] %s: %s\n", cmd.action, cmd.input);
@@ -168,11 +197,11 @@ void *worker_write(void *_args) {
         fprintf(stderr, "[ERR] worker_write fopen\n");
         exit(1);
     }
-
     fprintf(target_file, "%s", cmd.input);
     fclose(target_file);
 
-    pthread_cond_signal(args->used);
+    fprintf(stderr, "jeff\n");
+    flex_cond_signal(args);
     pthread_mutex_unlock(args->flock);
 
     free(args);
@@ -186,7 +215,7 @@ void *worker_read(void *_args) {
 
     command cmd; // check for race
     while(q_peekget(args->q, &cmd, "read") == 1)
-        pthread_cond_wait(args->used, args->flock);
+        pthread_cond_wait(args->read, args->flock);
 
 
     FILE *from_file, *to_file;
@@ -217,8 +246,7 @@ void *worker_read(void *_args) {
         pthread_mutex_unlock(&glocks[READ]);
     }
 
-
-    pthread_cond_signal(args->used);
+    flex_cond_signal(args);
     pthread_mutex_unlock(args->flock);
 
     free(args);
@@ -232,10 +260,10 @@ void *worker_empty(void *_args) {
 
     command cmd; // check for race
     while(q_peekget(args->q, &cmd, "empty") == 1)
-        pthread_cond_wait(args->used, args->flock);
+        pthread_cond_wait(args->empty, args->flock);
 
     FILE *from_file, *to_file;
-
+    fprintf(stderr, "[START] %s %s\n", cmd.action, cmd.path);
     strcpy(cmd.path, "/home/derick/acad/cs140/proj2/main/program.txt"); // temporary
     from_file = fopen(cmd.path, "r");
 
@@ -269,7 +297,7 @@ void *worker_empty(void *_args) {
         fclose(from_file);
     }
 
-    pthread_cond_signal(args->used);
+    flex_cond_signal(args);
     pthread_mutex_unlock(args->flock);
 
     rand_sleep(7, 10);
@@ -292,8 +320,10 @@ int main() {
     pthread_mutex_t flock;
     pthread_mutex_init(&flock, NULL);
 
-    pthread_cond_t used;
-    pthread_cond_init(&used, NULL);
+    pthread_cond_t read, write, empty;
+    pthread_cond_init(&read, NULL);
+    pthread_cond_init(&write, NULL);
+    pthread_cond_init(&empty, NULL);
 
     while (1) {
         char **split = malloc(3 * sizeof(char *));
@@ -317,8 +347,10 @@ int main() {
         wargs *args = malloc(sizeof(wargs));
         args->flock = &flock;
         args->q = &q1;
-        args->used = &used;
-        pthread_t tid;
+        args->read = &read;
+        args->write = &write;
+        args->empty = &empty;
+        pthread_t tid; // we don't need to store all tids
         if (strcmp(cmd->action, "write") == 0) {
             pthread_create(&tid, NULL, worker_write, args);
         } else if (strcmp(cmd->action, "read") == 0) {
