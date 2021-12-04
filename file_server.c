@@ -275,13 +275,13 @@ void *worker_read(void *_args) {
 
     if (from_file == NULL) {
         pthread_mutex_lock(&glocks[READ]);
-        to_file = fopen("/home/derick/acad/cs140/proj2/main/read.txt", "a"); // temporary
+        to_file = fopen("read.txt", "a"); // temporary
         fprintf(to_file, "%s %s: FILE DNE\n", cmd.action, cmd.path);
         fclose(to_file);
         pthread_mutex_unlock(&glocks[READ]);
     } else {
         pthread_mutex_lock(&glocks[READ]);
-        to_file = fopen("/home/derick/acad/cs140/proj2/main/read.txt", "a"); // temporary
+        to_file = fopen("read.txt", "a"); // temporary
         fprintf(to_file, "%s %s: ", cmd.action, cmd.path);
         int copy;
         while ((copy = fgetc(from_file)) != EOF)
@@ -298,7 +298,7 @@ void *worker_read(void *_args) {
     flex_cond_signal(args);
     pthread_mutex_unlock(&args->flock);
 
-    fprintf(stderr, "[END] %s: %s\n", cmd.action, cmd.input);
+    fprintf(stderr, "[END] %s: %s\n", cmd.action, cmd.path);
 }
 
 
@@ -318,13 +318,13 @@ void *worker_empty(void *_args) {
 
     if (from_file == NULL) {
         pthread_mutex_lock(&glocks[EMPTY]);
-        to_file = fopen("/home/derick/acad/cs140/proj2/main/empty.txt", "a"); // temporary
+        to_file = fopen("empty.txt", "a"); // temporary
         fprintf(to_file, "%s %s: FILE DNE\n", cmd.action, cmd.path);
         fclose(to_file);
         pthread_mutex_unlock(&glocks[EMPTY]);
     } else {
         pthread_mutex_lock(&glocks[EMPTY]);
-        to_file = fopen("/home/derick/acad/cs140/proj2/main/empty.txt", "a"); // temporary
+        to_file = fopen("empty.txt", "a"); // temporary
         int copy;
         if ((copy = fgetc(from_file)) == EOF) {
             fprintf(to_file, "%s %s: FILE DNE\n", cmd.action, cmd.path);
