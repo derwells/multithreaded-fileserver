@@ -136,14 +136,22 @@ void fconc_init(fconc *f) {
     HELPER LIB
 **/
 void get_input(char **split) {
-    char inp[MAX_INP_SIZE*4];
+    char inp[MAX_INP_SIZE * 4];
     if (scanf("%[^\n]%*c", inp) == EOF) { while (1) {} } // FIX THIS
-    int i = 0;
+    int nspaces = 0;
+
+    // Get command
     char *ptr = strtok(inp, " ");
-    while (ptr != NULL) {
-        strcpy(split[i++], ptr);
-        ptr = strtok(NULL, " ");
-    }
+    strcpy(split[nspaces++], ptr);
+
+    // Get path
+    ptr = strtok(NULL, " ");
+    strcpy(split[nspaces++], ptr);
+
+    // Get write input
+    ptr = strtok(NULL, "");
+    if (ptr != NULL)
+        strcpy(split[nspaces], ptr);
 }
 
 void simulate_access() {
@@ -193,7 +201,7 @@ void *worker_write(void *_args) {
         pthread_cond_wait(&args->write, &args->flock);
 
     simulate_access();
-    fprintf(stderr, "[START] %s: %s\n", cmd.action, cmd.input);
+    fprintf(stderr, "[START] %s: %s %s\n", cmd.action, cmd.path, cmd.input);
 
     FILE *target_file;
     target_file = fopen(cmd.path, "a");
