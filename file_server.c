@@ -241,7 +241,6 @@ void *worker_write(void *_args) {
     fprintf(stderr, "[START] %s: %s\n", cmd.action, cmd.input);
 
     FILE *target_file;
-    // strcpy(cmd.path, "/home/derick/acad/cs140/proj2/main/program.txt"); // temporary
     target_file = fopen(cmd.path, "a");
     if (target_file == NULL) {
         fprintf(stderr, "[ERR] worker_write fopen\n");
@@ -269,19 +268,18 @@ void *worker_read(void *_args) {
 
     FILE *from_file, *to_file;
 
-    // strcpy(cmd.path, "/home/derick/acad/cs140/proj2/main/program.txt"); // temporary
     fprintf(stderr, "[START] %s %s\n", cmd.action, cmd.path);
     from_file = fopen(cmd.path, "r");
 
     if (from_file == NULL) {
         pthread_mutex_lock(&glocks[READ]);
-        to_file = fopen("read.txt", "a"); // temporary
+        to_file = fopen("read.txt", "a");
         fprintf(to_file, "%s %s: FILE DNE\n", cmd.action, cmd.path);
         fclose(to_file);
         pthread_mutex_unlock(&glocks[READ]);
     } else {
         pthread_mutex_lock(&glocks[READ]);
-        to_file = fopen("read.txt", "a"); // temporary
+        to_file = fopen("read.txt", "a");
         fprintf(to_file, "%s %s: ", cmd.action, cmd.path);
         int copy;
         while ((copy = fgetc(from_file)) != EOF)
@@ -313,18 +311,17 @@ void *worker_empty(void *_args) {
 
     FILE *from_file, *to_file;
     fprintf(stderr, "[START] %s %s\n", cmd.action, cmd.path);
-    // strcpy(cmd.path, "/home/derick/acad/cs140/proj2/main/program.txt"); // temporary
     from_file = fopen(cmd.path, "r");
 
     if (from_file == NULL) {
         pthread_mutex_lock(&glocks[EMPTY]);
-        to_file = fopen("empty.txt", "a"); // temporary
+        to_file = fopen("empty.txt", "a");
         fprintf(to_file, "%s %s: FILE DNE\n", cmd.action, cmd.path);
         fclose(to_file);
         pthread_mutex_unlock(&glocks[EMPTY]);
     } else {
         pthread_mutex_lock(&glocks[EMPTY]);
-        to_file = fopen("empty.txt", "a"); // temporary
+        to_file = fopen("empty.txt", "a");
         int copy;
         if ((copy = fgetc(from_file)) == EOF) {
             fprintf(to_file, "%s %s: FILE DNE\n", cmd.action, cmd.path);
@@ -389,7 +386,6 @@ int main() {
             l_insert(flist, cmd->path, fc);
         }
 
-
         fprintf(stderr, "Enqueue %s %s\n", cmd->action, cmd->input);
         q_put(&fc->q, cmd);
 
@@ -401,6 +397,20 @@ int main() {
         } else if (strcmp(cmd->action, "empty") == 0) {
             pthread_create(&tid, NULL, worker_empty, fc);
         }
+
+        FILE *commands_file = fopen("commands.txt", "a");
+        if (commands_file == NULL) {
+            fprintf(stderr, "[ERR] worker_write fopen\n");
+            exit(1);
+        }
+        if (strcmp(cmd->action, "write") == 0) {
+            fprintf(commands_file, "%s %s %s\n", cmd->action, cmd->path, cmd->input);
+        } else {
+            fprintf(commands_file, "%s %s\n", cmd->action, cmd->path);
+        }
+        fclose(commands_file);
+        // do i put fopen outside?
+        // ADD TIMESTAMP
     }
 
     return 0;
