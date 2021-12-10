@@ -17,6 +17,7 @@ pthread_mutex_t glocks[N_GLOCKS];
 **/
 void l_init(list_t *l) {
     l->head = NULL;
+    pthread_mutex_init(&l->lock, NULL);
 }
 
 void l_insert(list_t *l, char *key, fconc *value) {
@@ -29,13 +30,16 @@ void l_insert(list_t *l, char *key, fconc *value) {
     new->key = key;
     new->value = value;
 
+    pthread_mutex_lock(&l->lock);
     new->next = l->head;
     l->head = new;
+    pthread_mutex_unlock(&l->lock);
 }
 
 fconc *l_lookup(list_t *l, char *key) {
     fconc *value = NULL;
 
+    pthread_mutex_lock(&l->lock);
     lnode_t *curr = l->head;
     while (curr) {
         if (strcmp(curr->key, key) == 0) {
@@ -44,6 +48,7 @@ fconc *l_lookup(list_t *l, char *key) {
         }
         curr = curr->next;
     }
+    pthread_mutex_unlock(&l->lock);
 
     return value;
 }
