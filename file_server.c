@@ -20,7 +20,7 @@ void l_init(list_t *l) {
     pthread_mutex_init(&l->lock, NULL);
 }
 
-fconc *l_find_or_put(list_t *l, args_t *args, char *path, int *is_found) {
+fconc *l_find_or_put(list_t *l, args_t *args, char *path) {
     fconc *value = NULL;
 
     pthread_mutex_lock(&l->lock);
@@ -28,7 +28,11 @@ fconc *l_find_or_put(list_t *l, args_t *args, char *path, int *is_found) {
     while (curr) {
         if (strcmp(curr->key, path) == 0) {
             value = curr->value;
-            *(is_found) = 1;
+
+            args->in_lock = value->recent_lock;
+            args->in_cond = value->recent_cond;
+            args->in_flag = value->recent_flag;
+            *args->out_flag = 0;
             break;
         }
         curr = curr->next;
@@ -41,8 +45,18 @@ fconc *l_find_or_put(list_t *l, args_t *args, char *path, int *is_found) {
             perror("malloc");
             return NULL;
         }
+        // Initialze value
         new->value = malloc(sizeof(fconc));
         strcpy(new->value->path, path);
+        args->path = new->value->path;
+        args->in_lock = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
+        args->in_cond = (pthread_cond_t *) malloc(sizeof(pthread_cond_t));
+        args->in_flag = (int *) malloc(sizeof(int));
+        pthread_mutex_init(args->in_lock, NULL);
+        pthread_cond_init(args->in_cond, NULL);
+        *args->in_flag = 1;
+
+        // Initialze key
         new->key = new->value->path;
 
         new->next = l->head;
@@ -50,6 +64,11 @@ fconc *l_find_or_put(list_t *l, args_t *args, char *path, int *is_found) {
 
         value = new->value;
     }
+
+    args->path = value->path;
+    value->recent_lock = args->out_lock;
+    value->recent_cond = args->out_cond;
+    value->recent_flag = args->out_flag;
 
     pthread_mutex_unlock(&l->lock);
 
@@ -66,7 +85,7 @@ void simulate_access() {
         sleep(1);
     } else {
         // sleep(6);
-        sleep(1);
+        sleep(2);
     }
 }
 
@@ -270,28 +289,7 @@ int main() {
         pthread_cond_init(args->out_cond, NULL);
         *args->out_flag = 0;
 
-        // Find file metadata
-        int is_found = 0;
-        fconc *fc = l_find_or_put(flist, args, split[PATH], &is_found);
-        if(is_found) {
-            args->in_lock = fc->recent_lock;
-            args->in_cond = fc->recent_cond;
-            args->in_flag = fc->recent_flag;
-            *args->out_flag = 0;
-        } else {
-            args->path = fc->path;
-            args->in_lock = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
-            args->in_cond = (pthread_cond_t *) malloc(sizeof(pthread_cond_t));
-            args->in_flag = (int *) malloc(sizeof(int));
-            pthread_mutex_init(args->in_lock, NULL);
-            pthread_cond_init(args->in_cond, NULL);
-
-            *args->in_flag = 1;
-        }
-        args->path = fc->path;
-        fc->recent_lock = args->out_lock;
-        fc->recent_cond = args->out_cond;
-        fc->recent_flag = args->out_flag;
+        fconc *fc = l_find_or_put(flist, args, split[PATH]);
 
         for (int i = 0; i < 3; i++)
             free(split[i]);
