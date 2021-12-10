@@ -49,27 +49,8 @@ fconc *l_lookup(list_t *l, char *key) {
 }
 
 /**
-    HELPER LIB
+ * HELPER LIB
 **/
-void get_input(char **split) {
-    char inp[MAX_INP_SIZE * 4];
-    if (scanf("%[^\n]%*c", inp) == EOF) { while (1) {} } // FIX THIS
-    int nspaces = 0;
-
-    // Get command
-    char *ptr = strtok(inp, " ");
-    strcpy(split[nspaces++], ptr);
-
-    // Get path
-    ptr = strtok(NULL, " ");
-    strcpy(split[nspaces++], ptr);
-
-    // Get write input
-    ptr = strtok(NULL, "");
-    if (ptr != NULL)
-        strcpy(split[nspaces], ptr);
-}
-
 void simulate_access() {
     // return;
     int prob = (rand() % 100);
@@ -199,7 +180,7 @@ void *worker_empty(void *_args) {
         fclose(to_file);
         pthread_mutex_unlock(&glocks[EMPTY]);
 
-        // empty
+        // Empty
         fclose(from_file);
         from_file = fopen(args->path, "w");
         fclose(from_file);
@@ -216,7 +197,29 @@ void *worker_empty(void *_args) {
 
 
 /**
-    MAIN
+ * MAIN HELPERS
+**/
+void get_input(char **split) {
+    char inp[MAX_INP_SIZE * 4];
+    if (scanf("%[^\n]%*c", inp) == EOF) { while (1) {} } // FIX THIS
+    int nspaces = 0;
+
+    // Get command
+    char *ptr = strtok(inp, " ");
+    strcpy(split[nspaces++], ptr);
+
+    // Get path
+    ptr = strtok(NULL, " ");
+    strcpy(split[nspaces++], ptr);
+
+    // Get write input
+    ptr = strtok(NULL, "");
+    if (ptr != NULL)
+        strcpy(split[nspaces], ptr);
+}
+
+/**
+ * MAIN
 **/
 int main() {
     for(int i = 0; i < N_GLOCKS; i++)
@@ -238,49 +241,37 @@ int main() {
 
         // Find file metadata
         fconc *fc = l_lookup(flist, split[PATH]);
+        args->out_lock = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
+        args->out_cond = (pthread_cond_t *) malloc(sizeof(pthread_cond_t));
+        args->out_flag = malloc(sizeof(int));
+        pthread_mutex_init(args->out_lock, NULL);
+        pthread_mutex_lock(args->out_lock);
+        pthread_cond_init(args->out_cond, NULL);
+        *args->out_flag = 0;
         if (fc == NULL) {
             fprintf(stderr, "%s not found\n", split[PATH]);
             args->in_lock = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
-            args->out_lock = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
             args->in_cond = (pthread_cond_t *) malloc(sizeof(pthread_cond_t));
-            args->out_cond = (pthread_cond_t *) malloc(sizeof(pthread_cond_t));
-            args->in_flag = malloc(sizeof(int));
-            args->out_flag = malloc(sizeof(int));
+            args->in_flag = (int *) malloc(sizeof(int));
             pthread_mutex_init(args->in_lock, NULL);
-            pthread_mutex_init(args->out_lock, NULL);
-            pthread_mutex_lock(args->out_lock);
             pthread_cond_init(args->in_cond, NULL);
-            pthread_cond_init(args->out_cond, NULL);
             *args->in_flag = 1;
-            *args->out_flag = 0;
 
             // Unique per file
             fc = malloc(sizeof(fconc));
             strcpy(fc->path, split[PATH]);
-            fc->recent_lock = args->out_lock;
-            fc->recent_cond = args->out_cond;
-            fc->recent_flag = args->out_flag;
-
-            args->path = fc->path;
             l_insert(flist, fc->path, fc);
         } else {
             fprintf(stderr, "%s found\n", split[PATH]);
             args->in_lock = fc->recent_lock;
-            args->out_lock = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
             args->in_cond = fc->recent_cond;
-            args->out_cond = (pthread_cond_t *) malloc(sizeof(pthread_cond_t));
             args->in_flag = fc->recent_flag;
-            args->out_flag = malloc(sizeof(int));
-            pthread_mutex_init(args->out_lock, NULL);
-            pthread_mutex_lock(args->out_lock);
-            pthread_cond_init(args->out_cond, NULL);
             *args->out_flag = 0;
-
-            args->path = fc->path;
-            fc->recent_lock = args->out_lock;
-            fc->recent_cond = args->out_cond;
-            fc->recent_flag = args->out_flag;
         }
+        args->path = fc->path;
+        fc->recent_lock = args->out_lock;
+        fc->recent_cond = args->out_cond;
+        fc->recent_flag = args->out_flag;
 
         // Spawn thread
         pthread_t tid; // we don't need to store all tids
