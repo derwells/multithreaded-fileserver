@@ -98,6 +98,10 @@ void *worker_write(void *_args) {
     pthread_cond_signal(args->out_cond);
 
     pthread_mutex_unlock(args->out_lock);
+    free(args->in_lock);
+    free(args->in_cond);
+    free(args->in_flag);
+    free(args);
 }
 
 
@@ -141,6 +145,10 @@ void *worker_read(void *_args) {
     pthread_cond_signal(args->out_cond);
 
     pthread_mutex_unlock(args->out_lock);
+    free(args->in_lock);
+    free(args->in_cond);
+    free(args->in_flag);
+    free(args);
 }
 
 
@@ -192,6 +200,10 @@ void *worker_empty(void *_args) {
     pthread_cond_signal(args->out_cond);
 
     pthread_mutex_unlock(args->out_lock);
+    free(args->in_lock);
+    free(args->in_cond);
+    free(args->in_flag);
+    free(args);
     rand_sleep(7, 10);
 }
 
@@ -273,6 +285,10 @@ int main() {
         fc->recent_cond = args->out_cond;
         fc->recent_flag = args->out_flag;
 
+        for (int i = 0; i < 3; i++)
+            free(split[i]);
+        free(split);
+
         // Spawn thread
         pthread_t tid; // we don't need to store all tids
         if (strcmp(args->action, "write") == 0) {
@@ -297,10 +313,6 @@ int main() {
         fclose(commands_file);
         // do i put fopen outside?
         // ADD TIMESTAMP
-
-        for (int i = 0; i < 3; i++)
-            free(split[i]);
-        free(split);
     }
 
     return 0;
