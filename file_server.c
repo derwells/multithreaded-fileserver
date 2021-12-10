@@ -10,7 +10,7 @@
 
 
 pthread_mutex_t glocks[N_GLOCKS];
-
+list_t *flist;
 
 /** 
  * LINKED LIST
@@ -49,6 +49,7 @@ fconc *l_find_or_put(list_t *l, args_t *args, char *path) {
         new->value = malloc(sizeof(fconc));
         strcpy(new->value->path, path);
         args->path = new->value->path;
+        fprintf(stderr, "Adding %s\n", new->value->path);
         args->in_lock = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
         args->in_cond = (pthread_cond_t *) malloc(sizeof(pthread_cond_t));
         args->in_flag = (int *) malloc(sizeof(int));
@@ -66,6 +67,7 @@ fconc *l_find_or_put(list_t *l, args_t *args, char *path) {
     }
 
     args->path = value->path;
+    value->recent_id = args->id;
     value->recent_lock = args->out_lock;
     value->recent_cond = args->out_cond;
     value->recent_flag = args->out_flag;
@@ -73,6 +75,42 @@ fconc *l_find_or_put(list_t *l, args_t *args, char *path) {
     pthread_mutex_unlock(&l->lock);
 
     return value;
+}
+
+void l_cleanup(list_t *l, args_t *args) {
+    fconc *value = NULL;
+    int for_cleanup = 0;
+
+    pthread_mutex_lock(&l->lock);
+    lnode_t *curr = l->head;
+    lnode_t *prev = NULL;
+
+    while (curr) {
+        if (strcmp(curr->key, args->path) == 0) {
+            if(curr->value->recent_id == args->id)
+                for_cleanup = 1;
+            break;
+        }
+        prev = curr;
+        curr = curr->next;
+    }
+
+    // List deletion
+    if (for_cleanup) {
+        if (curr == l->head) {
+            l->head = curr->next;
+        } else {
+            prev->next = curr->next;
+        }
+
+        fprintf(stderr, "Cleaning up %s\n", curr->value->path);
+        free(curr->value->recent_lock);
+        free(curr->value->recent_cond);
+        free(curr->value->recent_flag);
+        free(curr);
+    }
+
+    pthread_mutex_unlock(&l->lock);
 }
 
 /**
@@ -125,12 +163,13 @@ void *worker_write(void *_args) {
     pthread_cond_signal(args->out_cond);
 
     pthread_mutex_unlock(args->out_lock);
+    // Free
+    l_cleanup(flist, args);
     free(args->in_lock);
     free(args->in_cond);
     free(args->in_flag);
     free(args);
 
-    // Free
 }
 
 
@@ -174,10 +213,12 @@ void *worker_read(void *_args) {
     pthread_cond_signal(args->out_cond);
 
     pthread_mutex_unlock(args->out_lock);
+    l_cleanup(flist, args);
     free(args->in_lock);
     free(args->in_cond);
     free(args->in_flag);
     free(args);
+
 }
 
 
@@ -229,10 +270,12 @@ void *worker_empty(void *_args) {
     pthread_cond_signal(args->out_cond);
 
     pthread_mutex_unlock(args->out_lock);
+    l_cleanup(flist, args);
     free(args->in_lock);
     free(args->in_cond);
     free(args->in_flag);
     free(args);
+
     rand_sleep(7, 10);
 }
 
@@ -268,8 +311,10 @@ int main() {
         pthread_mutex_init(&glocks[i], NULL);
 
 
-    list_t *flist = malloc(sizeof(list_t));
+    flist = malloc(sizeof(list_t));
     l_init(flist);
+
+    int id = 0;
 
     while (1) {
         char **split = malloc(3 * sizeof(char *));
@@ -288,7 +333,9 @@ int main() {
         pthread_mutex_lock(args->out_lock); // Initialize as locked
         pthread_cond_init(args->out_cond, NULL);
         *args->out_flag = 0;
+        args->id = id;
 
+        fprintf(stderr, "Placing %s\n", split[PATH]);
         fconc *fc = l_find_or_put(flist, args, split[PATH]);
 
         for (int i = 0; i < 3; i++)
@@ -319,6 +366,8 @@ int main() {
         fclose(commands_file);
         // do i put fopen outside?
         // ADD TIMESTAMP
+
+        id++;
     }
 
     return 0;
