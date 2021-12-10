@@ -15,27 +15,24 @@
 #define N_GLOCKS 3
 
 
-typedef struct __command {
+typedef struct __args_t {
+    pthread_mutex_t *in_lock;
+    pthread_mutex_t *out_lock;
+    pthread_cond_t *in_cond;
+    pthread_cond_t *out_cond;
+    int *in_flag;
+    int *out_flag;
+
     char action[MAX_INP_SIZE + 1];
     char input[MAX_INP_SIZE + 1];
-} command;
-
-typedef struct __qnode_t {
-    command *cmd;
-    struct __qnode_t *next;
-} qnode_t;
-
-typedef struct __queue_t {
-    qnode_t *head;
-    qnode_t *tail;
-    pthread_mutex_t headLock;
-    pthread_mutex_t tailLock;
-} queue_t;
+    char *path;
+} args_t;
 
 typedef struct __file_sync {
-    pthread_mutex_t flock;
-    pthread_cond_t read, write, empty;
-    queue_t q;
+    pthread_mutex_t *recent_lock;
+    pthread_cond_t *recent_cond;
+    int *recent_flag;
+
     char path[MAX_INP_SIZE + 1];
 } fconc;
 
