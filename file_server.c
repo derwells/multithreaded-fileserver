@@ -325,7 +325,8 @@ int main() {
         get_input(split);
         args_t *args = malloc(sizeof(args_t));
         strcpy(args->action, split[ACTION]);
-        strcpy(args->input, split[INPUT]);
+        if (strcmp(args->action, "write") == 0)
+            strcpy(args->input, split[INPUT]);
 
         args->out_lock = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
         args->out_cond = (pthread_cond_t *) malloc(sizeof(pthread_cond_t));
@@ -352,6 +353,7 @@ int main() {
         } else if (strcmp(args->action, "empty") == 0) {
             pthread_create(&tid, NULL, worker_empty, args);
         }
+        pthread_detach(tid); // Is this ok?
 
         // Write to commands.txt
         FILE *commands_file = fopen("commands.txt", "a");
