@@ -20,7 +20,7 @@ void l_init(list_t *l) {
     pthread_mutex_init(&l->lock, NULL);
 }
 
-fconc *l_lookup_or_put(list_t *l, args_t *args, char *path, int *is_found) {
+fconc *l_find_or_put(list_t *l, args_t *args, char *path, int *is_found) {
     fconc *value = NULL;
 
     pthread_mutex_lock(&l->lock);
@@ -272,7 +272,7 @@ int main() {
 
         // Find file metadata
         int is_found = 0;
-        fconc *fc = l_lookup_or_put(flist, args, split[PATH], &is_found);
+        fconc *fc = l_find_or_put(flist, args, split[PATH], &is_found);
         if(is_found) {
             args->in_lock = fc->recent_lock;
             args->in_cond = fc->recent_cond;
