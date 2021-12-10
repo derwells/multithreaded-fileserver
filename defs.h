@@ -16,6 +16,8 @@
 
 
 typedef struct __args_t {
+    int id;
+
     pthread_mutex_t *in_lock;
     pthread_mutex_t *out_lock;
     pthread_cond_t *in_cond;
@@ -29,6 +31,8 @@ typedef struct __args_t {
 } args_t;
 
 typedef struct __file_sync {
+    int recent_id;
+
     pthread_mutex_t *recent_lock;
     pthread_cond_t *recent_cond;
     int *recent_flag;

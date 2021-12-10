@@ -107,6 +107,7 @@ void l_cleanup(list_t *l, args_t *args) {
         free(curr->value->recent_lock);
         free(curr->value->recent_cond);
         free(curr->value->recent_flag);
+        free(curr->value);
         free(curr);
     }
 
