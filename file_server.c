@@ -15,7 +15,7 @@ pthread_mutex_t glocks[N_GLOCKS];
  * QUEUE
 **/
 void queue_init(queue_t *q) {
-    node_t *tmp = malloc(sizeof(node_t));
+    qnode_t *tmp = malloc(sizeof(qnode_t));
     tmp->next = NULL;
     q->head = q->tail = tmp;
     pthread_mutex_init(&q->headLock, NULL);
@@ -24,7 +24,7 @@ void queue_init(queue_t *q) {
 
 
 void q_put(queue_t *q, command *cmd) {
-    node_t *tmp = malloc(sizeof(node_t));
+    qnode_t *tmp = malloc(sizeof(qnode_t));
     assert(tmp != NULL);
     tmp->cmd = cmd;
     tmp->next = NULL;
@@ -38,8 +38,8 @@ void q_put(queue_t *q, command *cmd) {
 
 int q_peekget(queue_t *q, command *cmd_out, char *action) {
     pthread_mutex_lock(&q->headLock);
-    node_t *tmp = q->head;
-    node_t *newHead = tmp->next;
+    qnode_t *tmp = q->head;
+    qnode_t *newHead = tmp->next;
 
     if (newHead == NULL) {
         pthread_mutex_unlock(&q->headLock);
@@ -63,7 +63,7 @@ int q_peekget(queue_t *q, command *cmd_out, char *action) {
 int q_peek(queue_t *q) {
     pthread_mutex_lock(&q->headLock);
     int ret = -1;
-    node_t *top = q->head->next;
+    qnode_t *top = q->head->next;
 
     if (top == NULL) {
         pthread_mutex_unlock(&q->headLock);
