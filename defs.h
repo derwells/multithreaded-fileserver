@@ -17,13 +17,12 @@
 
 typedef struct __command {
     char action[MAX_INP_SIZE + 1];
-    char path[MAX_INP_SIZE + 1];
     char input[MAX_INP_SIZE + 1];
 } command;
 
 typedef struct __qnode_t {
     command *cmd;
-       struct __qnode_t *next;
+    struct __qnode_t *next;
 } qnode_t;
 
 typedef struct __queue_t {
@@ -37,6 +36,7 @@ typedef struct __file_sync {
     pthread_mutex_t flock;
     pthread_cond_t read, write, empty;
     queue_t q;
+    char path[MAX_INP_SIZE + 1];
 } fconc;
 
 typedef struct __lnode_t {

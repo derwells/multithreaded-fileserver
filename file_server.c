@@ -122,7 +122,7 @@ fconc *l_lookup(list_t *l, char *key) {
 /**
  * FILE METADATA
 **/
-void fconc_init(fconc *f) {
+void fconc_init(fconc *f, char path[]) {
     queue_init(&f->q);
 
     pthread_mutex_init(&f->flock, NULL);
@@ -130,6 +130,8 @@ void fconc_init(fconc *f) {
     pthread_cond_init(&f->read, NULL);
     pthread_cond_init(&f->write, NULL);
     pthread_cond_init(&f->empty, NULL);
+
+    strcpy(f->path, path);
 }
 
 /**
@@ -201,10 +203,10 @@ void *worker_write(void *_args) {
         pthread_cond_wait(&args->write, &args->flock);
 
     simulate_access();
-    fprintf(stderr, "[START] %s: %s %s\n", cmd.action, cmd.path, cmd.input);
+    fprintf(stderr, "[START] %s: %s %s\n", cmd.action, args->path, cmd.input);
 
     FILE *target_file;
-    target_file = fopen(cmd.path, "a");
+    target_file = fopen(args->path, "a");
     if (target_file == NULL) {
         fprintf(stderr, "[ERR] worker_write fopen\n");
         exit(1);
@@ -231,19 +233,19 @@ void *worker_read(void *_args) {
 
     FILE *from_file, *to_file;
 
-    fprintf(stderr, "[START] %s %s\n", cmd.action, cmd.path);
-    from_file = fopen(cmd.path, "r");
+    fprintf(stderr, "[START] %s %s\n", cmd.action, args->path);
+    from_file = fopen(args->path, "r");
 
     if (from_file == NULL) {
         pthread_mutex_lock(&glocks[READ]);
         to_file = fopen("read.txt", "a");
-        fprintf(to_file, "%s %s: FILE DNE\n", cmd.action, cmd.path);
+        fprintf(to_file, "%s %s: FILE DNE\n", cmd.action, args->path);
         fclose(to_file);
         pthread_mutex_unlock(&glocks[READ]);
     } else {
         pthread_mutex_lock(&glocks[READ]);
         to_file = fopen("read.txt", "a");
-        fprintf(to_file, "%s %s: ", cmd.action, cmd.path);
+        fprintf(to_file, "%s %s: ", cmd.action, args->path);
         int copy;
         while ((copy = fgetc(from_file)) != EOF)
             fputc(copy, to_file);
@@ -259,7 +261,7 @@ void *worker_read(void *_args) {
     flex_cond_signal(args);
     pthread_mutex_unlock(&args->flock);
 
-    fprintf(stderr, "[END] %s: %s\n", cmd.action, cmd.path);
+    fprintf(stderr, "[END] %s: %s\n", cmd.action, args->path);
 }
 
 
@@ -273,13 +275,13 @@ void *worker_empty(void *_args) {
         pthread_cond_wait(&args->empty, &args->flock);
 
     FILE *from_file, *to_file;
-    fprintf(stderr, "[START] %s %s\n", cmd.action, cmd.path);
-    from_file = fopen(cmd.path, "r");
+    fprintf(stderr, "[START] %s %s\n", cmd.action, args->path);
+    from_file = fopen(args->path, "r");
 
     if (from_file == NULL) {
         pthread_mutex_lock(&glocks[EMPTY]);
         to_file = fopen("empty.txt", "a");
-        fprintf(to_file, "%s %s: FILE DNE\n", cmd.action, cmd.path);
+        fprintf(to_file, "%s %s: FILE DNE\n", cmd.action, args->path);
         fclose(to_file);
         pthread_mutex_unlock(&glocks[EMPTY]);
     } else {
@@ -287,9 +289,9 @@ void *worker_empty(void *_args) {
         to_file = fopen("empty.txt", "a");
         int copy;
         if ((copy = fgetc(from_file)) == EOF) {
-            fprintf(to_file, "%s %s: FILE DNE\n", cmd.action, cmd.path);
+            fprintf(to_file, "%s %s: FILE DNE\n", cmd.action, args->path);
         } else {
-            fprintf(to_file, "%s %s: ", cmd.action, cmd.path);
+            fprintf(to_file, "%s %s: ", cmd.action, args->path);
             fputc(copy, to_file); // sleep per character???
             while ((copy = fgetc(from_file)) != EOF)
                 fputc(copy, to_file);
@@ -302,7 +304,7 @@ void *worker_empty(void *_args) {
 
         // empty
         fclose(from_file);
-        from_file = fopen(cmd.path, "w");
+        from_file = fopen(args->path, "w");
         fclose(from_file);
     }
 
@@ -310,7 +312,7 @@ void *worker_empty(void *_args) {
     pthread_mutex_unlock(&args->flock);
 
     rand_sleep(7, 10);
-    fprintf(stderr, "[END] %s: %s\n", cmd.action, cmd.input);
+    fprintf(stderr, "[END] %s: %s\n", cmd.action, args->path);
 }
 
 
@@ -330,25 +332,20 @@ int main() {
         for (int i = 0; i < 3; i++)
             split[i] = malloc((MAX_INP_SIZE + 1) * sizeof(char)); // free afterwards in thread
 
-        command *cmd = malloc(sizeof(command));
         get_input(split);
-        strcpy(cmd->action, split[ACTION]);
-        strcpy(cmd->path, split[PATH]);
-        strcpy(cmd->input, split[INPUT]);
 
-        for (int i = 0; i < 3; i++)
-            free(split[i]);
-        free(split);
-
-        fconc *fc = l_lookup(flist, cmd->path);
+        fconc *fc = l_lookup(flist, split[PATH]);
         if (fc == NULL) {
             // Unique per file
             fc = malloc(sizeof(fconc));
-            fconc_init(fc);
+            fconc_init(fc, split[PATH]);
 
-            l_insert(flist, cmd->path, fc);
+            l_insert(flist, fc->path, fc);
         }
 
+        command *cmd = malloc(sizeof(command));
+        strcpy(cmd->action, split[ACTION]);
+        strcpy(cmd->input, split[INPUT]);
         fprintf(stderr, "Enqueue %s %s\n", cmd->action, cmd->input);
         q_put(&fc->q, cmd);
 
@@ -367,13 +364,17 @@ int main() {
             exit(1);
         }
         if (strcmp(cmd->action, "write") == 0) {
-            fprintf(commands_file, "%s %s %s\n", cmd->action, cmd->path, cmd->input);
+            fprintf(commands_file, "%s %s %s\n", cmd->action, fc->path, cmd->input);
         } else {
-            fprintf(commands_file, "%s %s\n", cmd->action, cmd->path);
+            fprintf(commands_file, "%s %s\n", cmd->action, fc->path);
         }
         fclose(commands_file);
         // do i put fopen outside?
         // ADD TIMESTAMP
+
+        for (int i = 0; i < 3; i++)
+            free(split[i]);
+        free(split);
     }
 
     return 0;
