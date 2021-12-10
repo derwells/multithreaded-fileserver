@@ -50,11 +50,11 @@ int q_peekget(queue_t *q, command *cmd_out, char *action) {
         pthread_mutex_unlock(&q->headLock);
         return 1;
     }
-
-    *cmd_out = *(newHead->cmd);
+    memcpy(cmd_out, newHead->cmd, sizeof(command));
     q->head = newHead;
     pthread_mutex_unlock(&q->headLock);
-
+    fprintf(stderr, "QT Freeing %p\n", tmp);
+    free(tmp->cmd);
     free(tmp);
     return 0;
 }
@@ -217,7 +217,7 @@ void *worker_write(void *_args) {
     flex_cond_signal(args);
     pthread_mutex_unlock(&args->flock);
 
-    fprintf(stderr, "[END] %s: %s\n", cmd.action, cmd.input);
+    fprintf(stderr, "[END] %s: %s %s; freeing %p\n", cmd.action, args->path, cmd.input, args);
 }
 
 
@@ -310,9 +310,8 @@ void *worker_empty(void *_args) {
 
     flex_cond_signal(args);
     pthread_mutex_unlock(&args->flock);
-
-    rand_sleep(7, 10);
     fprintf(stderr, "[END] %s: %s\n", cmd.action, args->path);
+    rand_sleep(7, 10);
 }
 
 
