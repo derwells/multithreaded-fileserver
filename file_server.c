@@ -20,34 +20,37 @@ void l_init(list_t *l) {
     pthread_mutex_init(&l->lock, NULL);
 }
 
-void l_insert(list_t *l, char *key, fconc *value) {
-    lnode_t *new = malloc(sizeof(lnode_t));
-
-    if (new == NULL) {
-        perror("malloc");
-        return;
-    }
-    new->key = key;
-    new->value = value;
-
-    pthread_mutex_lock(&l->lock);
-    new->next = l->head;
-    l->head = new;
-    pthread_mutex_unlock(&l->lock);
-}
-
-fconc *l_lookup(list_t *l, char *key) {
+fconc *l_lookup_or_put(list_t *l, args_t *args, char *path, int *is_found) {
     fconc *value = NULL;
 
     pthread_mutex_lock(&l->lock);
     lnode_t *curr = l->head;
     while (curr) {
-        if (strcmp(curr->key, key) == 0) {
+        if (strcmp(curr->key, path) == 0) {
             value = curr->value;
+            *(is_found) = 1;
             break;
         }
         curr = curr->next;
     }
+
+    // Not found, insert
+    if (value == NULL) {
+        lnode_t *new = malloc(sizeof(lnode_t));
+        if (new == NULL) {
+            perror("malloc");
+            return NULL;
+        }
+        new->value = malloc(sizeof(fconc));
+        strcpy(new->value->path, path);
+        new->key = new->value->path;
+
+        new->next = l->head;
+        l->head = new;
+
+        value = new->value;
+    }
+
     pthread_mutex_unlock(&l->lock);
 
     return value;
@@ -107,6 +110,8 @@ void *worker_write(void *_args) {
     free(args->in_cond);
     free(args->in_flag);
     free(args);
+
+    // Free
 }
 
 
@@ -219,20 +224,21 @@ void *worker_empty(void *_args) {
 void get_input(char **split) {
     char inp[MAX_INP_SIZE * 4];
     if (scanf("%[^\n]%*c", inp) == EOF) { while (1) {} } // FIX THIS
-    int nspaces = 0;
 
     // Get command
     char *ptr = strtok(inp, " ");
-    strcpy(split[nspaces++], ptr);
+    strcpy(split[ACTION], ptr);
 
     // Get path
     ptr = strtok(NULL, " ");
-    strcpy(split[nspaces++], ptr);
+    strcpy(split[PATH], ptr);
 
     // Get write input
     ptr = strtok(NULL, "");
     if (ptr != NULL)
-        strcpy(split[nspaces], ptr);
+        strcpy(split[INPUT], ptr);
+
+    return;
 }
 
 /**
@@ -256,34 +262,31 @@ int main() {
         strcpy(args->action, split[ACTION]);
         strcpy(args->input, split[INPUT]);
 
-        // Find file metadata
-        fconc *fc = l_lookup(flist, split[PATH]);
         args->out_lock = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
         args->out_cond = (pthread_cond_t *) malloc(sizeof(pthread_cond_t));
         args->out_flag = malloc(sizeof(int));
         pthread_mutex_init(args->out_lock, NULL);
-        pthread_mutex_lock(args->out_lock);
+        pthread_mutex_lock(args->out_lock); // Initialize as locked
         pthread_cond_init(args->out_cond, NULL);
         *args->out_flag = 0;
-        if (fc == NULL) {
-            fprintf(stderr, "%s not found\n", split[PATH]);
+
+        // Find file metadata
+        int is_found = 0;
+        fconc *fc = l_lookup_or_put(flist, args, split[PATH], &is_found);
+        if(is_found) {
+            args->in_lock = fc->recent_lock;
+            args->in_cond = fc->recent_cond;
+            args->in_flag = fc->recent_flag;
+            *args->out_flag = 0;
+        } else {
+            args->path = fc->path;
             args->in_lock = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
             args->in_cond = (pthread_cond_t *) malloc(sizeof(pthread_cond_t));
             args->in_flag = (int *) malloc(sizeof(int));
             pthread_mutex_init(args->in_lock, NULL);
             pthread_cond_init(args->in_cond, NULL);
-            *args->in_flag = 1;
 
-            // Unique per file
-            fc = malloc(sizeof(fconc));
-            strcpy(fc->path, split[PATH]);
-            l_insert(flist, fc->path, fc);
-        } else {
-            fprintf(stderr, "%s found\n", split[PATH]);
-            args->in_lock = fc->recent_lock;
-            args->in_cond = fc->recent_cond;
-            args->in_flag = fc->recent_flag;
-            *args->out_flag = 0;
+            *args->in_flag = 1;
         }
         args->path = fc->path;
         fc->recent_lock = args->out_lock;
