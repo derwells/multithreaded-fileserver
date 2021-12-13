@@ -17,13 +17,11 @@ list_t *flist;
 **/
 void l_init(list_t *l) {
     l->head = NULL;
-    pthread_mutex_init(&l->lock, NULL);
 }
 
 fconc *l_find_or_put(list_t *l, args_t *args, char *path) {
     fconc *value = NULL;
 
-    pthread_mutex_lock(&l->lock);
     lnode_t *curr = l->head;
     while (curr) {
         if (strcmp(curr->key, path) == 0) {
@@ -72,46 +70,7 @@ fconc *l_find_or_put(list_t *l, args_t *args, char *path) {
     value->recent_cond = args->out_cond;
     value->recent_flag = args->out_flag;
 
-    pthread_mutex_unlock(&l->lock);
-
     return value;
-}
-
-void l_cleanup(list_t *l, args_t *args) {
-    fconc *value = NULL;
-    int for_cleanup = 0;
-
-    pthread_mutex_lock(&l->lock);
-    lnode_t *curr = l->head;
-    lnode_t *prev = NULL;
-
-    while (curr) {
-        if (strcmp(curr->key, args->path) == 0) {
-            if(curr->value->recent_id == args->id)
-                for_cleanup = 1;
-            break;
-        }
-        prev = curr;
-        curr = curr->next;
-    }
-
-    // List deletion
-    if (for_cleanup) {
-        if (curr == l->head) {
-            l->head = curr->next;
-        } else {
-            prev->next = curr->next;
-        }
-
-        fprintf(stderr, "Cleaning up %s\n", curr->value->path);
-        free(curr->value->recent_lock);
-        free(curr->value->recent_cond);
-        free(curr->value->recent_flag);
-        free(curr->value);
-        free(curr);
-    }
-
-    pthread_mutex_unlock(&l->lock);
 }
 
 /**
@@ -124,7 +83,7 @@ void simulate_access() {
         sleep(1);
     } else {
         // sleep(6);
-        sleep(2);
+        sleep(6);
     }
 }
 
@@ -165,7 +124,6 @@ void *worker_write(void *_args) {
 
     pthread_mutex_unlock(args->out_lock);
     // Free
-    l_cleanup(flist, args);
     free(args->in_lock);
     free(args->in_cond);
     free(args->in_flag);
@@ -214,7 +172,6 @@ void *worker_read(void *_args) {
     pthread_cond_signal(args->out_cond);
 
     pthread_mutex_unlock(args->out_lock);
-    l_cleanup(flist, args);
     free(args->in_lock);
     free(args->in_cond);
     free(args->in_flag);
@@ -271,7 +228,6 @@ void *worker_empty(void *_args) {
     pthread_cond_signal(args->out_cond);
 
     pthread_mutex_unlock(args->out_lock);
-    l_cleanup(flist, args);
     free(args->in_lock);
     free(args->in_cond);
     free(args->in_flag);
