@@ -7,12 +7,22 @@
 #define PATH 1
 #define INPUT 2
 
-#define READ 0
-#define WRITE 1
-#define EMPTY 2
+#define READ_GLOCK 0
+#define WRITE_GLOCK 1
+#define EMPTY_GLOCK 2
 
 #define MAX_INP_SIZE 50
 #define N_GLOCKS 3
+
+#define EMPTY_TARGET "empty.txt"
+#define EMPTY_MODE "a"
+#define READ_TARGET "read.txt"
+#define READ_MODE "a"
+
+#define FMT_2HIT "%s %s: "
+#define FMT_3HIT "%s %s %s: "
+#define FMT_READ_MISS "%s %s: FILE DNE\n"
+#define FMT_EMPTY_MISS "%s %s: FILE ALREADY EMPTY\n"
 
 
 typedef struct __args_t {

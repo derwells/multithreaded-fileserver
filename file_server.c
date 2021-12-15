@@ -13,6 +13,7 @@
 pthread_mutex_t glocks[N_GLOCKS];
 list_t *flist;
 
+
 void l_init(list_t *l) {
     l->head = NULL;
 }
@@ -74,6 +75,48 @@ void r_sleep_range(int min, int max) {
     sleep(sleep_time);
 }
 
+void header_2cmd(FILE* to_file, args_t *args) {
+    fprintf(
+        to_file, 
+        FMT_2HIT,
+        args->action,
+        args->path
+    );
+}
+
+void header_3cmd(FILE* to_file, args_t *args) {
+    fprintf(
+        to_file, 
+        FMT_3HIT, 
+        args->action,
+        args->path,
+        args->input
+    );
+}
+
+FILE *open_read() {
+    return fopen(READ_TARGET, READ_MODE);
+}
+
+FILE *open_empty() {
+    return fopen(EMPTY_TARGET, EMPTY_MODE);
+}
+
+void copy_f2f(FILE* to_file, FILE* from_file) {
+    // Must hold to_file and from_file locks
+
+    // Read contents
+    int copy;
+    while ((copy = fgetc(from_file)) != EOF)
+        fputc(copy, to_file);
+    fputc(10, to_file); // Place newline
+}
+
+void empty_file(char *path) {
+    // Must hold target_file lock
+    FILE *target_file = fopen(path, "w");
+    fclose(target_file);
+}
 
 void *worker_write(void *_args) {
     // Typecast void into args_t
@@ -131,29 +174,26 @@ void *worker_read(void *_args) {
     if (from_file == NULL) {
         // If file doesn't exist
 
-        pthread_mutex_lock(&glocks[READ]);
-        to_file = fopen("read.txt", "a");
+        pthread_mutex_lock(&glocks[READ_GLOCK]);
+        to_file = open_read();
 
         // Header
-        fprintf(to_file, "%s %s: FILE DNE\n", args->action, args->path);
+        fprintf(to_file, FMT_READ_MISS, args->action, args->path);
         fclose(to_file);
-        pthread_mutex_unlock(&glocks[READ]);
+        pthread_mutex_unlock(&glocks[READ_GLOCK]);
     } else {
         // File exists
-        pthread_mutex_lock(&glocks[READ]);
-        to_file = fopen("read.txt", "a");
+        pthread_mutex_lock(&glocks[READ_GLOCK]);
+        to_file = open_read();
         
         // Header
-        fprintf(to_file, "%s %s: ", args->action, args->path);
+        header_2cmd(to_file, args);
 
         // Read contents
-        int copy;
-        while ((copy = fgetc(from_file)) != EOF)
-            fputc(copy, to_file);
-        fputc(10, to_file); // Place newline
+        copy_f2f(to_file, from_file);
 
         fclose(to_file);
-        pthread_mutex_unlock(&glocks[READ]);
+        pthread_mutex_unlock(&glocks[READ_GLOCK]);
 
         fclose(from_file);
     }
@@ -189,43 +229,31 @@ void *worker_empty(void *_args) {
     if (from_file == NULL) {
         // If file doesn't exist
     
-        pthread_mutex_lock(&glocks[EMPTY]);
-        to_file = fopen("empty.txt", "a");
+        pthread_mutex_lock(&glocks[EMPTY_GLOCK]);
+        to_file = open_empty();
 
         // Header
-        fprintf(to_file, "%s %s: FILE ALREADY EMPTY\n", args->action, args->path);
+        fprintf(to_file, FMT_EMPTY_MISS, args->action, args->path);
         fclose(to_file);
-        pthread_mutex_unlock(&glocks[EMPTY]);
+        pthread_mutex_unlock(&glocks[EMPTY_GLOCK]);
     } else {
         // File exists
-        pthread_mutex_lock(&glocks[EMPTY]);
-        to_file = fopen("empty.txt", "a");
+        pthread_mutex_lock(&glocks[EMPTY_GLOCK]);
+        to_file = open_empty();
+
+        // Place header
+        header_2cmd(to_file, args);
 
         // Read contents
-        int copy;
-        if ((copy = fgetc(from_file)) == EOF) {
-            // File exists but empty (!!!)
-            fprintf(to_file, "%s %s: FILE ALREADY EMPTY\n", args->action, args->path);
-        } else {
-            // File exists and not empty
+        copy_f2f(to_file, from_file);
 
-            // Header
-            fprintf(to_file, "%s %s: ", args->action, args->path);
-
-            // Read contents
-            fputc(copy, to_file);
-            while ((copy = fgetc(from_file)) != EOF)
-                fputc(copy, to_file);
-            fputc(10, to_file); // Place newline
-        }
         fclose(to_file);
-        pthread_mutex_unlock(&glocks[EMPTY]);
+        pthread_mutex_unlock(&glocks[EMPTY_GLOCK]);
 
         // Empty contents
         fclose(from_file);
-        from_file = fopen(args->path, "w");
-        fclose(from_file);
-        
+        empty_file(args->path);
+
         // Sleep for 7-10 seconds
         r_sleep_range(7, 10);
     }
@@ -262,7 +290,8 @@ void get_input(char **split) {
 
 
 int main() {
-    for(int i = 0; i < N_GLOCKS; i++)
+    int i;
+    for (i = 0; i < N_GLOCKS; i++)
         pthread_mutex_init(&glocks[i], NULL);
 
 
@@ -271,7 +300,7 @@ int main() {
 
     while (1) {
         char **split = malloc(3 * sizeof(char *));
-        for (int i = 0; i < 3; i++)
+        for (i = 0; i < 3; i++)
             split[i] = malloc((MAX_INP_SIZE + 1) * sizeof(char)); // free afterwards in thread
 
         get_input(split);
@@ -312,7 +341,7 @@ int main() {
         fc->recent_lock = args->out_lock;
 
         // Free split, not needed
-        for (int i = 0; i < 3; i++)
+        for (i = 0; i < 3; i++)
             free(split[i]);
         free(split);
 
