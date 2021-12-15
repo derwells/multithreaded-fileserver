@@ -11,7 +11,8 @@
 #define WRITE_GLOCK 1
 #define EMPTY_GLOCK 2
 
-#define MAX_INP_SIZE 50
+#define MAX_INPUT_SIZE 51
+#define MAX_ACTION_SIZE 6
 #define N_GLOCKS 3
 
 #define EMPTY_TARGET "empty.txt"
@@ -29,9 +30,9 @@
 
 
 typedef struct __cmd {
-    char action[5 + 1];
-    char input[MAX_INP_SIZE + 1];
-    char path[MAX_INP_SIZE + 1];
+    char action[MAX_ACTION_SIZE];
+    char input[MAX_INPUT_SIZE];
+    char path[MAX_INPUT_SIZE];
 } command;
 
 typedef struct __thread_args {
@@ -45,7 +46,7 @@ typedef struct __thread_args {
 typedef struct __file_metadata {
     pthread_mutex_t *recent_lock;
 
-    char path[MAX_INP_SIZE + 1];
+    char path[MAX_INPUT_SIZE];
 } fmeta;
 
 typedef struct __lnode_t {

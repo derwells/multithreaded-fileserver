@@ -145,6 +145,7 @@ void *worker_write(void *_args) {
     free(args->in_lock);
     free(args);
 
+    pthread_exit(NULL);
 }
 
 
@@ -203,6 +204,7 @@ void *worker_read(void *_args) {
     free(args->in_lock);
     free(args);
 
+    pthread_exit(NULL);
 }
 
 
@@ -261,11 +263,13 @@ void *worker_empty(void *_args) {
     free(args->cmd);
     free(args->in_lock);
     free(args);
+
+    pthread_exit(NULL);
 }
 
 
 void get_command(command *cmd) {
-    char inp[MAX_INP_SIZE * 4];
+    char inp[MAX_INPUT_SIZE*2 + MAX_ACTION_SIZE];
     if (scanf("%[^\n]%*c", inp) == EOF) { while (1) {} } // FIX THIS
 
     // Get command
