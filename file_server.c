@@ -11,7 +11,7 @@
 
 
 pthread_mutex_t glocks[N_GLOCKS];
-list_t *flist;
+list_t *tracker;
 
 
 void l_init(list_t *l) {
@@ -75,22 +75,32 @@ void r_sleep_range(int min, int max) {
     sleep(sleep_time);
 }
 
-void header_2cmd(FILE* to_file, args_t *args) {
+void header_2cmd(FILE* to_file, command *cmd) {
     fprintf(
         to_file, 
         FMT_2HIT,
-        args->action,
-        args->path
+        cmd->action,
+        cmd->path
     );
 }
 
-void header_3cmd(FILE* to_file, args_t *args) {
+void header_3cmd(FILE* to_file, command *cmd) {
     fprintf(
         to_file, 
         FMT_3HIT, 
-        args->action,
-        args->path,
-        args->input
+        cmd->action,
+        cmd->path,
+        cmd->input
+    );
+}
+
+void header_3cmd(FILE* to_file, command *cmd) {
+    fprintf(
+        to_file, 
+        FMT_3HIT, 
+        cmd->action,
+        cmd->path,
+        cmd->input
     );
 }
 
@@ -121,17 +131,18 @@ void empty_file(char *path) {
 void *worker_write(void *_args) {
     // Typecast void into args_t
     args_t *args = (args_t *)_args;
+    command *cmd = args->cmd;
 
     // Crtical section start
     pthread_mutex_lock(args->in_lock);
 
 
-    fprintf(stderr, "[START] %s %s %s\n", args->action, args->path, args->input);
+    fprintf(stderr, "[START] %s %s %s\n", cmd->action, cmd->path, cmd->input);
     
     // Access file
     r_simulate_access();
     FILE *target_file;
-    target_file = fopen(args->path, "a");
+    target_file = fopen(cmd->path, "a");
 
     // Error handling
     if (target_file == NULL) {
@@ -140,16 +151,17 @@ void *worker_write(void *_args) {
     }
 
     // Write to file
-    sleep(0.025 * strlen(args->input));
-    fprintf(target_file, "%s", args->input);
+    sleep(0.025 * strlen(cmd->input));
+    fprintf(target_file, "%s", cmd->input);
     fclose(target_file);
-    fprintf(stderr, "[END] %s %s %s\n", args->action, args->path, args->input);
+    fprintf(stderr, "[END] %s %s %s\n", cmd->action, cmd->path, cmd->input);
 
 
     // Critical section end
     pthread_mutex_unlock(args->out_lock);
 
     // Free
+    free(args->cmd);
     free(args->in_lock);
     free(args);
 
@@ -159,16 +171,17 @@ void *worker_write(void *_args) {
 void *worker_read(void *_args) {
     // Typecast void into args_t
     args_t *args = (args_t *)_args;
+    command *cmd = args->cmd;
 
     // Critical section start
     pthread_mutex_lock(args->in_lock);
 
-    fprintf(stderr, "[START] %s %s\n", args->action, args->path);
+    fprintf(stderr, "[START] %s %s\n", cmd->action, cmd->path);
 
     // Access file
     r_simulate_access();
     FILE *from_file, *to_file;
-    from_file = fopen(args->path, "r");
+    from_file = fopen(cmd->path, "r");
 
     // Read file
     if (from_file == NULL) {
@@ -178,7 +191,7 @@ void *worker_read(void *_args) {
         to_file = open_read();
 
         // Header
-        fprintf(to_file, FMT_READ_MISS, args->action, args->path);
+        fprintf(to_file, FMT_READ_MISS, cmd->action, cmd->path);
         fclose(to_file);
         pthread_mutex_unlock(&glocks[READ_GLOCK]);
     } else {
@@ -200,12 +213,13 @@ void *worker_read(void *_args) {
 
     // Critical section end
 
-    fprintf(stderr, "[END] %s %s\n", args->action, args->path);
+    fprintf(stderr, "[END] %s %s\n", cmd->action, cmd->path);
 
     // Critical section end
     pthread_mutex_unlock(args->out_lock);
 
     // Free uneeded args
+    free(args->cmd);
     free(args->in_lock);
     free(args);
 
@@ -215,15 +229,16 @@ void *worker_read(void *_args) {
 void *worker_empty(void *_args) {
     // Typecast void into args_t
     args_t *args = (args_t *)_args;
+    command *cmd = args->cmd;
 
     // Critical section start
     pthread_mutex_lock(args->in_lock);
-    fprintf(stderr, "[START] %s %s\n", args->action, args->path);
+    fprintf(stderr, "[START] %s %s\n", cmd->action, cmd->path);
 
     // Access file
     r_simulate_access();
     FILE *from_file, *to_file;
-    from_file = fopen(args->path, "r");
+    from_file = fopen(cmd->path, "r");
 
     // Start manipulating file
     if (from_file == NULL) {
@@ -233,7 +248,7 @@ void *worker_empty(void *_args) {
         to_file = open_empty();
 
         // Header
-        fprintf(to_file, FMT_EMPTY_MISS, args->action, args->path);
+        fprintf(to_file, FMT_EMPTY_MISS, cmd->action, cmd->path);
         fclose(to_file);
         pthread_mutex_unlock(&glocks[EMPTY_GLOCK]);
     } else {
@@ -252,128 +267,163 @@ void *worker_empty(void *_args) {
 
         // Empty contents
         fclose(from_file);
-        empty_file(args->path);
+        empty_file(cmd->path);
 
         // Sleep for 7-10 seconds
         r_sleep_range(7, 10);
     }
-    fprintf(stderr, "[END] %s %s\n", args->action, args->path);
+    fprintf(stderr, "[END] %s %s\n", cmd->action, cmd->path);
 
     // Critical section end
     pthread_mutex_unlock(args->out_lock);
 
     // Free uneeded args
+    free(args->cmd);
     free(args->in_lock);
     free(args);
 }
 
 
-void get_input(char **split) {
+void get_command(command *cmd) {
     char inp[MAX_INP_SIZE * 4];
     if (scanf("%[^\n]%*c", inp) == EOF) { while (1) {} } // FIX THIS
 
     // Get command
     char *ptr = strtok(inp, " ");
-    strcpy(split[ACTION], ptr);
+    strcpy(cmd->action, ptr);
 
     // Get path
     ptr = strtok(NULL, " ");
-    strcpy(split[PATH], ptr);
+    strcpy(cmd->path, ptr);
 
     // Get write input
     ptr = strtok(NULL, "");
     if (ptr != NULL)
-        strcpy(split[INPUT], ptr);
+        strcpy(cmd->input, ptr);
 
     return;
 }
 
+void command_copy(command *to, command *from) {
+    // Deep copy
+
+    strcpy(to->action, from->action);
+    strcpy(to->input, from->input);
+    strcpy(to->path, from->path);
+}
+
+void args_init(args_t *args, command *cmd) {
+    args->out_lock = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
+    pthread_mutex_init(args->out_lock, NULL);
+
+    // Next thread can't run immediately
+    pthread_mutex_lock(args->out_lock);
+
+    // Deep copy cmd
+    args->cmd = malloc(sizeof(command));
+    command_copy(args->cmd, cmd);
+}
+
+void fconc_init(fconc *fc, command *cmd) {
+    strcpy(fc->path, cmd->path);
+}
+
+void fconc_update(fconc *fc, args_t *args) {
+    fc->recent_lock = args->out_lock;
+}
+
+void spawn_worker(args_t *targs) {
+    command *cmd = targs->cmd;
+
+    pthread_t tid; // we don't need to store all tids
+    if (strcmp(cmd->action, "write") == 0) {
+        pthread_create(&tid, NULL, worker_write, targs);
+    } else if (strcmp(cmd->action, "read") == 0) {
+        pthread_create(&tid, NULL, worker_read, targs);
+    } else if (strcmp(cmd->action, "empty") == 0) {
+        pthread_create(&tid, NULL, worker_empty, targs);
+    } else {
+        perror("[ERR] Invalid `action`");
+        exit(1);
+    }
+
+    pthread_detach(tid); // Is this ok?
+}
+
+void command_record(command *cmd) {
+    // Write to commands.txt
+
+    // Build timestamp
+    time_t rawtime;
+    struct tm * timeinfo;
+    time ( &rawtime );
+    timeinfo = localtime ( &rawtime );
+    char *cleaned_timestamp = asctime(timeinfo); // Remove newline
+    cleaned_timestamp[24] = '\0'; // Check if consistent with older linux kernels
+
+    FILE *commands_file = fopen(CMD_TARGET, CMD_MODE);
+    if (commands_file == NULL) {
+        fprintf(stderr, "[ERR] worker_write fopen\n");
+        exit(1);
+    }
+    if (strcmp(cmd->action, "write") == 0) {
+        fprintf(commands_file, FMT_3CMD, cleaned_timestamp, cmd->action, cmd->path, cmd->input);
+    } else {
+        fprintf(commands_file, FMT_2CMD, cleaned_timestamp, cmd->action, cmd->path);
+    }
+
+    fclose(commands_file);
+}
 
 int main() {
     int i;
     for (i = 0; i < N_GLOCKS; i++)
         pthread_mutex_init(&glocks[i], NULL);
 
-
-    flist = malloc(sizeof(list_t));
-    l_init(flist);
+    tracker = malloc(sizeof(list_t));
+    l_init(tracker);
 
     while (1) {
-        char **split = malloc(3 * sizeof(char *));
-        for (i = 0; i < 3; i++)
-            split[i] = malloc((MAX_INP_SIZE + 1) * sizeof(char)); // free afterwards in thread
+        // Turn input into struct command
+        command *cmd = malloc(sizeof(command));
+        get_command(cmd);
 
-        get_input(split);
-        args_t *args = malloc(sizeof(args_t));
-        strcpy(args->action, split[ACTION]);
-        if (strcmp(args->action, "write") == 0)
-            strcpy(args->input, split[INPUT]);
+        // Build thread args targs
+        args_t *targs = (args_t *) malloc(sizeof(args_t));
+        args_init(targs, cmd);
 
-
-        fprintf(stderr, "[METADATA CHECK] %s\n", split[PATH]);
-        args->out_lock = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
-        pthread_mutex_init(args->out_lock, NULL);
-        pthread_mutex_lock(args->out_lock); // Initialize as locked
-
-        fconc *fc = l_lookup(flist, split[PATH]);
+        // Check if file metadata exists
+        fprintf(stderr, "[METADATA CHECK] %s\n", cmd->path);
+        fconc *fc = l_lookup(tracker, cmd->path);
         if (fc != NULL) {
             // Metadata found
-            fprintf(stderr, "[METADATA HIT] %s\n", split[PATH]);
-            args->in_lock = fc->recent_lock;
-            // Do we copy path to args too? To ensure non-blocking
+            fprintf(stderr, "[METADATA HIT] %s\n", cmd->path);
+
+            targs->in_lock = fc->recent_lock;
         } else if (fc == NULL) {
-            // Not found, insert to list
-            fprintf(stderr, "[METADATA ADD] %s\n", split[PATH]);
-            // Build fconc (make function for this)
-            fconc *new_fconc = malloc(sizeof(fconc));
-            args->in_lock = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
-            pthread_mutex_init(args->in_lock, NULL);
+            // Metadata not found, insert to list
+            fprintf(stderr, "[METADATA ADD] %s\n", cmd->path);
+
+            // Thread can run immediately
+            targs->in_lock = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
+            pthread_mutex_init(targs->in_lock, NULL);
 
             // Metadata per unique file
             fc = malloc(sizeof(fconc));
-            strcpy(fc->path, split[PATH]);
-            l_insert(flist, fc->path, fc);
+            fconc_init(fc, cmd);
+
+            // Insert to tracker
+            l_insert(tracker, fc->path, fc);
         }
-        // Final piece in args
-        args->path = fc->path;
-
-        // Update metadata
-        fc->recent_lock = args->out_lock;
-
-        // Free split, not needed
-        for (i = 0; i < 3; i++)
-            free(split[i]);
-        free(split);
+        fconc_update(fc, targs);
 
         // Spawn thread
-        pthread_t tid; // we don't need to store all tids
-        if (strcmp(args->action, "write") == 0) {
-            pthread_create(&tid, NULL, worker_write, args);
-        } else if (strcmp(args->action, "read") == 0) {
-            pthread_create(&tid, NULL, worker_read, args);
-        } else if (strcmp(args->action, "empty") == 0) {
-            pthread_create(&tid, NULL, worker_empty, args);
-        }
-        pthread_detach(tid); // Is this ok?
+        spawn_worker(targs);
 
         // Write to commands.txt
-        time_t rawtime;
-        struct tm * timeinfo;
-        time ( &rawtime );
-        timeinfo = localtime ( &rawtime );
-        FILE *commands_file = fopen("commands.txt", "a");
-        if (commands_file == NULL) {
-            fprintf(stderr, "[ERR] worker_write fopen\n");
-            exit(1);
-        }
-        char *cleaned_timestamp = asctime(timeinfo);
-        cleaned_timestamp[24] = '\0';
-        if (strcmp(args->action, "write") == 0) {
-            fprintf(commands_file, "[%s] %s %s %s\n", cleaned_timestamp, args->action, fc->path, args->input);
-        } else {
-            fprintf(commands_file, "[%s] %s %s\n", cleaned_timestamp, args->action, fc->path);
-        }
-        fclose(commands_file);
+        command_record(cmd);
+
+        free(cmd);
     }
 
     return 0;

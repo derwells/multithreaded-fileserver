@@ -18,21 +18,30 @@
 #define EMPTY_MODE "a"
 #define READ_TARGET "read.txt"
 #define READ_MODE "a"
+#define CMD_TARGET "commands.txt"
+#define CMD_MODE "a"
 
 #define FMT_2HIT "%s %s: "
 #define FMT_3HIT "%s %s %s: "
 #define FMT_READ_MISS "%s %s: FILE DNE\n"
 #define FMT_EMPTY_MISS "%s %s: FILE ALREADY EMPTY\n"
+#define FMT_2CMD "[%s] %s %s\n"
+#define FMT_3CMD "[%s] %s %s %s\n"
 
+
+typedef struct __cmd {
+    char action[5 + 1];
+    char input[MAX_INP_SIZE + 1];
+    char path[MAX_INP_SIZE + 1];
+} command;
 
 typedef struct __args_t {
     pthread_mutex_t *in_lock;
     pthread_mutex_t *out_lock;
 
-    char action[MAX_INP_SIZE + 1];
-    char input[MAX_INP_SIZE + 1];
-    char *path;
+    command *cmd;
 } args_t;
+
 
 typedef struct __file_sync {
     pthread_mutex_t *recent_lock;
