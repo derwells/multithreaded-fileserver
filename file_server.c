@@ -5,6 +5,7 @@
 #include <pthread.h>
 #include <sys/file.h>
 #include <assert.h>
+#include <time.h>
 
 #include "defs.h"
 
@@ -268,13 +269,38 @@ int main() {
         if (strcmp(args->action, "write") == 0)
             strcpy(args->input, split[INPUT]);
 
+
+        fprintf(stderr, "[METADATA CHECK] %s\n", split[PATH]);
         args->out_lock = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
         pthread_mutex_init(args->out_lock, NULL);
         pthread_mutex_lock(args->out_lock); // Initialize as locked
 
-        fprintf(stderr, "Placing %s\n", split[PATH]);
-        fconc *fc = l_find_or_put(flist, args, split[PATH]);
+        fconc *fc = l_lookup(flist, split[PATH]);
+        if (fc != NULL) {
+            // Metadata found
+            fprintf(stderr, "[METADATA HIT] %s\n", split[PATH]);
+            args->in_lock = fc->recent_lock;
+            // Do we copy path to args too? To ensure non-blocking
+        } else if (fc == NULL) {
+            // Not found, insert to list
+            fprintf(stderr, "[METADATA ADD] %s\n", split[PATH]);
+            // Build fconc (make function for this)
+            fconc *new_fconc = malloc(sizeof(fconc));
+            args->in_lock = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
+            pthread_mutex_init(args->in_lock, NULL);
 
+            // Metadata per unique file
+            fc = malloc(sizeof(fconc));
+            strcpy(fc->path, split[PATH]);
+            l_insert(flist, fc->path, fc);
+        }
+        // Final piece in args
+        args->path = fc->path;
+
+        // Update metadata
+        fc->recent_lock = args->out_lock;
+
+        // Free split, not needed
         for (int i = 0; i < 3; i++)
             free(split[i]);
         free(split);
@@ -291,15 +317,19 @@ int main() {
         pthread_detach(tid); // Is this ok?
 
         // Write to commands.txt
+        time_t rawtime;
+        struct tm * timeinfo;
+        time ( &rawtime );
+        timeinfo = localtime ( &rawtime );
         FILE *commands_file = fopen("commands.txt", "a");
         if (commands_file == NULL) {
             fprintf(stderr, "[ERR] worker_write fopen\n");
             exit(1);
         }
         if (strcmp(args->action, "write") == 0) {
-            fprintf(commands_file, "%s %s %s\n", args->action, fc->path, args->input);
+            fprintf(commands_file, "%s %s %s %s\n", args->action, fc->path, args->input, asctime(timeinfo));
         } else {
-            fprintf(commands_file, "%s %s\n", args->action, fc->path);
+            fprintf(commands_file, "%s %s %s\n", args->action, fc->path, asctime(timeinfo));
         }
         fclose(commands_file);
         // do i put fopen outside?
