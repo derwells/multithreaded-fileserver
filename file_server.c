@@ -49,18 +49,29 @@ fconc *l_lookup(list_t *l, char *key) {
 }
 
 
-void simulate_access() {
-    int prob = (rand() % 100);
-    if (prob < 80) {
+int rng() {
+	srand(time(0));
+	int r = rand() % 100;
+
+	return r;
+}
+
+void r_simulate_access() {
+    int r = rng();
+    if (r < 80) {
         sleep(1);
     } else {
         sleep(6);
     }
 }
 
-void rand_sleep(int min, int max) {
-    int prob = (rand() % (max - min)) + min;
-    sleep(prob);
+void r_sleep_range(int min, int max) {
+    int r = rng();
+
+    // Translate random number to range
+    int sleep_time = (rng() % (max - min)) + min;
+
+    sleep(sleep_time);
 }
 
 
@@ -75,7 +86,7 @@ void *worker_write(void *_args) {
     fprintf(stderr, "[START] %s %s %s\n", args->action, args->path, args->input);
     
     // Access file
-    simulate_access();
+    r_simulate_access();
     FILE *target_file;
     target_file = fopen(args->path, "a");
 
@@ -112,7 +123,7 @@ void *worker_read(void *_args) {
     fprintf(stderr, "[START] %s %s\n", args->action, args->path);
 
     // Access file
-    simulate_access();
+    r_simulate_access();
     FILE *from_file, *to_file;
     from_file = fopen(args->path, "r");
 
@@ -170,7 +181,7 @@ void *worker_empty(void *_args) {
     fprintf(stderr, "[START] %s %s\n", args->action, args->path);
 
     // Access file
-    simulate_access();
+    r_simulate_access();
     FILE *from_file, *to_file;
     from_file = fopen(args->path, "r");
 
@@ -216,7 +227,7 @@ void *worker_empty(void *_args) {
         fclose(from_file);
         
         // Sleep for 7-10 seconds
-        rand_sleep(7, 10);
+        r_sleep_range(7, 10);
     }
     fprintf(stderr, "[END] %s %s\n", args->action, args->path);
 
