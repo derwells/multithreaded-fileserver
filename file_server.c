@@ -326,14 +326,14 @@ int main() {
             fprintf(stderr, "[ERR] worker_write fopen\n");
             exit(1);
         }
+        char *cleaned_timestamp = asctime(timeinfo);
+        cleaned_timestamp[24] = '\0';
         if (strcmp(args->action, "write") == 0) {
-            fprintf(commands_file, "%s %s %s %s\n", args->action, fc->path, args->input, asctime(timeinfo));
+            fprintf(commands_file, "[%s] %s %s %s\n", cleaned_timestamp, args->action, fc->path, args->input);
         } else {
-            fprintf(commands_file, "%s %s %s\n", args->action, fc->path, asctime(timeinfo));
+            fprintf(commands_file, "[%s] %s %s\n", cleaned_timestamp, args->action, fc->path);
         }
         fclose(commands_file);
-        // do i put fopen outside?
-        // ADD TIMESTAMP
     }
 
     return 0;
