@@ -16,14 +16,8 @@
 
 
 typedef struct __args_t {
-    int id;
-
     pthread_mutex_t *in_lock;
     pthread_mutex_t *out_lock;
-    pthread_cond_t *in_cond;
-    pthread_cond_t *out_cond;
-    int *in_flag;
-    int *out_flag;
 
     char action[MAX_INP_SIZE + 1];
     char input[MAX_INP_SIZE + 1];
@@ -31,11 +25,7 @@ typedef struct __args_t {
 } args_t;
 
 typedef struct __file_sync {
-    int recent_id;
-
     pthread_mutex_t *recent_lock;
-    pthread_cond_t *recent_cond;
-    int *recent_flag;
 
     char path[MAX_INP_SIZE + 1];
 } fconc;

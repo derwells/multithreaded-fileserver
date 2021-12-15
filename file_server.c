@@ -28,9 +28,6 @@ fconc *l_find_or_put(list_t *l, args_t *args, char *path) {
             value = curr->value;
 
             args->in_lock = value->recent_lock;
-            args->in_cond = value->recent_cond;
-            args->in_flag = value->recent_flag;
-            *args->out_flag = 0;
             break;
         }
         curr = curr->next;
@@ -49,11 +46,8 @@ fconc *l_find_or_put(list_t *l, args_t *args, char *path) {
         args->path = new->value->path;
         fprintf(stderr, "Adding %s\n", new->value->path);
         args->in_lock = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
-        args->in_cond = (pthread_cond_t *) malloc(sizeof(pthread_cond_t));
-        args->in_flag = (int *) malloc(sizeof(int));
         pthread_mutex_init(args->in_lock, NULL);
-        pthread_cond_init(args->in_cond, NULL);
-        *args->in_flag = 1;
+
 
         // Initialze key
         new->key = new->value->path;
@@ -65,10 +59,7 @@ fconc *l_find_or_put(list_t *l, args_t *args, char *path) {
     }
 
     args->path = value->path;
-    value->recent_id = args->id;
     value->recent_lock = args->out_lock;
-    value->recent_cond = args->out_cond;
-    value->recent_flag = args->out_flag;
 
     return value;
 }
@@ -101,9 +92,6 @@ void *worker_write(void *_args) {
 
     pthread_mutex_lock(args->in_lock);
 
-    while(args->in_flag == 0)
-        pthread_cond_wait(args->in_cond, args->in_lock);
-
     simulate_access();
 
     fprintf(stderr, "[START] %s %s %s\n", args->action, args->path, args->input);
@@ -118,15 +106,10 @@ void *worker_write(void *_args) {
     fclose(target_file);
     fprintf(stderr, "[END] %s %s %s\n", args->action, args->path, args->input);
 
-    // Pass
-    *args->out_flag = 1;
-    pthread_cond_signal(args->out_cond);
 
     pthread_mutex_unlock(args->out_lock);
     // Free
     free(args->in_lock);
-    free(args->in_cond);
-    free(args->in_flag);
     free(args);
 
 }
@@ -136,9 +119,6 @@ void *worker_read(void *_args) {
     args_t *args = (args_t *)_args;
 
     pthread_mutex_lock(args->in_lock);
-
-    while(args->in_flag == 0)
-        pthread_cond_wait(args->in_cond, args->in_lock);
 
     fprintf(stderr, "[START] %s %s\n", args->action, args->path);
     // Read
@@ -167,14 +147,8 @@ void *worker_read(void *_args) {
     }
     fprintf(stderr, "[END] %s %s\n", args->action, args->path);
 
-    // Pass
-    *args->out_flag = 1;
-    pthread_cond_signal(args->out_cond);
-
     pthread_mutex_unlock(args->out_lock);
     free(args->in_lock);
-    free(args->in_cond);
-    free(args->in_flag);
     free(args);
 
 }
@@ -184,9 +158,6 @@ void *worker_empty(void *_args) {
     args_t *args = (args_t *)_args;
 
     pthread_mutex_lock(args->in_lock);
-
-    while(args->in_flag == 0)
-        pthread_cond_wait(args->in_cond, args->in_lock);
 
     fprintf(stderr, "[START] %s %s\n", args->action, args->path);
     // Empty
@@ -223,14 +194,8 @@ void *worker_empty(void *_args) {
     }
     fprintf(stderr, "[END] %s %s\n", args->action, args->path);
 
-    // Pass
-    *args->out_flag = 1;
-    pthread_cond_signal(args->out_cond);
-
     pthread_mutex_unlock(args->out_lock);
     free(args->in_lock);
-    free(args->in_cond);
-    free(args->in_flag);
     free(args);
 
     rand_sleep(7, 10);
@@ -271,8 +236,6 @@ int main() {
     flist = malloc(sizeof(list_t));
     l_init(flist);
 
-    int id = 0;
-
     while (1) {
         char **split = malloc(3 * sizeof(char *));
         for (int i = 0; i < 3; i++)
@@ -285,13 +248,8 @@ int main() {
             strcpy(args->input, split[INPUT]);
 
         args->out_lock = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
-        args->out_cond = (pthread_cond_t *) malloc(sizeof(pthread_cond_t));
-        args->out_flag = malloc(sizeof(int));
         pthread_mutex_init(args->out_lock, NULL);
         pthread_mutex_lock(args->out_lock); // Initialize as locked
-        pthread_cond_init(args->out_cond, NULL);
-        *args->out_flag = 0;
-        args->id = id;
 
         fprintf(stderr, "Placing %s\n", split[PATH]);
         fconc *fc = l_find_or_put(flist, args, split[PATH]);
@@ -325,8 +283,6 @@ int main() {
         fclose(commands_file);
         // do i put fopen outside?
         // ADD TIMESTAMP
-
-        id++;
     }
 
     return 0;
