@@ -18,7 +18,7 @@ void l_init(list_t *l) {
     l->head = NULL;
 }
 
-void l_insert(list_t *l, char *key, fconc *value) {
+void l_insert(list_t *l, char *key, fmeta *value) {
     lnode_t *new = malloc(sizeof(lnode_t));
 
     if (new == NULL) {
@@ -34,8 +34,8 @@ void l_insert(list_t *l, char *key, fconc *value) {
     l->head = new;
 }
 
-fconc *l_lookup(list_t *l, char *key) {
-    fconc *value = NULL;
+fmeta *l_lookup(list_t *l, char *key) {
+    fmeta *value = NULL;
 
     lnode_t *curr = l->head;
     while (curr) {
@@ -70,7 +70,7 @@ void r_sleep_range(int min, int max) {
     int r = rng();
 
     // Translate random number to range
-    int sleep_time = (rng() % (max - min)) + min;
+    int sleep_time = (r % (max - min)) + min;
 
     sleep(sleep_time);
 }
@@ -81,26 +81,6 @@ void header_2cmd(FILE* to_file, command *cmd) {
         FMT_2HIT,
         cmd->action,
         cmd->path
-    );
-}
-
-void header_3cmd(FILE* to_file, command *cmd) {
-    fprintf(
-        to_file, 
-        FMT_3HIT, 
-        cmd->action,
-        cmd->path,
-        cmd->input
-    );
-}
-
-void header_3cmd(FILE* to_file, command *cmd) {
-    fprintf(
-        to_file, 
-        FMT_3HIT, 
-        cmd->action,
-        cmd->path,
-        cmd->input
     );
 }
 
@@ -200,7 +180,7 @@ void *worker_read(void *_args) {
         to_file = open_read();
         
         // Header
-        header_2cmd(to_file, args);
+        header_2cmd(to_file, cmd);
 
         // Read contents
         copy_f2f(to_file, from_file);
@@ -257,7 +237,7 @@ void *worker_empty(void *_args) {
         to_file = open_empty();
 
         // Place header
-        header_2cmd(to_file, args);
+        header_2cmd(to_file, cmd);
 
         // Read contents
         copy_f2f(to_file, from_file);
@@ -324,11 +304,11 @@ void args_init(args_t *args, command *cmd) {
     command_copy(args->cmd, cmd);
 }
 
-void fconc_init(fconc *fc, command *cmd) {
+void fmeta_init(fmeta *fc, command *cmd) {
     strcpy(fc->path, cmd->path);
 }
 
-void fconc_update(fconc *fc, args_t *args) {
+void fmeta_update(fmeta *fc, args_t *args) {
     fc->recent_lock = args->out_lock;
 }
 
@@ -375,14 +355,7 @@ void command_record(command *cmd) {
     fclose(commands_file);
 }
 
-int main() {
-    int i;
-    for (i = 0; i < N_GLOCKS; i++)
-        pthread_mutex_init(&glocks[i], NULL);
-
-    tracker = malloc(sizeof(list_t));
-    l_init(tracker);
-
+void *master() {
     while (1) {
         // Turn input into struct command
         command *cmd = malloc(sizeof(command));
@@ -394,7 +367,7 @@ int main() {
 
         // Check if file metadata exists
         fprintf(stderr, "[METADATA CHECK] %s\n", cmd->path);
-        fconc *fc = l_lookup(tracker, cmd->path);
+        fmeta *fc = l_lookup(tracker, cmd->path);
         if (fc != NULL) {
             // Metadata found
             fprintf(stderr, "[METADATA HIT] %s\n", cmd->path);
@@ -409,13 +382,13 @@ int main() {
             pthread_mutex_init(targs->in_lock, NULL);
 
             // Metadata per unique file
-            fc = malloc(sizeof(fconc));
-            fconc_init(fc, cmd);
+            fc = malloc(sizeof(fmeta));
+            fmeta_init(fc, cmd);
 
             // Insert to tracker
             l_insert(tracker, fc->path, fc);
         }
-        fconc_update(fc, targs);
+        fmeta_update(fc, targs);
 
         // Spawn thread
         spawn_worker(targs);
@@ -425,6 +398,20 @@ int main() {
 
         free(cmd);
     }
+}
+
+int main() {
+    int i;
+    for (i = 0; i < N_GLOCKS; i++)
+        pthread_mutex_init(&glocks[i], NULL);
+
+    tracker = malloc(sizeof(list_t));
+    l_init(tracker);
+
+    pthread_t tid; // we don't need to store all tids
+    pthread_create(&tid, NULL, master, NULL);
+
+    pthread_join(tid, NULL);
 
     return 0;
 }

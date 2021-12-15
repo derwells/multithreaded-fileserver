@@ -22,7 +22,6 @@
 #define CMD_MODE "a"
 
 #define FMT_2HIT "%s %s: "
-#define FMT_3HIT "%s %s %s: "
 #define FMT_READ_MISS "%s %s: FILE DNE\n"
 #define FMT_EMPTY_MISS "%s %s: FILE ALREADY EMPTY\n"
 #define FMT_2CMD "[%s] %s %s\n"
@@ -35,7 +34,7 @@ typedef struct __cmd {
     char path[MAX_INP_SIZE + 1];
 } command;
 
-typedef struct __args_t {
+typedef struct __thread_args {
     pthread_mutex_t *in_lock;
     pthread_mutex_t *out_lock;
 
@@ -43,15 +42,15 @@ typedef struct __args_t {
 } args_t;
 
 
-typedef struct __file_sync {
+typedef struct __file_metadata {
     pthread_mutex_t *recent_lock;
 
     char path[MAX_INP_SIZE + 1];
-} fconc;
+} fmeta;
 
 typedef struct __lnode_t {
     char *key;
-    fconc *value;
+    fmeta *value;
     struct __lnode_t *next;
 } lnode_t;
 
