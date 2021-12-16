@@ -9,8 +9,9 @@
 
 #include "defs.h"
 
-
+/** Stores file locks for read.txt and empty.txt */
 pthread_mutex_t glocks[N_GLOCKS];
+/** Tracks file metadata. Used only by master thread. */
 list_t *tracker;
 
 /**
@@ -24,9 +25,8 @@ void l_init(list_t *l) {
 }
 
 /**
+ * @relates __list_t
  * Insert key, value pair into a list_t.
- * 
- * @see __list_t
  * 
  * @param l     Target list_t.
  * @param key   Key. Pointer to file path stored in corresponding fmeta.
@@ -49,10 +49,9 @@ void l_insert(list_t *l, char *key, fmeta *value) {
 }
 
 /**
+ * @relates __list_t
  * Returns pointer to file metadata for 
  * file path equal to key
- * 
- * @see __list_t
  * 
  * @param l     Target list_t.
  * @param key   Key to match. Pointer to file path 
@@ -184,6 +183,10 @@ void empty_file(char *path) {
  * 
  * @param _args     Arguments passed to worker thread. Typecasted back into args_t.
  * @return          Void. Just exists using pthread_exit().
+ * 
+ * Only requires args.in_lock.
+ * 
+ * Unlocks args.out_lock on exit, allowing next thread to run.
  */
 void *worker_write(void *_args) {
     // Typecast void into args_t
@@ -230,6 +233,11 @@ void *worker_write(void *_args) {
  * 
  * @param _args     Arguments passed to worker thread. Typecasted back into args_t.
  * @return          Void. Just exists using pthread_exit().
+ * 
+ * Initially requires args.in_lock. Needs global file 
+ * lock for read.txt (glocks[READ_GLOCK]) when recording.
+ * 
+ * Unlocks args.out_lock on exit, allowing next thread to run.
  */
 void *worker_read(void *_args) {
     // Typecast void into args_t
@@ -254,6 +262,7 @@ void *worker_read(void *_args) {
         to_file = open_read();
 
         // Header
+        /** wee wee */
         fprintf(to_file, FMT_READ_MISS, cmd->action, cmd->path);
         fclose(to_file);
         pthread_mutex_unlock(&glocks[READ_GLOCK]);
@@ -294,6 +303,11 @@ void *worker_read(void *_args) {
  * 
  * @param _args     Arguments passed to worker thread. Typecasted back into args_t.
  * @return          Void. Just exists using pthread_exit().
+ * 
+ * Initially requires args.in_lock. Needs global file 
+ * lock for empty.txt (glocks[EMPTY_GLOCK]) when recording.
+ * 
+ * Unlocks args.out_lock on exit, allowing next thread to run.
  */
 void *worker_empty(void *_args) {
     // Typecast void into args_t
@@ -355,6 +369,7 @@ void *worker_empty(void *_args) {
 }
 
 /**
+ * @relates     __command
  * Helper function. Reads user into into command struct.
  * 
  * @param cmd   Struct command to be written to,
@@ -381,6 +396,7 @@ void get_command(command *cmd) {
 }
 
 /**
+ * @relates     __command
  * Deep copy of command contents from one command to another.
  * 
  * @param to    Command to copy to.
@@ -396,11 +412,43 @@ void command_copy(command *to, command *from) {
 }
 
 /**
+ * @relates     __command
+ * Wrapper for writing to commands.txt
+ * 
+ * @param cmd   Struct command to record.
+ * @return      Void.
+ */
+void command_record(command *cmd) {
+    // Write to commands.txt
+
+    // Build timestamp
+    time_t rawtime;
+    struct tm * timeinfo;
+    time ( &rawtime );
+    timeinfo = localtime ( &rawtime );
+    char *cleaned_timestamp = asctime(timeinfo); // Remove newline
+    cleaned_timestamp[24] = '\0'; // Check if consistent with older linux kernels
+
+    FILE *commands_file = fopen(CMD_TARGET, CMD_MODE);
+    if (commands_file == NULL) {
+        fprintf(stderr, "[ERR] worker_write fopen\n");
+        exit(1);
+    }
+    if (strcmp(cmd->action, "write") == 0) {
+        fprintf(commands_file, FMT_3CMD, cleaned_timestamp, cmd->action, cmd->path, cmd->input);
+    } else {
+        fprintf(commands_file, FMT_2CMD, cleaned_timestamp, cmd->action, cmd->path);
+    }
+
+    fclose(commands_file);
+}
+
+/**
+ * @relates     __args_t
  * Initialize thread arguments based on user 
  * input described by command cmd.
  * 
- * @see         __args_t
- * @param targs  Thread arguments to initialize
+ * @param targs Thread arguments to initialize
  * @param cmd   Struct command to read from.
  * @return      Void.
  */
@@ -417,10 +465,10 @@ void args_init(args_t *targs, command *cmd) {
 }
 
 /**
+ * @relates     __fmeta
  * Initialize file metadata based on user 
  * input described by command cmd.
  * 
- * @see         __fmeta
  * @param fc    File metadata to initialize.
  * @param cmd   Struct command to read from.
  * @return      Void.
@@ -430,10 +478,10 @@ void fmeta_init(fmeta *fc, command *cmd) {
 }
 
 /**
+ * @relates     __fmeta
  * Update file metadata based on built
  * thread arguments.
  * 
- * @see         __fmeta
  * @param fc    File metadata to update.
  * @param targs Thread arguments to read from.
  * @return      Void.
@@ -466,38 +514,6 @@ void spawn_worker(args_t *targs) {
     }
 
     pthread_detach(tid); // Is this ok?
-}
-
-/**
- * Wrapper for writing to commands.txt
- * 
- * @see         __fmeta
- * @param cmd   Struct command to record.
- * @return      Void.
- */
-void command_record(command *cmd) {
-    // Write to commands.txt
-
-    // Build timestamp
-    time_t rawtime;
-    struct tm * timeinfo;
-    time ( &rawtime );
-    timeinfo = localtime ( &rawtime );
-    char *cleaned_timestamp = asctime(timeinfo); // Remove newline
-    cleaned_timestamp[24] = '\0'; // Check if consistent with older linux kernels
-
-    FILE *commands_file = fopen(CMD_TARGET, CMD_MODE);
-    if (commands_file == NULL) {
-        fprintf(stderr, "[ERR] worker_write fopen\n");
-        exit(1);
-    }
-    if (strcmp(cmd->action, "write") == 0) {
-        fprintf(commands_file, FMT_3CMD, cleaned_timestamp, cmd->action, cmd->path, cmd->input);
-    } else {
-        fprintf(commands_file, FMT_2CMD, cleaned_timestamp, cmd->action, cmd->path);
-    }
-
-    fclose(commands_file);
 }
 
 /**
