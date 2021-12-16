@@ -13,11 +13,25 @@
 pthread_mutex_t glocks[N_GLOCKS];
 list_t *tracker;
 
-
+/**
+ * @relates __list_t
+ * Initializes a list_t.
+ * 
+ * @param l Target list_t to initialize.
+ */
 void l_init(list_t *l) {
     l->head = NULL;
 }
 
+/**
+ * Insert key, value pair into a list_t.
+ * 
+ * @see __list_t
+ * 
+ * @param l     Target list_t.
+ * @param key   Key. Pointer to file path stored in corresponding fmeta.
+ * @param value Value. Pointer to file metadata.
+ */
 void l_insert(list_t *l, char *key, fmeta *value) {
     lnode_t *new = malloc(sizeof(lnode_t));
 
@@ -34,6 +48,17 @@ void l_insert(list_t *l, char *key, fmeta *value) {
     l->head = new;
 }
 
+/**
+ * Returns pointer to file metadata for 
+ * file path equal to key
+ * 
+ * @see __list_t
+ * 
+ * @param l     Target list_t.
+ * @param key   Key to match. Pointer to file path 
+ *              stored in corresponding fmeta.
+ * @return      Pointer to corresponding file metadata.
+ */
 fmeta *l_lookup(list_t *l, char *key) {
     fmeta *value = NULL;
 
@@ -49,7 +74,9 @@ fmeta *l_lookup(list_t *l, char *key) {
     return value;
 }
 
-
+/**
+ * Provided random number generator
+ */
 int rng() {
 	srand(time(0));
 	int r = rand() % 100;
@@ -57,6 +84,11 @@ int rng() {
 	return r;
 }
 
+/**
+ * Simulate accessing file. 
+ * 80% chance of sleeping for 1 second. 
+ * 20% chance of sleeping for 6 seconds.
+ */
 void r_simulate_access() {
     int r = rng();
     if (r < 80) {
@@ -66,6 +98,13 @@ void r_simulate_access() {
     }
 }
 
+/**
+ * Sleeps for a random amount between min and max.
+ * 
+ * @param min Minimum sleep time.
+ * @param max Maximum sleep time.
+ * @return    Void.
+ */
 void r_sleep_range(int min, int max) {
     int r = rng();
 
@@ -75,6 +114,14 @@ void r_sleep_range(int min, int max) {
     sleep(sleep_time);
 }
 
+/**
+ * Generates header in record files. Used for
+ * inputs with 2 parameters (read, empty).
+ * 
+ * @param to_file   Target record file.
+ * @param cmd       Issued command to be recorded.
+ * @return          Void.
+ */
 void header_2cmd(FILE* to_file, command *cmd) {
     fprintf(
         to_file, 
@@ -84,15 +131,33 @@ void header_2cmd(FILE* to_file, command *cmd) {
     );
 }
 
+/**
+ * Wrapper for opening read.txt.
+ * 
+ * @return  FILE pointer to read.txt.
+ */
 FILE *open_read() {
     return fopen(READ_TARGET, READ_MODE);
 }
 
+/**
+ * Wrapper for opening empty.txt.
+ * 
+ * @return  FILE pointer to empty.txt.
+ */
 FILE *open_empty() {
     return fopen(EMPTY_TARGET, EMPTY_MODE);
 }
 
-void copy_f2f(FILE* to_file, FILE* from_file) {
+/**
+ * Append contents of from_file to to_file. Assumes
+ * to_file and from_file locks are held.
+ * 
+ * @param to_file   File to write to.
+ * @param to_file   File to read and copy from.
+ * @return          Void.
+ */
+void fdump(FILE* to_file, FILE* from_file) {
     // Must hold to_file and from_file locks
 
     // Read contents
@@ -102,12 +167,24 @@ void copy_f2f(FILE* to_file, FILE* from_file) {
     fputc(10, to_file); // Place newline
 }
 
+/**
+ * Wrapper for emptying a target file.
+ * 
+ * @param path  Filepath of file to empty.
+ * @return      Void.
+ */
 void empty_file(char *path) {
     // Must hold target_file lock
     FILE *target_file = fopen(path, "w");
     fclose(target_file);
 }
 
+/**
+ * Worker thread function. Contains workload for `write` command.
+ * 
+ * @param _args     Arguments passed to worker thread. Typecasted back into args_t.
+ * @return          Void. Just exists using pthread_exit().
+ */
 void *worker_write(void *_args) {
     // Typecast void into args_t
     args_t *args = (args_t *)_args;
@@ -148,7 +225,12 @@ void *worker_write(void *_args) {
     pthread_exit(NULL);
 }
 
-
+/**
+ * Worker thread function. Contains workload for `read` command.
+ * 
+ * @param _args     Arguments passed to worker thread. Typecasted back into args_t.
+ * @return          Void. Just exists using pthread_exit().
+ */
 void *worker_read(void *_args) {
     // Typecast void into args_t
     args_t *args = (args_t *)_args;
@@ -184,7 +266,7 @@ void *worker_read(void *_args) {
         header_2cmd(to_file, cmd);
 
         // Read contents
-        copy_f2f(to_file, from_file);
+        fdump(to_file, from_file);
 
         fclose(to_file);
         pthread_mutex_unlock(&glocks[READ_GLOCK]);
@@ -207,7 +289,12 @@ void *worker_read(void *_args) {
     pthread_exit(NULL);
 }
 
-
+/**
+ * Worker thread function. Contains workload for `empty` command.
+ * 
+ * @param _args     Arguments passed to worker thread. Typecasted back into args_t.
+ * @return          Void. Just exists using pthread_exit().
+ */
 void *worker_empty(void *_args) {
     // Typecast void into args_t
     args_t *args = (args_t *)_args;
@@ -242,7 +329,7 @@ void *worker_empty(void *_args) {
         header_2cmd(to_file, cmd);
 
         // Read contents
-        copy_f2f(to_file, from_file);
+        fdump(to_file, from_file);
 
         fclose(to_file);
         pthread_mutex_unlock(&glocks[EMPTY_GLOCK]);
@@ -267,9 +354,14 @@ void *worker_empty(void *_args) {
     pthread_exit(NULL);
 }
 
-
+/**
+ * Helper function. Reads user into into command struct.
+ * 
+ * @param cmd   Struct command to be written to,
+ * @return      Void.
+ */
 void get_command(command *cmd) {
-    char inp[MAX_INPUT_SIZE*2 + MAX_ACTION_SIZE];
+    char inp[2*MAX_INPUT_SIZE + MAX_ACTION_SIZE];
     if (scanf("%[^\n]%*c", inp) == EOF) { while (1) {} } // FIX THIS
 
     // Get command
@@ -288,6 +380,13 @@ void get_command(command *cmd) {
     return;
 }
 
+/**
+ * Deep copy of command contents from one command to another.
+ * 
+ * @param to    Command to copy to.
+ * @param from  Command to copy from.
+ * @return      Void.
+ */
 void command_copy(command *to, command *from) {
     // Deep copy
 
@@ -296,26 +395,61 @@ void command_copy(command *to, command *from) {
     strcpy(to->path, from->path);
 }
 
-void args_init(args_t *args, command *cmd) {
-    args->out_lock = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
-    pthread_mutex_init(args->out_lock, NULL);
+/**
+ * Initialize thread arguments based on user 
+ * input described by command cmd.
+ * 
+ * @see         __args_t
+ * @param targs  Thread arguments to initialize
+ * @param cmd   Struct command to read from.
+ * @return      Void.
+ */
+void args_init(args_t *targs, command *cmd) {
+    targs->out_lock = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
+    pthread_mutex_init(targs->out_lock, NULL);
 
     // Next thread can't run immediately
-    pthread_mutex_lock(args->out_lock);
+    pthread_mutex_lock(targs->out_lock);
 
     // Deep copy cmd
-    args->cmd = malloc(sizeof(command));
-    command_copy(args->cmd, cmd);
+    targs->cmd = malloc(sizeof(command));
+    command_copy(targs->cmd, cmd);
 }
 
+/**
+ * Initialize file metadata based on user 
+ * input described by command cmd.
+ * 
+ * @see         __fmeta
+ * @param fc    File metadata to initialize.
+ * @param cmd   Struct command to read from.
+ * @return      Void.
+ */
 void fmeta_init(fmeta *fc, command *cmd) {
     strcpy(fc->path, cmd->path);
 }
 
-void fmeta_update(fmeta *fc, args_t *args) {
-    fc->recent_lock = args->out_lock;
+/**
+ * Update file metadata based on built
+ * thread arguments.
+ * 
+ * @see         __fmeta
+ * @param fc    File metadata to update.
+ * @param targs Thread arguments to read from.
+ * @return      Void.
+ */
+void fmeta_update(fmeta *fc, args_t *targs) {
+    fc->recent_lock = targs->out_lock;
 }
 
+/**
+ * Wrapper for deciding what thread to spawn
+ * 
+ * @see         worker_read(), worker_write(), worker_empty()
+ * @param targs Thread arguments. Also used for deciding
+ *              type of thread.
+ * @return      Void.
+ */
 void spawn_worker(args_t *targs) {
     command *cmd = targs->cmd;
 
@@ -334,6 +468,13 @@ void spawn_worker(args_t *targs) {
     pthread_detach(tid); // Is this ok?
 }
 
+/**
+ * Wrapper for writing to commands.txt
+ * 
+ * @see         __fmeta
+ * @param cmd   Struct command to record.
+ * @return      Void.
+ */
 void command_record(command *cmd) {
     // Write to commands.txt
 
@@ -359,6 +500,13 @@ void command_record(command *cmd) {
     fclose(commands_file);
 }
 
+/**
+ * Master thread function.
+ * 
+ * @param _args     Arguments passed to worker thread. 
+ *                  Typecasted back into args_t.
+ * @return          Void. Loops indefinitely.
+ */
 void *master() {
     while (1) {
         // Turn input into struct command
@@ -404,6 +552,14 @@ void *master() {
     }
 }
 
+/**
+ * Entrypoint. Initializes global variables and spawns
+ * master thread.
+ * 
+ * @param _args     Arguments passed to worker thread. 
+ *                  Typecasted back into args_t.
+ * @return          Void. Loops indefinitely.
+ */
 int main() {
     int i;
     for (i = 0; i < N_GLOCKS; i++)
