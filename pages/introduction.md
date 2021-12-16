@@ -8,7 +8,6 @@ This project is divided into two files:
 
 See \ref File_index (!!!) for a detailed description of each file.
 
- Visit \subpage pg_overview "Overview" for an quick explanation of how the file server works. This section goes over how Level 1-4 requirements are met. Hopefully, this will ease into the in-depth explanations for each level found at:
-  - \subpage pg_concurrency "Concurrency" for Level 3 requirements. 
+ Visit \subpage pg_overview "Overview" for an quick explanation of how the file server works. This section goes over how Level 1-4 requirements are met. Hopefully, this will ease into the in-depth explanations found at:
+  - \subpage pg_concurrency "Concurrency" for Level 3 requirements.
   - \subpage pg_synchronization "Synchronization" for Level 4 requirements.
-
