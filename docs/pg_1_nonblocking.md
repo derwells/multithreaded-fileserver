@@ -16,21 +16,26 @@ Here are more detailed steps
 1. Parse and store user input in `command` struct
     - Uses `get_command()` to read user input into a `command` struct
     - Command information is deep-copied into other locations (e.g. file trackers `fmeta` and thread arguments `args_t`)
-2. Is filepath in metadata tracker? 
-    - This operation is a part of \subpage pg_synchronization "synchronization".
+2. Initialize thread arguments
+    - Dynamically create struct `args_t`
+    - Use `args_init` to partially build new `args_t`
+    - Dynamically create new `out_lock`; initialize as **locked** (see \ref pg_synchronization "*synchronization*")
+    - Deep-copy current `command`
+3. Is filepath in metadata tracker? 
+    - This operation is a part of \ref pg_synchronization "*synchronization*".
     - **YES** Hand over recent lock
         - Pass most recent `out_lock` as new thread's `in_lock`
     - **NO** Create and add to metadata tracker. Initialize HoH locking
         - Create new unlocked mutex for new thread's `in_lock`
         - Dynamically create file metadata
         - Insert to tracker
-3. Update file metadata
+4. Update file metadata
     - See wrapper function `fmeta_update()`
     - Points metadata's `recent_lock` to new thread's `out_lock`.
-4. Spawn worker thread
+5. Spawn worker thread
     - See `spawn_worker()`
     - Comprised of if-else branches and `pthread_create()` invocations
-5. Record command in command.txt
+6. Record command in command.txt
     - See `command_record()`
 
 ## Why master thread is non-blocking
