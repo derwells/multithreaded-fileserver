@@ -5,3 +5,4 @@ test.*
 !Doxyfile
 !/docs
 !/tests
+!/docs/pics
