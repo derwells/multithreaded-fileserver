@@ -29,6 +29,9 @@ The critical section is bounded by `args_t.in_lock` and `args_t.out_lock` (see l
         -# Release *global read.txt file lock*
 
 # Empty Thread
+All empty actions are encapsulated in `worker_empty()`. Before the critical section begins, the thread arguments are typecasted into an `args_t` pointer. After the critical section, the thread arguments are freed except for `out_lock` (see \ref pg_nonblocking "non-blocking master").
+
+## Critical section
 The critical section is bounded by `args_t.in_lock` and `args_t.out_lock` (see lines !!!). A detailed explanation can be found in \ref pg_synchronization "synchronization". Below are the steps taken by the worker thread in executing an empty command.
 1. The file-to-be-read is accessed using a `FILE` pointer `from_file`. The filepath is passed using the thread arguments. We use `r_simulate_access()` to introduce the specified delay.
 2. Check if the `from_file` exists
