@@ -104,7 +104,7 @@ typedef struct __lnode_t {
 } lnode_t;
 
 /** @struct __list_t
- * @brief List struct. Based-off OSTEP.
+ * @brief Non-blocking list struct. Based-off OSTEP.
  * 
  * @var __list_t::head
  * Pointer to head of linked list.

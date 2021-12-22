@@ -3,5 +3,5 @@
 *.txt
 test.*
 !Doxyfile
-!/pages
+!/docs
 !/tests

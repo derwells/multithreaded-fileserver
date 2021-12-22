@@ -51,7 +51,8 @@ void l_insert(list_t *l, char *key, fmeta *value) {
 /**
  * @relates __list_t
  * Returns pointer to file metadata for 
- * file path equal to key
+ * file path equal to key. Iterates through nodes
+ * until match is found.
  * 
  * @param l     Target list_t.
  * @param key   Key to match. Pointer to file path 
