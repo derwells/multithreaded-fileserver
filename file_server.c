@@ -11,7 +11,7 @@
 
 /** Stores file locks for read.txt and empty.txt */
 pthread_mutex_t glocks[N_GLOCKS];
-/** Tracks file metadata. Used only by master thread. */
+/** Tracks file metadata. Used only by master thread.. */
 list_t *tracker;
 
 /**
@@ -377,7 +377,10 @@ void *worker_empty(void *_args) {
  */
 void get_command(command *cmd) {
     char inp[2*MAX_INPUT_SIZE + MAX_ACTION_SIZE];
-    if (scanf("%[^\n]%*c", inp) == EOF) { while (1) {} } // FIX THIS
+    if (scanf("%[^\n]%*c", inp) == EOF) {
+        while (1) {}
+    }
+    // FIX THIS
 
     // Get command
     char *ptr = strtok(inp, " ");
