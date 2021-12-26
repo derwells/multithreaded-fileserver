@@ -11,7 +11,12 @@
 
 /** Stores file locks for read.txt and empty.txt */
 pthread_mutex_t glocks[N_GLOCKS];
-/** Tracks file metadata. Used only by master thread.. */
+/**  
+ * Linked list of existing target files and their corresponding `fmeta`. 
+ * Indexed using filepath.
+ * This is not threadsafe - hence it is non-blocking. 
+ * Only the master thread accesses this data structure.
+*/
 list_t *tracker;
 
 /**
@@ -263,7 +268,6 @@ void *worker_read(void *_args) {
         to_file = open_read();
 
         // Header
-        /** wee wee */
         fprintf(to_file, FMT_READ_MISS, cmd->action, cmd->path);
         fclose(to_file);
         pthread_mutex_unlock(&glocks[READ_GLOCK]);

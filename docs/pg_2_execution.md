@@ -1,17 +1,17 @@
 \page pg_execution Execution
 
 # Write Thread
-All write actions are encapsulated in `worker_write()`. Before the critical section begins, the thread arguments are typecasted into an `args_t` pointer. After the critical section, the thread arguments are freed except for `out_lock` (see \ref pg_nonblocking "non-blocking master").
+All write actions are encapsulated in `worker_write()`. Before the critical section begins, the thread arguments are typecasted into an `args_t` pointer. The user input command is passed using `args_t.cmd`. After the critical section, the thread arguments are freed except for `out_lock` (see \ref pg_nonblocking "non-blocking master").
 
 ## Critical section
-The critical section is bounded by `args_t.in_lock` and `args_t.out_lock` (see lines !!!). A detailed explanation can be found in \ref pg_synchronization "synchronization". Below are the steps taken by the worker thread in executing a write command.
+The critical section is bounded by `args_t.in_lock` and `args_t.out_lock` (see lines !!!). A detailed explanation can be found in \ref pg_synchronization "synchronization". The user input command is passed using `args_t.cmd`. Below are the steps taken by the worker thread in executing a write command.
 1. The file is accessed using a `FILE` pointer `target_file`. The filepath is passed using the thread arguments. We use `r_simulate_access()` to introduce the specified delay.
 2. Write the user input to the targeted file (line !!!). We sleep 25ms per character in the user input (line !!!). 
     - We use the append mode. This creates the file if it does not exist. 
 
 
 # Read Thread
-All read actions are encapsulated in `worker_read()`. Before the critical section begins, the thread arguments are typecasted into an `args_t` pointer. After the critical section, the thread arguments are freed except for `out_lock` (see \ref pg_nonblocking "non-blocking master").
+All read actions are encapsulated in `worker_read()`. Before the critical section begins, the thread arguments are typecasted into an `args_t` pointer. The user input command is passed using `args_t.cmd`. After the critical section, the thread arguments are freed except for `out_lock` (see \ref pg_nonblocking "non-blocking master").
 
 ## Critical section
 The critical section is bounded by `args_t.in_lock` and `args_t.out_lock` (see lines !!!). A detailed explanation can be found in \ref pg_synchronization "synchronization". Below are the steps taken by the worker thread in executing a read command.

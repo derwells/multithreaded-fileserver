@@ -1,64 +1,64 @@
-write outputs/test.txt 1 2
-write outputs/test.txt 3 4
-read outputs/test.txt
-write outputs/test.txt 5 6
-write outputs/anothertest.txt 1 2
-write outputs/anothertest.txt 3 4
-empty outputs/test.txt
-read outputs/test.txt
-read outputs/test.txt
-write outputs/test.txt 7 8
-read outputs/anothertest.txt
-read outputs/test.txt
-empty outputs/test.txt
-write outputs/anothertest.txt 5 6
-empty outputs/anothertest.txt
-read outputs/anothertest.txt
-write outputs/test.txt 9 10
-write outputs/test.txt 11 12
-read outputs/anothertest.txt
-write outputs/anothertest.txt 7 8
-read outputs/anothertest.txt
-empty outputs/anothertest.txt
-write outputs/test.txt 13 14
-read outputs/test.txt
-write outputs/anothertest.txt 11 12
-write outputs/anothertest.txt 13 14
-read outputs/anothertest.txt
-empty outputs/test.txt
-write outputs/anothertest.txt 9 10
-empty outputs/anothertest.txt
-write outputs/testes.txt 1 2
-write outputs/testes.txt 3 4
-read outputs/testes.txt
-write outputs/testes.txt 5 6
-write outputs/awooga.txt 1 2
-write outputs/awooga.txt 3 4
-empty outputs/testes.txt
-read outputs/testes.txt
-read outputs/testes.txt
-write outputs/testes.txt 7 8
-read outputs/awooga.txt
-read outputs/testes.txt
-empty outputs/testes.txt
-write outputs/awooga.txt 5 6
-empty outputs/awooga.txt
-read outputs/awooga.txt
-write outputs/testes.txt 9 10
-write outputs/testes.txt 11 12
-read outputs/awooga.txt
-write outputs/awooga.txt 7 8
-read outputs/awooga.txt
-empty outputs/awooga.txt
-write outputs/testes.txt 13 14
-read outputs/testes.txt
-write outputs/awooga.txt 11 12
-write outputs/awooga.txt 13 14
-read outputs/awooga.txt
-empty outputs/testes.txt
-write outputs/awooga.txt 9 10
-read outputs/awooga.txt
-empty outputs/awooga.txt
-write outputs/snooze.txt 9 10
-read outputs/snooze.txt
-empty outputs/snooze.txt
+write outputs/a.txt 1 2
+write outputs/a.txt 3 4
+read outputs/a.txt
+write outputs/a.txt 5 6
+write outputs/b.txt 1 2
+write outputs/b.txt 3 4
+empty outputs/a.txt
+read outputs/a.txt
+read outputs/a.txt
+write outputs/a.txt 7 8
+read outputs/b.txt
+read outputs/a.txt
+empty outputs/a.txt
+write outputs/b.txt 5 6
+empty outputs/b.txt
+read outputs/b.txt
+write outputs/a.txt 9 10
+write outputs/a.txt 11 12
+read outputs/b.txt
+write outputs/b.txt 7 8
+read outputs/b.txt
+empty outputs/b.txt
+write outputs/a.txt 13 14
+read outputs/a.txt
+write outputs/b.txt 11 12
+write outputs/b.txt 13 14
+read outputs/b.txt
+empty outputs/a.txt
+write outputs/b.txt 9 10
+empty outputs/b.txt
+write outputs/c.txt 1 2
+write outputs/c.txt 3 4
+read outputs/c.txt
+write outputs/c.txt 5 6
+write outputs/d.txt 1 2
+write outputs/d.txt 3 4
+empty outputs/c.txt
+read outputs/c.txt
+read outputs/c.txt
+write outputs/c.txt 7 8
+read outputs/d.txt
+read outputs/c.txt
+empty outputs/c.txt
+write outputs/d.txt 5 6
+empty outputs/d.txt
+read outputs/d.txt
+write outputs/c.txt 9 10
+write outputs/c.txt 11 12
+read outputs/d.txt
+write outputs/d.txt 7 8
+read outputs/d.txt
+empty outputs/d.txt
+write outputs/c.txt 13 14
+read outputs/c.txt
+write outputs/d.txt 11 12
+write outputs/d.txt 13 14
+read outputs/d.txt
+empty outputs/c.txt
+write outputs/d.txt 9 10
+read outputs/d.txt
+empty outputs/d.txt
+write outputs/e.txt 9 10
+read outputs/e.txt
+empty outputs/e.txt

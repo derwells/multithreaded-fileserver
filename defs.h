@@ -72,8 +72,9 @@ typedef struct __args_t {
 } args_t;
 
 /** @struct __fmeta
- * @brief File metadata. Tracks most recent out_lock.
- * Used in hand-over-hand locking.
+ * @brief File metadata. Key component of hand-over-hand 
+ * locking and building worker threads. This keeps track 
+ * of the most recent `out_lock` in `fmeta.recent_lock`.
  * 
  * @var __fmeta::recent_lock
  * Most recent out_lock. Used as the next in_lock.
