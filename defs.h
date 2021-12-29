@@ -10,8 +10,10 @@
 /** Index of empty.txt glock */
 #define EMPTY_GLOCK 1
 
-#define MAX_ACTION_SIZE 6   /** Maximum size of action */
-#define MAX_INPUT_SIZE  51  /** Maximum size of path and input */
+/** Maximum size of action */
+#define MAX_ACTION_SIZE 6
+/** Maximum size of path and input */
+#define MAX_INPUT_SIZE  51
 
 #define EMPTY_TARGET    "empty.txt"
 /** Access mode for empty.txt */
