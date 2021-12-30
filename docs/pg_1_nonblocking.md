@@ -1,12 +1,12 @@
 \page pg_nonblocking Non-blocking Master
 
 # main()
-Entrypoint `main()` initializes global variables and spawns the master thread.
+Entrypoint `main()` initializes global variables and spawns the master thread. There will always at be at least 2 threads.
 
 # Master Thread
 All master thread actions are found in `master()`. 
 
-Note that the master thread also makes use of struct functions. Examples of these are `fmeta_init()` and `l_lookup()` (see !!!).
+Note that the master thread also makes use of struct functions. Examples of these are `fmeta_init()` and `l_lookup()`.
 
 Figure \latexonly\ref{mtflcht}\endlatexonly is a flowchart of how the master thread works.
 
