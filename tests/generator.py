@@ -25,7 +25,7 @@ N_FILES = 20
 N_CMDS = 10
 
 # For Python 3.4
-# https://stackoverflow.com/questions/58915023/what-is-an-alternative-method-of-using-random-choices-in-python-3-5
+# https://stackoverflow.com/questions/58915023
 def choices(population, weights=None, *, cum_weights=None, k=1):
     """Return a k sized list of population elements chosen with replacement.
     If the relative weights or cumulative weights are not specified,
