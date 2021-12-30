@@ -16,7 +16,7 @@ This is not threadsafe - hence it is non-blocking. Only the master thread access
 
 # Hand-over-hand locking
 ## Rationale
-Hand-over-hand locking, or HoH for short, is a simple way to overcome possible synchronization problems. Each file path has an associated "chain" of locks. This chain is built based on the arrival of worker threads. A worker thread can execute only if the thread before it unlocks a shared lock upon exiting. This shared lock is what prevents the worker thread from executing before the previousu thread. This principle ensures that threads targeting the same file path execute in the order they arrived.
+Hand-over-hand locking, or HoH for short, is a simple way to overcome possible synchronization problems. Each file path has an associated "chain" of locks. This chain is built based on the arrival of worker threads. A worker thread can execute only if the thread before it unlocks a shared lock upon exiting. This shared lock is what prevents the worker thread from executing prematurely. This principle ensures that threads targeting the same file path execute in the order they arrived.
 Note that these "chain" of locks are only associated to a single file path. They are uninvolved in HoH locks for other files. This ensure that threads targeting different file paths are not mutually exclusive. Hence, they can run concurrently.
 
 The only mutually exclusive operations between worker threads of different files the write operations to `read.txt` or `empty.txt`. The program uses global locks to guard these files.
@@ -32,12 +32,15 @@ The only mutually exclusive operations between worker threads of different files
 \end{figure}
 \endlatexonly
 
-Every type of worker thread uses hand-over-hand locking to ensure execution order. Every spawned thread will have their own `in_lock` and `out_lock`. The `in_lock` guards execution of the whole thread. The `out_lock` is a shared lock that is released once the thread is finished, allowing the next thread to run. (see `args_t` for a description of thread arguments).
+Every type of worker thread uses hand-over-hand locking to ensure execution order. Every type of worker thread is passed mutex pointers `in_lock` and `out_lock`. The `*in_lock` guards execution of the whole thread. The `*out_lock` is a shared lock that is released once the thread is finished, allowing the next thread to run (see `args_t`).
 
-Worker threads are built so that their `in_lock` is the most recent thread's `out_lock` (tracked by `fmeta.recent_lock`). A worker thread's `in_lock` is unlocked **if and only if** any of the following conditions are met:
- -# It the first thread associated with a target file. There have been no previous commands to the target file. (see lines !!!)
- -# A previous thread is finished executing (see lines !!!)
-Condition (1) is expounded upon later in this chapter.
+Worker threads are built such that their `*out_lock` begins locked. Their `*in_lock` is the `*out_lock` of the worker thread at the tail of the chain. The tail - or trailing - `*out_lock` is tracked by `fmeta.recent_lock`. Everytime a worker thread is built `fmeta.recent_lock` gets overwritten by the new `out_lock`.
+
+A worker thread's `in_lock` is unlocked **if and only if** any of the following conditions are met
+ -# It is the first thread associated with a target file (see lines !!!)
+ 	This means there have been no previous commands to the target file.
+ -# The thread before it has finished executing (see lines !!!)
+	This means the shared mutex has been unlocked.
 
 \latexonly
 \begin{figure}[H]
@@ -48,8 +51,7 @@ Condition (1) is expounded upon later in this chapter.
 \end{figure}
 \endlatexonly
 
-
-In Figure \latexonly\ref{hoh}\endlatexonly, mutex a1 would have to be unlocked by cmd 1 before cmd 2 can execute (condition 2). However, mutex a0 would begin unlocked (condition 1).
+See Figure \latexonly\ref{hoh}\endlatexonly for an example. Suppose that no worker thread has executed yet. Condition 1 ensures that mutex a0 would begin unlocked - allowing the chain of threads to begin. Condition 2 ensures that mutex a1 would have to be unlocked by cmd 1. This means cmd 1 has to execute before cmd 2.
 
 ## Adding new command
 Say a new user input `cmd n+1` gets passed. 
@@ -85,8 +87,11 @@ Figure \latexonly\ref{hoh_update_exists}\endlatexonly is what happens after the 
 ## Race conditions
 ### Per target file
 The HoH locking mechanism ensures that a thread can run only if
- - It is the first thread associated with a target file or
- - A previous thread released the shared lock (finished executing)
+ -# It is the first thread associated with a target file (see lines !!!)
+ 	This means there have been no previous commands to the target file.
+ -# The thread before it has finished executing (see lines !!!)
+	This means the shared mutex has been unlocked.
+
 
 \latexonly
 \begin{figure}[H]
@@ -122,11 +127,9 @@ The program uses global locks to guard writing to `read.txt` and `empty.txt`. Th
 These files do not have to be ordered - they are non-deterministic. Hence, it sufficies to ensure atomicity.
 
 ## Deadlocks
-Nested locks are the most prone to causing deadlock errors. The only nested locks are `read.txt` and `empty.txt`. Per the suggestion of OSTEP, we ensure that all nested lock acesses follow the same ordering. When accessing these two global locks, we follow the order
- -# Get worker thread `in_lock`
- -# Get global lock
+Nested locks prone to deadlock. The only nested locks are `read.txt` and `empty.txt`. Per the suggestion of OSTEP, we ensure that all nested lock acesses follow the same ordering. The program always gets the `*in_lock` first before getting the global lock.
 
 ## Invalid memory locations
 This portion addresses the validity of the freeing mechanism done by the worker threads (see lines !!!). ... Figure \latexonly\ref{mlp2t}\endlatexonly summarizes the interaction between existing worker thread arugments (`t1`) and ones being built (`t2`).
 
-Once a worker thread completes, it frees uneeded dynamic memory. This includes its `in_lock` (in Figure \latexonly\ref{mlp2t}\endlatexonly, this is LOCK 0). This may seem like a problem because `in_lock` starts out as a shared lock - it was an older thread's `out_lock`. However by the time the current worker thread completes, the `in_lock` is not shared anymore - it is the only pointer to that lock. The older worker thread would have already completed and freed its `out_lock` pointer. This ensures that `recent_lock` and `t2.in_lock` never point to invalid memory locations. Figure \latexonly\ref{mlp1t}\endlatexonly shows the lock pointer states when `t1` completes.
+Once a worker thread completes, it frees uneeded dynamic memory. This includes its `*in_lock` (in Figure \latexonly\ref{mlp2t}\endlatexonly, this is LOCK 0). This may seem like a problem because `*in_lock` starts out as a shared lock - it was an older thread's `*out_lock`. However by the time the current worker thread completes, the `*in_lock` is not shared anymore. The older worker thread would have already completed and freed its `out_lock` pointer. This ensures that `recent_lock` and `t2.in_lock` never point to invalid memory locations. Figure \latexonly\ref{mlp1t}\endlatexonly shows the lock pointer states when `t1` completes.

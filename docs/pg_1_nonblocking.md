@@ -63,7 +63,7 @@ Figure \latexonly\ref{mlp2t}\endlatexonly summarizes the interaction between exi
 \end{figure}
 \endlatexonly
 
-Once a worker thread completes, the only lock freed is the `in_lock` (in the Figure above, this is LOCK 0 , `t1.in_lock`). By the time a worker thread completes, the `in_lock` is not shared. This ensures that `recent_lock` and `t2.in_lock` never point to invalid memory locations. Figure \latexonly\ref{mlp1t}\endlatexonly shows the lock pointer states when `t1` completes.
+Once a worker thread completes, it frees both `&in_lock` and `*in_lock` (in the Figure above, this is LOCK 0 - `*t1.in_lock`). By the time a worker thread completes, the `*in_lock` is not shared. It has reached the end of its life cycle. This ensures that `recent_lock` and `t2.in_lock` never point to invalid memory locations. Figure \latexonly\ref{mlp1t}\endlatexonly shows the lock pointer states when `t1` completes.
 
 \latexonly
 \begin{figure}[H]

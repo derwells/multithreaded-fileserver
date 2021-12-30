@@ -13,3 +13,6 @@ In-depth explanations for each level requirement can be found at
 - \subpage pg_execution "Command Execution" for Level 2 requirements.
 - \subpage pg_concurrency "Concurrency" for Level 3 requirements.
 - \subpage pg_synchronization "Synchronization" for Level 3, 4 requirements.
+
+# Terminologies
+- *target file*: `<path/to/file>` of each command
