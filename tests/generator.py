@@ -142,11 +142,23 @@ def test_synchronization():
 
     fault_flag = False
 
-    print("[ANALYZING] read.txt")
     actual_read = {}
     read_record = []
     with open(READ_FILE, "r+") as f:
         read_record = f.readlines()
+    actual_empty = {}
+    empty_record = []
+    with open(EMPTY_FILE, "r+") as f:
+        empty_record = f.readlines()
+    cmd_record = []
+    with open(CMD_FILE, "r+") as f:
+        cmd_record = f.readlines()
+
+    # Cleanup
+    for path in to_clean:
+        os.remove(path)
+
+    print("[ANALYZING] read.txt")
     for r in read_record:
         _, path, input_ = r.split(" ", 2)
         path = path[:-1]
@@ -156,6 +168,8 @@ def test_synchronization():
     for path in files:
         if not(path in read_seq.keys()):
             continue
+        print(path)
+        print(len(read_seq[path]), len(actual_read[path]))
         for i in range(len(read_seq[path])):
             if read_seq[path][i] != actual_read[path][i][:-1]:
                 print("[FAULT] Inconsistent read at index {}".format(i))
@@ -164,10 +178,6 @@ def test_synchronization():
                 fault_flag = True
 
     print("[ANALYZING] empty.txt")
-    actual_empty = {}
-    empty_record = []
-    with open(EMPTY_FILE, "r+") as f:
-        empty_record = f.readlines()
     for r in empty_record:
         _, path, input_ = r.split(" ", 2)
         path = path[:-1]
@@ -185,9 +195,6 @@ def test_synchronization():
                 fault_flag = True
     
     print("[ANALYZING] commands.txt")
-    cmd_record = []
-    with open(CMD_FILE, "r+") as f:
-        cmd_record = f.readlines()
     for i, r in enumerate(cmd_record):
         _cmd = r.split(" ", 5)[-1]
         _cmd = _cmd[:-1]
@@ -197,10 +204,6 @@ def test_synchronization():
     if not fault_flag:
         print("[GOOD] All tests passed")
 
-    input("Press [enter] for cleanup: ")
-
-    for path in to_clean:
-        os.remove(path)
 
 
 def main():
