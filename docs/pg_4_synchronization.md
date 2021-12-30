@@ -125,3 +125,8 @@ These files do not have to be ordered - they are non-deterministic. Hence, it su
 Nested locks are the most prone to causing deadlock errors. The only nested locks are `read.txt` and `empty.txt`. Per the suggestion of OSTEP, we ensure that all nested lock acesses follow the same ordering. When accessing these two global locks, we follow the order
  -# Get worker thread `in_lock`
  -# Get global lock
+
+## Invalid memory locations
+This portion addresses the validity of the freeing mechanism done by the worker threads (see lines !!!). ... Figure \latexonly\ref{mlp2t}\endlatexonly summarizes the interaction between existing worker thread arugments (`t1`) and ones being built (`t2`).
+
+Once a worker thread completes, it frees uneeded dynamic memory. This includes its `in_lock` (in Figure \latexonly\ref{mlp2t}\endlatexonly, this is LOCK 0). This may seem like a problem because `in_lock` starts out as a shared lock - it was an older thread's `out_lock`. However by the time the current worker thread completes, the `in_lock` is not shared anymore - it is the only pointer to that lock. The older worker thread would have already completed and freed its `out_lock` pointer. This ensures that `recent_lock` and `t2.in_lock` never point to invalid memory locations. Figure \latexonly\ref{mlp1t}\endlatexonly shows the lock pointer states when `t1` completes.

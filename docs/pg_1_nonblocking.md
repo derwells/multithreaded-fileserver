@@ -24,6 +24,7 @@ Here are more detailed steps
 1. Parse and store user input in `command` struct
     - Uses `get_command()` to read user input into a `command` struct
     - Command information is deep-copied into other locations (e.g. file trackers `fmeta` and thread arguments `args_t`)
+    - File inputs are accommodated to aid debugging and automated tests. We make the master thread run in an infinite loop at the EOF.
 2. Initialize thread arguments
     - Dynamically create struct `args_t`
     - Use `args_init` to partially build new `args_t`
@@ -49,7 +50,7 @@ Here are more detailed steps
 ## Why master thread is non-blocking
 It is never the case that the master thread gets blocked. The data structures used - `fmeta`, `command`, `list_t` - do not involve locks nor synchronization features.
 
-Of note are the updating of the file metadata `fmeta` and thread args `args_t`. These involve *pointers* to a lock used by worker threads. It should be emphasized that the locks themselves are not involved. The locks simply "passed-along" with the use of pointers. 
+Of note are the updating of the file metadata `fmeta` and thread args `args_t`. These involve shared locks - *pointers* to a lock used by worker threads. It should be emphasized that the locks themselves are not involved. The locks simply "passed-along" with the use of pointers.
 
 Figure \latexonly\ref{mlp2t}\endlatexonly summarizes the interaction between existing worker thread arugments (`t1`) and ones being built (`t2`).
 
@@ -62,8 +63,7 @@ Figure \latexonly\ref{mlp2t}\endlatexonly summarizes the interaction between exi
 \end{figure}
 \endlatexonly
 
-Once a worker thread completes, the only lock freed is the `in_lock` (in the diagram above, it is `t1.in_lock`). This ensures that `recent_lock` and `t2.in_lock` never point to invalid memory locations. Figure \latexonly\ref{mlp1t}\endlatexonly shows what will happend if the thread of `t1` completes before the thread of `t2`.
-
+Once a worker thread completes, the only lock freed is the `in_lock` (in the Figure above, this is LOCK 0 , `t1.in_lock`). By the time a worker thread completes, the `in_lock` is not shared. This ensures that `recent_lock` and `t2.in_lock` never point to invalid memory locations. Figure \latexonly\ref{mlp1t}\endlatexonly shows the lock pointer states when `t1` completes.
 
 \latexonly
 \begin{figure}[H]
@@ -74,5 +74,4 @@ Once a worker thread completes, the only lock freed is the `in_lock` (in the dia
 \end{figure}
 \endlatexonly
 
-
-Therefore, it is impossible for an existing worker thread to interfere with the master thread. The master thread can safely create worker threads despite the lack of blocking and synchronization.
+Therefore, it is impossible for an existing worker thread to interfere with the master thread. The master thread can safely create worker threads.
