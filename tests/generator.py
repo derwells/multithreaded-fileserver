@@ -3,6 +3,9 @@ import subprocess
 import string    
 import random
 
+from itertools import accumulate as _accumulate, repeat as _repeat
+from bisect import bisect as _bisect
+
 READ_FILE = "read.txt"
 EMPTY_FILE = "empty.txt"
 CMD_FILE = "commands.txt"
@@ -16,14 +19,38 @@ READ, WRITE, EMPTY = 0, 1, 2
 
 # INPUTS
 N_FILES = 20
-N_CMDS = 10
+N_CMDS = 100
+
+# For Python 3.4
+# https://stackoverflow.com/questions/58915023/what-is-an-alternative-method-of-using-random-choices-in-python-3-5
+def choices(population, weights=None, *, cum_weights=None, k=1):
+    """Return a k sized list of population elements chosen with replacement.
+    If the relative weights or cumulative weights are not specified,
+    the selections are made with equal probability.
+    """
+    n = len(population)
+    if cum_weights is None:
+        if weights is None:
+            _int = int
+            n += 0.0    # convert to float for a small speed improvement
+            return [population[_int(random.random() * n)] for i in _repeat(None, k)]
+        cum_weights = list(_accumulate(weights))
+    elif weights is not None:
+        raise TypeError('Cannot specify both weights and cumulative weights')
+    if len(cum_weights) != n:
+        raise ValueError('The number of weights does not match the population')
+    bisect = _bisect
+    total = cum_weights[-1] + 0.0   # convert to float
+    hi = n - 1
+    return [population[bisect(cum_weights, random.random() * total, 0, hi)]
+            for i in _repeat(None, k)]
 
 
 def n_rand_chars(n):
     return "".join(
             [   
                 chr(x) for x in
-                random.choices(
+                choices(
                     list(range(32, 127 + 1)),
                     k=n
                 )
@@ -32,7 +59,7 @@ def n_rand_chars(n):
 
 def n_rand_alnum(n):
     return "".join(
-            random.choices(
+            choices(
                 string.ascii_uppercase + string.digits + string.ascii_lowercase,
                 k=n
             )
@@ -51,13 +78,13 @@ def build_empty(path):
     return EMPTY_STR.format(path)
 
 def test_synchronization():
-    path_len = 50 - len("outputs/.txt")
+    path_len = 50 - len(".txt")
     read_seq = {}
     empty_seq = {}
     contents = {}
 
     files = [
-        "outputs/{}.txt".format(
+        "{}.txt".format(
             n_rand_alnum(
                 random.randrange(1, path_len + 1)
             )
@@ -70,7 +97,10 @@ def test_synchronization():
     for i in range(N_CMDS):
         for path in files:
             _input = n_rand_chars(random.randrange(1, 50 + 1))
-            choice = random.choices([READ, WRITE, EMPTY], k=1)[0]
+            if not (path in to_clean):
+                choice = WRITE
+            else:
+                choice = choices([READ, WRITE, EMPTY], k=1)[0]
 
             if choice == READ:
                 if not (path in read_seq.keys()):
@@ -128,9 +158,9 @@ def test_synchronization():
             continue
         for i in range(len(read_seq[path])):
             if read_seq[path][i] != actual_read[path][i][:-1]:
-                print(f"[FAULT] Inconsistent read at index {i}")
-                print(f"[FAULT] generator: {len(read_seq[path][i])}\n", read_seq[path][i])
-                print(f"[FAULT] read.txt: {len(actual_read[path][i])}\n", actual_read[path][i])
+                print("[FAULT] Inconsistent read at index {}".format(i))
+                print("[FAULT] generator: {}\n".format(len(read_seq[path][i])), read_seq[path][i])
+                print("[FAULT] read.txt: {}\n".format(len(actual_read[path][i])), actual_read[path][i])
                 fault_flag = True
 
     print("[ANALYZING] empty.txt")
@@ -149,9 +179,9 @@ def test_synchronization():
             continue
         for i in range(len(empty_seq[path])):
             if empty_seq[path][i] != actual_empty[path][i][:-1]:
-                print(f"[FAULT] Inconsistent empty at index {i}")
-                print(f"[FAULT] generator: {len(empty_seq[path][i])}\n", empty_seq[path][i])
-                print(f"[FAULT] read.txt: {len(actual_empty[path][i])}\n", actual_empty[path][i])
+                print("[FAULT] Inconsistent empty at index {}".format(i))
+                print("[FAULT] generator: {}\n".format(len(empty_seq[path][i])), empty_seq[path][i])
+                print("[FAULT] read.txt: {}\n".format(len(actual_empty[path][i])), actual_empty[path][i])
                 fault_flag = True
     
     print("[ANALYZING] commands.txt")
@@ -162,11 +192,10 @@ def test_synchronization():
         _cmd = r.split(" ", 5)[-1]
         _cmd = _cmd[:-1]
         if _cmd != actual_cmds[i]:
-            print(f"[FAULT] Inconsistent cmd at index {i}")
             fault_flag = True
 
     if not fault_flag:
-        print(f"[GOOD] All tests passed")
+        print("[GOOD] All tests passed")
 
     input("Press [enter] for cleanup: ")
 
