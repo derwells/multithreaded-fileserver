@@ -1,9 +1,13 @@
 \page pg_concurrency Concurrency
 
 # Implementation
-Each worker thread is associated with a target file. This allows for operations to a single file to be synchronized (see \ref pg_synchronization "*Synchronization*" for more info).
+Each worker thread is associated with a target file. This allows for operations to a single file to be synchronized (see \ref pg_synchronization "Synchronization" for more info).
 
-However, *worker threads associated with different files can run concurrently*. The blocked portion of each worker thread is guarded by an `in_lock` dependent on the target file. Thus, there is no mutual exclusivity between worker threads of a different file. The only mutually exclusive operations between worker threads of different files are the recording operations to `read.txt` or `empty.txt`.
+However, *worker threads associated with different files can run concurrently*. The blocked portion of each worker thread is guarded by an `in_lock` dependent on the target file. Thus, there is no mutual exclusivity between worker threads of a different file. 
+
+The only mutually exclusive operations between worker threads of different files are the recording operations to `read.txt` or `empty.txt`. The program uses global locks to guard these files.
+
+A complete picture of this can be found in the \ref pg_synchronization "Synchronization section".
 
 # Proof
 [FIX THIS]
@@ -80,4 +84,4 @@ We show that worker threads of a different file indeed execute concurrently. Run
 
 we see that target files are opened (using `openat`) at the same time. Here are a few snippets of the output
 
-Program correctness is proven in \ref pg_synchronization "*Synchronization*".
+Program correctness is proven in \ref pg_synchronization "Synchronization".

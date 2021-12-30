@@ -10,6 +10,9 @@ READ_FILE = "read.txt"
 EMPTY_FILE = "empty.txt"
 CMD_FILE = "commands.txt"
 
+GEN_READ = "outputs/gen_read.txt"
+GEN_EMPTY = "outputs/gen_empty.txt"
+
 TEST_IN = "tests/test.in"
 WRITE_STR = "write {} {}"
 READ_STR = "read {}"
@@ -19,7 +22,7 @@ READ, WRITE, EMPTY = 0, 1, 2
 
 # INPUTS
 N_FILES = 20
-N_CMDS = 100
+N_CMDS = 10
 
 # For Python 3.4
 # https://stackoverflow.com/questions/58915023/what-is-an-alternative-method-of-using-random-choices-in-python-3-5
@@ -146,6 +149,7 @@ def test_synchronization():
     read_record = []
     with open(READ_FILE, "r+") as f:
         read_record = f.readlines()
+
     actual_empty = {}
     empty_record = []
     with open(EMPTY_FILE, "r+") as f:

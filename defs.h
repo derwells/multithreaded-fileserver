@@ -3,6 +3,11 @@
 
 #include <pthread.h>
 
+/** Debugging messages off by default */
+#define DEBUGGING   0
+/** Wrapper for stderr print */
+#define debug_mode(x) { if (DEBUGGING) x; } 
+
 /** Number of global file locks (glocks). */
 #define N_GLOCKS    2
 /** Index of read.txt glock */

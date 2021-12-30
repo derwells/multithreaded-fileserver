@@ -203,7 +203,7 @@ void *worker_write(void *_args) {
     pthread_mutex_lock(args->in_lock);
 
 
-    fprintf(stderr, "[START] %s %s %s\n", cmd->action, cmd->path, cmd->input);
+    debug_mode(fprintf(stderr, "[START] %s %s %s\n", cmd->action, cmd->path, cmd->input));
     
     /** Lines 209-211: Access target file */
     r_simulate_access();
@@ -212,7 +212,7 @@ void *worker_write(void *_args) {
 
     /** Lines 214-217: Error handling */
     if (target_file == NULL) {
-        fprintf(stderr, "[ERR] worker_write fopen\n");
+        debug_mode(fprintf(stderr, "[ERR] worker_write fopen\n"));
         exit(1);
     }
 
@@ -221,7 +221,7 @@ void *worker_write(void *_args) {
     fprintf(target_file, "%s", cmd->input);
     fclose(target_file);
 
-    fprintf(stderr, "[END] %s %s %s\n", cmd->action, cmd->path, cmd->input);
+    debug_mode(fprintf(stderr, "[END] %s %s %s\n", cmd->action, cmd->path, cmd->input));
 
     pthread_mutex_unlock(args->out_lock);
 
@@ -252,7 +252,7 @@ void *worker_read(void *_args) {
     /** Lines 253-298: Critical section for target file */
     pthread_mutex_lock(args->in_lock);
 
-    fprintf(stderr, "[START] %s %s\n", cmd->action, cmd->path);
+    debug_mode(fprintf(stderr, "[START] %s %s\n", cmd->action, cmd->path));
 
     /** Lines 258-260: Access target file */
     r_simulate_access();
@@ -293,7 +293,7 @@ void *worker_read(void *_args) {
         fclose(from_file);
     }
 
-    fprintf(stderr, "[END] %s %s\n", cmd->action, cmd->path);
+    debug_mode(fprintf(stderr, "[END] %s %s\n", cmd->action, cmd->path));
 
     pthread_mutex_unlock(args->out_lock);
 
@@ -324,7 +324,7 @@ void *worker_empty(void *_args) {
     /** Lines 325-322: Critical section for target file */
     pthread_mutex_lock(args->in_lock);
 
-    fprintf(stderr, "[START] %s %s\n", cmd->action, cmd->path);
+    debug_mode(fprintf(stderr, "[START] %s %s\n", cmd->action, cmd->path));
 
     /** Lines 330-332: Access target file */
     r_simulate_access();
@@ -369,7 +369,7 @@ void *worker_empty(void *_args) {
         /** Lines 370: Sleep after appending and emptying */
         r_sleep_range(7, 10);
     }
-    fprintf(stderr, "[END] %s %s\n", cmd->action, cmd->path);
+    debug_mode(fprintf(stderr, "[END] %s %s\n", cmd->action, cmd->path));
 
     pthread_mutex_unlock(args->out_lock);
 
@@ -445,7 +445,7 @@ void command_record(command *cmd) {
     /** Lines -: Write to commands.txt */
     FILE *commands_file = fopen(CMD_TARGET, CMD_MODE);
     if (commands_file == NULL) {
-        fprintf(stderr, "[ERR] worker_write fopen\n");
+        debug_mode(fprintf(stderr, "[ERR] worker_write fopen\n"));
         exit(1);
     }
     if (strcmp(cmd->action, "write") == 0) {
@@ -525,7 +525,7 @@ void spawn_worker(args_t *targs) {
         pthread_create(&tid, NULL, worker_empty, targs);
     } else {
         /** Lines -: Error handling */
-        perror("[ERR] Invalid `action`");
+        debug_mode(fprintf(stderr, "[ERR] Invalid `action`\n"));
         exit(1);
     }
 
@@ -555,16 +555,16 @@ void *master() {
          *  - If found, update `fmeta.recent_lock`
          *  - If not found, create `fmeta` and add to tracker
          */
-        fprintf(stderr, "[METADATA CHECK] %s\n", cmd->path);
+        debug_mode(fprintf(stderr, "[METADATA CHECK] %s\n", cmd->path));
         fmeta *fc = l_lookup(tracker, cmd->path);
         if (fc != NULL) {
             // Metadata found
-            fprintf(stderr, "[METADATA HIT] %s\n", cmd->path);
+            debug_mode(fprintf(stderr, "[METADATA HIT] %s\n", cmd->path));
 
             targs->in_lock = fc->recent_lock;
         } else if (fc == NULL) {
             // Metadata not found, insert to list
-            fprintf(stderr, "[METADATA ADD] %s\n", cmd->path);
+            debug_mode(fprintf(stderr, "[METADATA ADD] %s\n", cmd->path));
 
             // Thread can run immediately
             targs->in_lock = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
