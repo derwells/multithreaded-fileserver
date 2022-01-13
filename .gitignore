@@ -2,6 +2,7 @@
 !*.*
 *.txt
 test.*
+.gdbinit
 !Doxyfile
 !/docs
 !/tests

@@ -21,7 +21,7 @@ EMPTY_STR = "empty {}"
 READ, WRITE, EMPTY = 0, 1, 2
 
 # INPUTS
-N_FILES = 20
+N_FILES = 3
 N_CMDS = 10
 
 # For Python 3.4
@@ -98,6 +98,7 @@ def test_synchronization():
 
     actual_cmds = []
     for i in range(N_CMDS):
+        random.shuffle(files)
         for path in files:
             _input = n_rand_chars(random.randrange(1, 50 + 1))
             if not (path in to_clean):

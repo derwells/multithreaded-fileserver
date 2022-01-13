@@ -3,85 +3,119 @@
 # Implementation
 Each worker thread is associated with a target file. This allows for operations to a single file to be synchronized (see \ref pg_synchronization "Synchronization" for more info).
 
-However, *worker threads associated with different files can run concurrently*. The blocked portion of each worker thread is guarded by an `in_lock` dependent on the target file. Thus, there is no mutual exclusivity between worker threads of different files. 
+However, *worker threads associated with different files can run concurrently*. The blocked portion of each worker thread is guarded by an `in_lock` dependent on the target file. Thus, there is no mutual exclusivity between worker threads of different files. Commands associated with different files can run concurrently.
 
 The only atomic operations between worker threads of different files are recording to `read.txt` and `empty.txt`. The program uses global locks to guard these files.
 
 A complete picture of this can be found in the \ref pg_synchronization "Synchronization section".
 
 # Proof
-[FIX THIS]
-Note the integrity test input below:
+We can show that commands associated with different files can run concurrently using `gdb`. By examining thread states, we can ascertain that threads indeed run concurrently.
 
-    write outputs/a.txt 1 2
-    write outputs/a.txt 3 4
-    read outputs/a.txt
-    write outputs/a.txt 5 6
-    write outputs/b.txt 1 2
-    write outputs/b.txt 3 4
-    empty outputs/a.txt
-    read outputs/a.txt
-    read outputs/a.txt
-    write outputs/a.txt 7 8
-    read outputs/b.txt
-    read outputs/a.txt
-    empty outputs/a.txt
-    write outputs/b.txt 5 6
-    empty outputs/b.txt
-    read outputs/b.txt
-    write outputs/a.txt 9 10
-    write outputs/a.txt 11 12
-    read outputs/b.txt
-    write outputs/b.txt 7 8
-    read outputs/b.txt
-    empty outputs/b.txt
-    write outputs/a.txt 13 14
-    read outputs/a.txt
-    write outputs/b.txt 11 12
-    write outputs/b.txt 13 14
-    read outputs/b.txt
-    empty outputs/a.txt
-    write outputs/b.txt 9 10
-    empty outputs/b.txt
-    write outputs/c.txt 1 2
-    write outputs/c.txt 3 4
-    read outputs/c.txt
-    write outputs/c.txt 5 6
-    write outputs/d.txt 1 2
-    write outputs/d.txt 3 4
-    empty outputs/c.txt
-    read outputs/c.txt
-    read outputs/c.txt
-    write outputs/c.txt 7 8
-    read outputs/d.txt
-    read outputs/c.txt
-    empty outputs/c.txt
-    write outputs/d.txt 5 6
-    empty outputs/d.txt
-    read outputs/d.txt
-    write outputs/c.txt 9 10
-    write outputs/c.txt 11 12
-    read outputs/d.txt
-    write outputs/d.txt 7 8
-    read outputs/d.txt
-    empty outputs/d.txt
-    write outputs/c.txt 13 14
-    read outputs/c.txt
-    write outputs/d.txt 11 12
-    write outputs/d.txt 13 14
-    read outputs/d.txt
-    empty outputs/c.txt
-    write outputs/d.txt 9 10
-    read outputs/d.txt
-    empty outputs/d.txt
-    write outputs/e.txt 9 10
-    read outputs/e.txt
-    empty outputs/e.txt
+We do this by setting two breakpoints within the critical section. We do this by setting breakpoints in `.gdbinit`
 
-We show that worker threads of a different file indeed execute concurrently. Running the command below:
+\code{.unparsed}
+    break 222
+    break 296
+    break 372
+    run < conctest.txt
+\endcode
 
-    strace -ftCe trace=openat,close -p `pidof ./file_server` 2> debug.txt
+From the top, these are for write, read, and empty respectively.
 
-we see that target files are opened (using `openat`) at the same time. Here are a few snippets of the output
+The input file `conctest.txt` will contains two lines of input. These will target two different files `a.txt` and `b.txt`.
+
+Note that there are three types of commands. For completion, we show that every combination of two commands can run concurrently with each other.
+
+For brevity, we look for test outputs that explicitly show the thread working within the `worker_*` function. We avoid outputs where either one of the threads is sleeping.
+
+## write & write
+For testing write command concurreny with another write, we use the `contest.txt` below
+\code{.unparsed}
+    write a.txt A
+    write b.txt B
+\endcode
+
+Indeed, we see that the spawned threads are executing `worker_write()` at the same time.
+
+\latexonly
+\begin{figure}[H]
+    \centering
+	\includegraphics[scale=1]{sync_overview.png}
+	\caption{`write`, `write` concurrency}
+	\label{overview}
+\end{figure}
+\endlatexonly
+
+## write & read
+\code{.unparsed}
+    write a.txt A
+    read b.txt
+\endcode
+
+\latexonly
+\begin{figure}[H]
+    \centering
+	\includegraphics[scale=1]{sync_overview.png}
+	\caption{`write`, `read` concurrency}
+	\label{overview}
+\end{figure}
+\endlatexonly
+## write & empty
+\code{.unparsed}
+    write a.txt A
+    empty b.txt
+\endcode
+
+\latexonly
+\begin{figure}[H]
+    \centering
+	\includegraphics[scale=1]{sync_overview.png}
+	\caption{`write`, `empty` concurrency}
+	\label{overview}
+\end{figure}
+\endlatexonly
+## read & read
+\code{.unparsed}
+    read a.txt
+    read b.txt
+\endcode
+
+\latexonly
+\begin{figure}[H]
+    \centering
+	\includegraphics[scale=1]{sync_overview.png}
+	\caption{`read`, `read` concurrency}
+	\label{overview}
+\end{figure}
+\endlatexonly
+## read & empty
+\code{.unparsed}
+    read a.txt
+    empty b.txt
+\endcode
+
+\latexonly
+\begin{figure}[H]
+    \centering
+	\includegraphics[scale=1]{sync_overview.png}
+	\caption{`read`, `empty` concurrency}
+	\label{overview}
+\end{figure}
+\endlatexonly
+## empty & empty
+\code{.unparsed}
+    empty a.txt
+    empty b.txt
+\endcode
+
+\latexonly
+\begin{figure}[H]
+    \centering
+	\includegraphics[scale=1]{sync_overview.png}
+	\caption{`empty`, `empty` concurrency}
+	\label{overview}
+\end{figure}
+\endlatexonly
 
 Program correctness is proven in \ref pg_synchronization "Synchronization".

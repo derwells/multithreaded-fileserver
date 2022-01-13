@@ -107,8 +107,8 @@ void r_simulate_access() {
 /**
  * Sleeps for a random amount between min and max.
  * 
- * @param min Minimum sleep time.
- * @param max Maximum sleep time.
+ * @param min Minimum sleep time in microseconds.
+ * @param max Maximum sleep time in microseconds.
  * @return    Void.
  */
 void r_sleep_range(int min, int max) {
@@ -117,7 +117,7 @@ void r_sleep_range(int min, int max) {
     /** Line 118: Translate random number to range */
     int sleep_time = (r % (max - min)) + min;
 
-    sleep(sleep_time);
+    usleep(sleep_time);
 }
 
 /**
@@ -215,16 +215,16 @@ void *worker_write(void *_args) {
         debug_mode(fprintf(stderr, "[ERR] worker_write fopen\n"));
         exit(1);
     }
-
-    /** Lines 220-222: Write to target file (with sleep) */
-    sleep(0.025 * strlen(cmd->input));
-    fprintf(target_file, "%s", cmd->input);
+    /** Lines 219-223: Write to target file (with sleep) */
+    int i;
+    for(i = 0; i < strlen(cmd->input); i++) {
+        fputc(cmd->input[i], target_file);
+        usleep(25*1000); /** Line 222: Sleep for 25 ms */
+    }
     fclose(target_file);
-
     debug_mode(fprintf(stderr, "[END] %s %s %s\n", cmd->action, cmd->path, cmd->input));
 
     pthread_mutex_unlock(args->out_lock);
-
     /** Lines 229-231: Free unneeded args and struct args */
     free(args->cmd);
     free(args->in_lock);
@@ -335,8 +335,8 @@ void *worker_empty(void *_args) {
     if (from_file == NULL) {
         /** 
          * Lines 341-346: 
-         * - Target DNE
-         * - empty.txt critical section 
+         * - If target does not exist
+         * - Contains empty.txt critical section 
          */
         pthread_mutex_lock(&glocks[EMPTY_GLOCK]);
         to_file = open_empty();
@@ -347,8 +347,8 @@ void *worker_empty(void *_args) {
     } else {
         /** 
          * Lines 353-363: 
-         * - Target exists
-         * - empty.txt critical section 
+         * - If target exists
+         * - Contains empty.txt critical section 
          */
         pthread_mutex_lock(&glocks[EMPTY_GLOCK]);
         to_file = open_empty();
@@ -367,7 +367,7 @@ void *worker_empty(void *_args) {
         empty_file(cmd->path);
 
         /** Lines 370: Sleep after appending and emptying */
-        r_sleep_range(7, 10);
+        r_sleep_range(7*1000000, 10*1000000);
     }
     debug_mode(fprintf(stderr, "[END] %s %s\n", cmd->action, cmd->path));
 
@@ -389,22 +389,26 @@ void *worker_empty(void *_args) {
  * @return      Void.
  */
 void get_command(command *cmd) {
+    /** Lines 396-399: Reading input
+     * Use scanf to read user commands. Handle file inputs by
+     * Loopining infinitely on EOF.
+    */
     char inp[2*MAX_INPUT_SIZE + MAX_ACTION_SIZE];
     if (scanf("%[^\n]%*c", inp) == EOF) {
         while (1) {}
-    } // FIX THIS
+    }
 
-    /** Lines -: Get command action */
+    /** Lines 402-403: Get command action */
     char *ptr = strtok(inp, " ");
     strcpy(cmd->action, ptr);
 
-    /** Lines -: Get command path/to/file (aka. target file) */
+    /** Lines 406-407: Get command path/to/file (aka. target file) */
     ptr = strtok(NULL, " ");
     strcpy(cmd->path, ptr);
 
-    /** Lines -: Get command input string */
+    /** Lines 410-412: Get command input string */
     ptr = strtok(NULL, "");
-    if (ptr != NULL)
+    if (strcmp(cmd->action, "write") && ptr != NULL)
         strcpy(cmd->input, ptr);
 
     return;
@@ -426,34 +430,39 @@ void command_copy(command *to, command *from) {
 
 /**
  * @relates     __command
- * Wrapper for writing to commands.txt
+ * Wrapper for writing to commands.txt. Timestamp creation
+ * references https://www.cplusplus.com/reference/ctime/localtime/.
  * 
  * @param cmd   Struct command to record.
  * @return      Void.
  */
 void command_record(command *cmd) {
-    /** Lines -: Build timestamp */
+    /** Lines 441-445: Build timestamp using system time */
     time_t rawtime;
-    struct tm * timeinfo;
-    time ( &rawtime );
-    timeinfo = localtime ( &rawtime );
-    // Remove newline
+    time(&rawtime);
+    struct tm *timeinfo = localtime(&rawtime);
     char *cleaned_timestamp = asctime(timeinfo);
-    // Check if consistent with older linux kernels
-    cleaned_timestamp[24] = '\0';
+    cleaned_timestamp[24] = '\0';  /** Line 447: Replace newline with null-terminator */
 
     /** Lines -: Write to commands.txt */
     FILE *commands_file = fopen(CMD_TARGET, CMD_MODE);
+
+    /** Lines 451-452: Error handling if commands.txt does not exist */
     if (commands_file == NULL) {
         debug_mode(fprintf(stderr, "[ERR] worker_write fopen\n"));
         exit(1);
     }
+
+    /** Lines 456-463: Error handling if commands.txt does not exist */
     if (strcmp(cmd->action, "write") == 0) {
+        /** Line 459: If recording write action, use 3 inputs */
         fprintf(commands_file, FMT_3CMD, cleaned_timestamp, cmd->action, cmd->path, cmd->input);
     } else {
+        /** Line 462: If not recording write action, use 2 inputs */
         fprintf(commands_file, FMT_2CMD, cleaned_timestamp, cmd->action, cmd->path);
     }
 
+    /** Line 466: Close commands.txt */
     fclose(commands_file);
 }
 
@@ -467,13 +476,17 @@ void command_record(command *cmd) {
  * @return      Void.
  */
 void args_init(args_t *targs, command *cmd) {
+    /** Lines 483-484: 
+     * Dynamically allocate new mutex for out_lock; freed later
+     * Initialize mutex
+     */
     targs->out_lock = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
     pthread_mutex_init(targs->out_lock, NULL);
 
-    /** Line : Ensure next thread can't run immediately */
+    /** Line 487: Ensure next thread can't run immediately by locking out_lock */
     pthread_mutex_lock(targs->out_lock);
 
-    /** Lines -: Deep copy user input in cmd */
+    /** Lines 490-491: Deep copy user input stored in cmd to thread args */
     targs->cmd = malloc(sizeof(command));
     command_copy(targs->cmd, cmd);
 }
@@ -488,6 +501,7 @@ void args_init(args_t *targs, command *cmd) {
  * @return      Void.
  */
 void fmeta_init(fmeta *fc, command *cmd) {
+    /** Line 505: fmeta.path is the only initialization step */
     strcpy(fc->path, cmd->path);
 }
 
@@ -501,7 +515,8 @@ void fmeta_init(fmeta *fc, command *cmd) {
  * @return      Void.
  */
 void fmeta_update(fmeta *fc, args_t *targs) {
-    fc->recent_lock = targs->out_lock;
+    /** Line 519: Update fmeta.recent_lock */
+    fc->recent_lock = targs->out_lock; 
 }
 
 /**
@@ -513,23 +528,28 @@ void fmeta_update(fmeta *fc, args_t *targs) {
  * @return      Void.
  */
 void spawn_worker(args_t *targs) {
+     /** Line 532: Use separate pointer for args_t.cmd for brevity */
     command *cmd = targs->cmd;
 
-    /** Lines -: Spawn worker thread depending on cmd */
-    pthread_t tid; // tids are not stored
+    /** Lines 535-549: Spawn worker thread depending on cmd */
+    pthread_t tid; /** Line 535: Declare tid variable; tids are not saved */
     if (strcmp(cmd->action, "write") == 0) {
+        /** Line 538: If write command, spawn worker_write */
         pthread_create(&tid, NULL, worker_write, targs);
     } else if (strcmp(cmd->action, "read") == 0) {
+        /** Line 541: If read command, spawn worker_read */
         pthread_create(&tid, NULL, worker_read, targs);
     } else if (strcmp(cmd->action, "empty") == 0) {
+        /** Line 544: If empty command, spawn worker_empty */
         pthread_create(&tid, NULL, worker_empty, targs);
     } else {
-        /** Lines -: Error handling */
+        /** Lines 547-548: Error handling */
         debug_mode(fprintf(stderr, "[ERR] Invalid `action`\n"));
         exit(1);
     }
 
-    pthread_detach(tid); // Is this ok?
+    /** Line 552: Detach thread so resources are freed */
+    pthread_detach(tid);
 }
 
 /**
@@ -541,50 +561,54 @@ void spawn_worker(args_t *targs) {
  */
 void *master() {
     while (1) {
-        /** Lines -: Turn input into struct command */
+        /** Lines 565-566: Turn input into struct command */
         command *cmd = malloc(sizeof(command));
         get_command(cmd);
 
-        /** Lines -: Build thread args targs */
+        /** Lines 569-570: Build thread args targs */
         args_t *targs = (args_t *) malloc(sizeof(args_t));
         args_init(targs, cmd);
 
         /** 
-         * Lines -: 
-         *  - Check if file metadata exists in tracker
-         *  - If found, update `fmeta.recent_lock`
-         *  - If not found, create `fmeta` and add to tracker
+         * Lines 578-601: Check if target file has been tracked
+         * Check if file metadata exists in tracker.
+         * If found, update `fmeta.recent_lock`.
+         * If not found, create `fmeta` and add to tracker.
          */
         debug_mode(fprintf(stderr, "[METADATA CHECK] %s\n", cmd->path));
         fmeta *fc = l_lookup(tracker, cmd->path);
         if (fc != NULL) {
-            // Metadata found
+            /** Lines 582-584: Metadata found, update respective fmeta.recent_lock */
             debug_mode(fprintf(stderr, "[METADATA HIT] %s\n", cmd->path));
 
             targs->in_lock = fc->recent_lock;
         } else if (fc == NULL) {
-            // Metadata not found, insert to list
+            /** Line 587-598: Metadata not found, insert to file tracker */
             debug_mode(fprintf(stderr, "[METADATA ADD] %s\n", cmd->path));
 
-            // Thread can run immediately
+            /** Line 590-591: Dynamically allocate and initialize new in_lock mutex */
             targs->in_lock = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
             pthread_mutex_init(targs->in_lock, NULL);
 
-            // Metadata per unique file
+            /** Line 594-595: Dynamically allocate and initialize new file metadata fmeta */
             fc = malloc(sizeof(fmeta));
             fmeta_init(fc, cmd);
 
-            // Insert to tracker
+            /** Line 598: Insert new fmeta to the file tracker */
             l_insert(tracker, fc->path, fc);
         }
+        /** Line 601: Whether newly-created or not, update target file fmeta */
         fmeta_update(fc, targs);
 
-        /** Line : Spawn worker thread */
+        /** Line 604: Spawn worker thread */
         spawn_worker(targs);
 
-        /** Line : Write to commands.txt */
+        /** Line 607: Record to commands.txt */
         command_record(cmd);
 
+        /** Line 612: Free cmd struct. 
+         * Copy of user input already in thread args 
+         */
         free(cmd);
     }
 }
@@ -598,20 +622,20 @@ void *master() {
  * @return          Void. Loops indefinitely.
  */
 int main() {
-    /** Lines -: Initialize global mutexes */
+    /** Lines 626-628: Initialize global mutexes */
     int i;
     for (i = 0; i < N_GLOCKS; i++)
         pthread_mutex_init(&glocks[i], NULL);
 
-    /** Lines -: Initialize metadata tracker */
+    /** Lines 631-632: Initialize metadata tracker */
     tracker = malloc(sizeof(list_t));
     l_init(tracker);
 
-    /** Lines -: Spawn master thread */
+    /** Lines 635-636: Spawn master thread */
     pthread_t tid; // we don't need to store all tids
     pthread_create(&tid, NULL, master, NULL);
 
-    /** Line : Wait for master thread */
+    /** Line 639: Wait for master thread */
     pthread_join(tid, NULL);
 
     return 0;
