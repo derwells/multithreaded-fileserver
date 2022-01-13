@@ -34,14 +34,21 @@ The critical section is bounded by `args_t.in_lock` and `args_t.out_lock` (`file
     - We use `r_simulate_access()` to introduce the specified delay.
 -# [`file_server.c:263-294`] Check if the target file (`from_file`) exists
     - [`file_server.c:269-274`] Target file does not exists; `read.txt` critical section (uses global lock)
-        - [`file_server.c:270`] Open read.txt
+        - [`file_server.c:270`] Open read.txt (see `open_read()`)
+            - Wrapper for opening read.txt
+            - `READ_TARGET` is `"read.txt"`
+            - `READ_MODE` is `"a"`
         - file_server.c:272 Record "FILE DNE" to read.txt
+            - See `FMT_READ_MISS` in `defs.h:36`
         - file_server.c:273 Close read.txt
     - file_server.c:281-291 Target file exists; `read.txt` critical section (uses global lock)
         - file_server.c:282 Access read.txt using pointer
         - file_server.c:285 Write the corresponding record header to read.txt (see `header2_cmd()`)
             - file_server.c:132-137 Writes a 2-input header
-        - file_server.c:288 Append file contents to read.txt
+            - See `FMT_2CMD` in `defs.h:40`
+        - file_server.c:288 Append file contents to read.txt (see `fdump()`)
+            - file_server.c:168-170 Read contents per character
+            - file_server.c:172 Place newline
         - file_server.c:290 Close read.txt
 -# file_server.c:293 Close target file
 -# [file_server.c:301-303] Free unneeded args and struct args
@@ -62,18 +69,29 @@ The critical section is bounded by `args_t.in_lock` and `args_t.out_lock` (`file
     - We use `r_simulate_access()` to introduce the specified delay.
 -# [`file_server.c:335-371`] Check if the target file (`from_file`) exists
     - [`file_server.c:341-346`] Target file does not exists; `empty.txt` critical section (uses global lock)
-        - [`file_server.c:342`] Open read.txt
+        - [`file_server.c:342`] Open empty.txt (see `open_read()`)
+            - Wrapper for opening read.txt
+            - `EMPTY_TARGET` is `"empty.txt"`
+            - `EMPTY_MODE` is `"a"`
         - file_server.c:344 Record "FILE ALREADY EMPTY" to empty.txt
+            - See `FMT_EMPTY_MISS` in `defs.h:38`
         - file_server.c:345 Close empty.txt
     - file_server.c:353-363 Target file exists
         - `empty.txt` critical section (uses global lock)
             - file_server.c:354 Access empty.txt using pointer
             - file_server.c:356 Write the corresponding record header to empty.txt (see `header2_cmd()`)
                 - file_server.c:132-137 Writes a 2-input header
-            - file_server.c:359 Append file contents to empty.txt
+                - See `FMT_2CMD` in `defs.h:40`
+            - file_server.c:359 Append file contents to empty.txt (see `fdump()`)
+                - file_server.c:168-170 Read contents per character
+                - file_server.c:172 Place newline
             - file_server.c:362 Close empty.txt
         - file_server.c:366-367 Empty target file then close it (see `empty_file()`)
             - file_server.c:184 Close target file
+        - file_server.c:370: Sleep 7-10 seconds after appending and emptying (see `r_sleep_range`)
+            - file_server.c:118 Translate random number to range
+                - Random number from `rng()` - the provided generator
+            - file_server.c:120 Microsecond sleep
 -# [file_server.c:377-379] Free unneeded args and struct args
     - Free dynamically allocated memory
 

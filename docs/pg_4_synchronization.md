@@ -1,20 +1,20 @@
 \page pg_synchronization Synchronization
 
 # Overview
-The program ensures synchronization by enforcing a thread run order per target file. This is done using (1) a linked list of file metadata `tracker` (`file_server.c:`) and (2) a hand-over-hand locking scheme for threads targeting the same file.
+The program ensures synchronization by enforcing a thread run order per target file. This is done using (1) a linked list of file metadata `tracker` (`file_server.c:20,631`; see \ref pg_nonblocking "Non-blocking Master") and (2) a hand-over-hand locking scheme for threads targeting the same file.
 
 # Metadata Tracker
 \snippet{lineno} docs/snippets.c global_vars
 
-`tracker` is a linked list of existing target files and their corresponding `fmeta`. Indexed using filepath.
+`tracker` is a linked list (`lnode_t`) of existing target files and their corresponding `fmeta`. Indexed using filepath.
 
-This is not threadsafe - hence it is non-blocking. Only the master thread accesses this data structure.
+This is not threadsafe. However, only the master thread accesses this data structure. Hence, it is non-blocking.
 
 ## Tracker node
-`lnode_t` (`defs.h:`) contains key, value mapping for filepath to corresponding file metadata.
+`lnode_t` (`defs.h:108`) contains key, value mapping for filepath to corresponding file metadata.
  
 ## Metadata
-`fmeta` (`defs.h:`) is a key component of hand-over-hand locking and building worker threads. This keeps track of the most recent `out_lock` in `fmeta.recent_lock`.
+`fmeta` (`defs.h:91`) is a key component of hand-over-hand locking and building worker threads. This keeps track of the most recent `out_lock` in `fmeta.recent_lock`.
 
 # Hand-over-hand locking
 ## Rationale

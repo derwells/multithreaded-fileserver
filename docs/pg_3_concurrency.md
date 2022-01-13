@@ -3,9 +3,9 @@
 # Implementation
 Each worker thread is associated with a target file. This allows for operations to a single file to be synchronized (see \ref pg_synchronization "Synchronization" for more info).
 
-However, *worker threads associated with different files can run concurrently*. The blocked portion of each worker thread is guarded by an `in_lock` dependent on the target file. Thus, there is no mutual exclusivity between worker threads of different files. Commands associated with different files can run concurrently.
+However, *worker threads associated with different files can run concurrently*. The blocked portion of each worker thread is guarded by an `in_lock` dependent on the target file. Thus, there is no mutual exclusivity between worker threads of different files. Commands associated with different files can run concurrently (see \ref pg_synchronization "Synchronization" for more info).
 
-The only atomic operations between worker threads of different files are recording to `read.txt` and `empty.txt`. The program uses global locks to guard these files.
+The only atomic operations between worker threads of different files are recording to `read.txt` and `empty.txt`. The program uses global locks to guard these files (see \ref pg_execution "Execution").
 
 A complete picture of this can be found in the \ref pg_synchronization "Synchronization section".
 

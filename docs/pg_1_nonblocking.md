@@ -5,6 +5,13 @@ For more line-by-line explanations, refer to the file documentation `main()`, `m
 # main()
 Entrypoint `main()` initializes global variables and spawns the master thread. There will always at be at least 2 threads.
 
+Here are more detailed steps
+1. file_server.c:626-628 Initialize global mutexes
+2. file_server.c:631-632 Initialize metadata tracker (see `l_init()`)
+    - Sets `list_t.head` to NULL
+3. file_server.c:635-636 Spawn master thread
+4. file_server.c:639 Wait for master thread
+
 # Master Thread
 All master thread actions are found in `master()`. 
 
@@ -37,6 +44,8 @@ Here are more detailed steps
         - [`file_server.c:490-491`] Command information is deep-copied into other locations (e.g. file trackers `fmeta` and thread arguments `args_t`; see `command_copy()`)
 3. Check file metadata tracker
     - This operation is a part of \ref pg_synchronization "*synchronization*"
+    - See `l_lookup()`
+        -  file_server.c:73-76 Compare file path as key; save lookup value and exit
     - file_server.c:578-601 Check if target file has been tracked
     - file_server.c:582-584 Metadata found, update respective fmeta.recent_lock 
         - file_server.c:583 Pass most recent `out_lock` as new thread's `in_lock`

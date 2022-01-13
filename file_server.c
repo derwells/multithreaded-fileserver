@@ -69,7 +69,7 @@ fmeta *l_lookup(list_t *l, char *key) {
 
     lnode_t *curr = l->head;
     while (curr) {
-        /** file_server.c:73-76 ompare file path as key; save lookup value and exit */
+        /** file_server.c:73-76 Compare file path as key; save lookup value and exit */
         if (strcmp(curr->key, key) == 0) {
             value = curr->value;
             break;
@@ -164,7 +164,7 @@ FILE *open_empty() {
  * @return          Void.
  */
 void fdump(FILE* to_file, FILE* from_file) {
-    /** file_server.c:168-170 Read contents */
+    /** file_server.c:168-170 Read contents per character */
     int copy;
     while ((copy = fgetc(from_file)) != EOF)
         fputc(copy, to_file);
