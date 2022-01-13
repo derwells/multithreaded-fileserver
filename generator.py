@@ -13,7 +13,7 @@ CMD_FILE = "commands.txt"
 GEN_READ = "outputs/gen_read.txt"
 GEN_EMPTY = "outputs/gen_empty.txt"
 
-TEST_IN = "tests/test.in"
+TEST_IN = "test.in"
 WRITE_STR = "write {} {}"
 READ_STR = "read {}"
 EMPTY_STR = "empty {}"
@@ -25,7 +25,8 @@ N_FILES = 3
 N_CMDS = 10
 
 # For Python 3.4
-# https://stackoverflow.com/questions/58915023
+# Acquired from https://stackoverflow.com/questions/58915023
+# Useful for executing within Linux 2.6.4 kernel
 def choices(population, weights=None, *, cum_weights=None, k=1):
     """Return a k sized list of population elements chosen with replacement.
     If the relative weights or cumulative weights are not specified,

@@ -9,7 +9,8 @@ The only atomic operations between worker threads of different files are recordi
 
 A complete picture of this can be found in the \ref pg_synchronization "Synchronization section".
 
-# Proof
+# Concurrency Proof
+\anchor level3_proof
 We can show that commands associated with different files can run concurrently using `gdb`. By examining thread states, we can ascertain that threads indeed run concurrently.
 
 We do this by setting two breakpoints within the critical section. We do this by setting breakpoints in `.gdbinit`
