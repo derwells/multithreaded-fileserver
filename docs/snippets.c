@@ -641,12 +641,333 @@ int main() {
     return 0;
 }
 //! [main]
+//! [test.in]
+empty ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+write 0jkLoTOcX.txt HXY._"S:I1Sl$`e'2zt@Lu%(xUm^!("f#~i:A1
+write G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt xWM`P}U`>jV}r+F`a8<*x#Rh@$HTm0uO
+empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt
+write pxvN.txt j\1LN{kW4)Y/
+read 0jkLoTOcX.txt
+empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt
+write pxvN.txt {1_Y`f.>JjQlv#Y/)H2;^TA-UIE~qw7"l1r:'=
+read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+write G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt N'JZ?j~[nO"=j>rWH#+J_}UUEa$v5`x
+empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt
+read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+empty 0jkLoTOcX.txt
+read G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt
+write pxvN.txt CD,CH?NpZ~'dEx+Ca\2tV/6dE:q_Q1j
+write G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt irfPnkr0QSnQl5iHN@@FH)o$c#h?9N
+read FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt
+write 0jkLoTOcX.txt ~~Tb)4W\8y\0.F_o'OYy'#u,PLKV_[
+write pxvN.txt h[Q`M?vAW||RBsv@<|G@
+read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+read FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt
+read pxvN.txt
+write 0jkLoTOcX.txt >.6Q$qT5 [dL.+p:}%
+write G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt 8j0bE 6T9^?<'CmUPKW w:lW.'%-~@3;*eic%
+empty ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt
+read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+empty pxvN.txt
+write G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt nZ@F__9c$D"t6Yez =BVZfe_}asY
+read 0jkLoTOcX.txt
+read 0jkLoTOcX.txt
+write FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt IWfESxC-G%^{1gWUgtGh)rK_$n)*M?BFk7<Cv`lX:9z,nAr
+write ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt NcQq@mG]QqO/,V#l]
+write G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt G30X`ScQ&eS&unEa8t]Ttvfy<
+read pxvN.txt
+empty 0jkLoTOcX.txt
+write G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt ({x
+read FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt
+write pxvN.txt i#~A1=A_w,)7e %v;DG<EDonqRG-:,:NF.R
+empty ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+read G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt
+read FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt
+read 0jkLoTOcX.txt
+read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+empty pxvN.txt
+read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+empty G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt
+write pxvN.txt aa/];Q.t0mN-F=B`/loW$z[Q~IYj|4w(1%F.tSloeZtW5b1
+read 0jkLoTOcX.txt
+empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt
+write FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt }ZFtjNk^"r&`9a>wp]+IxAg" +V
+write ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt '}MFhgg(-I{dJ"&J@w.W`u-Z3R`x
+read G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt
+read 0jkLoTOcX.txt
+read pxvN.txt
+empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt
+read G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt
+write pxvN.txt 9IbC!sP( 1{m25vfMD8U]JEN3~z5D[\AqlsxjE:6C~<kVS_6q
+empty ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+write 0jkLoTOcX.txt NkA5L^}}9wf7
+write pxvN.txt pRY+ABi=\zcKo!>e+1[`P0vzh
+empty G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt
+read 0jkLoTOcX.txt
+empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt
+empty ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+empty ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+write pxvN.txt '%}d9{~0):q(}[?OW
+write G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt Gr/j11r+($"Xrv>3j:L@ &/=1jdt@\kxZ;"/-%RmyoO%^KquH+
+write 0jkLoTOcX.txt &Y/WD`reIy~o%Tyl}>
+empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt
+write G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt pwd'h+C*3jc+]'+ %ltn!Cfmx'!"qPNq<Cz]V-0
+read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+write pxvN.txt I&@%pTS2qMt@/lU {?mf>=J'oWVQ|69$D=T8Dw5D=
+write FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt @.A&J?es=3p;?(/8GZQ]y{TW;QTb#+(Z9xr*]s(
+read 0jkLoTOcX.txt
+write 0jkLoTOcX.txt AHa+9o^Ygz
+write ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt %w8-Sd*>Nq~[jxp36i^cVJD
+write G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt ;_ug%z~|)0-RqlR~\1"ciOvcZpB:qfN
+write pxvN.txt @kUN0;NG8x _5aI0IR,"T"^4Q#n\c2v[#zQ!w>L`j+XN~HP
+write FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt 6Mz=[~%Mtgj_n$&uw?aCB3B^'DgW9$i{r:=#,sbk
+read FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt
+empty ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+empty 0jkLoTOcX.txt
+empty pxvN.txt
+read G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt
+read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+write FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt gk/\qA,^Wy=Uh2<ZgaNJ6K'LD7 ?!3&d9i#mW
+empty pxvN.txt
+write G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt `=KvgCM6RFw|uEU
+write 0jkLoTOcX.txt (d,g1T1~'n5
+write 0jkLoTOcX.txt pr&eXia
+write FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt F(eLl!cGR5'q)ZgMfYiV<\<[DZ!UJ'Vo2VB143&-We1rb{j
+write pxvN.txt 3uNs
+read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+empty G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt
+empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt
+read 0jkLoTOcX.txt
+write G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt lnkFhsmbyu-I`=%_
+read pxvN.txt
+read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+//! [test.in]
 //! [empty.txt]
-
+empty ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: FILE ALREADY EMPTY
+empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt: FILE ALREADY EMPTY
+empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt: FILE ALREADY EMPTY
+empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt: FILE ALREADY EMPTY
+empty pxvN.txt: j\1LN{kW4)Y/{1_Y`f.>JjQlv#Y/)H2;^TA-UIE~qw7"l1r:'=CD,CH?NpZ~'dEx+Ca\2tV/6dE:q_Q1jh[Q`M?vAW||RBsv@<|G@
+empty 0jkLoTOcX.txt: HXY._"S:I1Sl$`e'2zt@Lu%(xUm^!("f#~i:A1
+empty ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: FILE ALREADY EMPTY
+empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt: FILE ALREADY EMPTY
+empty ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: NcQq@mG]QqO/,V#l]
+empty pxvN.txt: i#~A1=A_w,)7e %v;DG<EDonqRG-:,:NF.R
+empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt: IWfESxC-G%^{1gWUgtGh)rK_$n)*M?BFk7<Cv`lX:9z,nAr
+empty 0jkLoTOcX.txt: ~~Tb)4W\8y\0.F_o'OYy'#u,PLKV_[>.6Q$qT5 [dL.+p:}%
+empty G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt: xWM`P}U`>jV}r+F`a8<*x#Rh@$HTm0uON'JZ?j~[nO"=j>rWH#+J_}UUEa$v5`xirfPnkr0QSnQl5iHN@@FH)o$c#h?9N8j0bE 6T9^?<'CmUPKW w:lW.'%-~@3;*eic%nZ@F__9c$D"t6Yez =BVZfe_}asYG30X`ScQ&eS&unEa8t]Ttvfy<({x
+empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt: }ZFtjNk^"r&`9a>wp]+IxAg" +V
+empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt: 
+empty G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt: 
+empty ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: '}MFhgg(-I{dJ"&J@w.W`u-Z3R`x
+empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt: 
+empty ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: 
+empty 0jkLoTOcX.txt: NkA5L^}}9wf7&Y/WD`reIy~o%Tyl}>AHa+9o^Ygz
+empty pxvN.txt: aa/];Q.t0mN-F=B`/loW$z[Q~IYj|4w(1%F.tSloeZtW5b19IbC!sP( 1{m25vfMD8U]JEN3~z5D[\AqlsxjE:6C~<kVS_6qpRY+ABi=\zcKo!>e+1[`P0vzh'%}d9{~0):q(}[?OWI&@%pTS2qMt@/lU {?mf>=J'oWVQ|69$D=T8Dw5D=@kUN0;NG8x _5aI0IR,"T"^4Q#n\c2v[#zQ!w>L`j+XN~HP
+empty ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: 
+empty pxvN.txt: 
+empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt: @.A&J?es=3p;?(/8GZQ]y{TW;QTb#+(Z9xr*]s(6Mz=[~%Mtgj_n$&uw?aCB3B^'DgW9$i{r:=#,sbkgk/\qA,^Wy=Uh2<ZgaNJ6K'LD7 ?!3&d9i#mWF(eLl!cGR5'q)ZgMfYiV<\<[DZ!UJ'Vo2VB143&-We1rb{j
+empty G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt: Gr/j11r+($"Xrv>3j:L@ &/=1jdt@\kxZ;"/-%RmyoO%^KquH+pwd'h+C*3jc+]'+ %ltn!Cfmx'!"qPNq<Cz]V-0;_ug%z~|)0-RqlR~\1"ciOvcZpB:qfN`=KvgCM6RFw|uEU
+empty ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: %w8-Sd*>Nq~[jxp36i^cVJD
 //! [empty.txt]
 //! [read.txt]
-
+read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: FILE DNE
+read pxvN.txt: j\1LN{kW4)Y/{1_Y`f.>JjQlv#Y/)H2;^TA-UIE~qw7"l1r:'=CD,CH?NpZ~'dEx+Ca\2tV/6dE:q_Q1jh[Q`M?vAW||RBsv@<|G@
+read 0jkLoTOcX.txt: HXY._"S:I1Sl$`e'2zt@Lu%(xUm^!("f#~i:A1
+read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: FILE DNE
+read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: FILE DNE
+read FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt: FILE DNE
+read G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt: xWM`P}U`>jV}r+F`a8<*x#Rh@$HTm0uON'JZ?j~[nO"=j>rWH#+J_}UUEa$v5`x
+read FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt: FILE DNE
+read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: FILE DNE
+read pxvN.txt: 
+read FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt: IWfESxC-G%^{1gWUgtGh)rK_$n)*M?BFk7<Cv`lX:9z,nAr
+read 0jkLoTOcX.txt: ~~Tb)4W\8y\0.F_o'OYy'#u,PLKV_[>.6Q$qT5 [dL.+p:}%
+read FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt: IWfESxC-G%^{1gWUgtGh)rK_$n)*M?BFk7<Cv`lX:9z,nAr
+read 0jkLoTOcX.txt: ~~Tb)4W\8y\0.F_o'OYy'#u,PLKV_[>.6Q$qT5 [dL.+p:}%
+read G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt: xWM`P}U`>jV}r+F`a8<*x#Rh@$HTm0uON'JZ?j~[nO"=j>rWH#+J_}UUEa$v5`xirfPnkr0QSnQl5iHN@@FH)o$c#h?9N8j0bE 6T9^?<'CmUPKW w:lW.'%-~@3;*eic%nZ@F__9c$D"t6Yez =BVZfe_}asYG30X`ScQ&eS&unEa8t]Ttvfy<({x
+read pxvN.txt: aa/];Q.t0mN-F=B`/loW$z[Q~IYj|4w(1%F.tSloeZtW5b1
+read 0jkLoTOcX.txt: 
+read 0jkLoTOcX.txt: 
+read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: 
+read 0jkLoTOcX.txt: 
+read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: 
+read G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt: 
+read G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt: 
+read 0jkLoTOcX.txt: NkA5L^}}9wf7
+read 0jkLoTOcX.txt: NkA5L^}}9wf7&Y/WD`reIy~o%Tyl}>
+read G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt: Gr/j11r+($"Xrv>3j:L@ &/=1jdt@\kxZ;"/-%RmyoO%^KquH+pwd'h+C*3jc+]'+ %ltn!Cfmx'!"qPNq<Cz]V-0;_ug%z~|)0-RqlR~\1"ciOvcZpB:qfN
+read FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt: @.A&J?es=3p;?(/8GZQ]y{TW;QTb#+(Z9xr*]s(6Mz=[~%Mtgj_n$&uw?aCB3B^'DgW9$i{r:=#,sbk
+read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: 
+read 0jkLoTOcX.txt: (d,g1T1~'n5pr&eXia
+read pxvN.txt: 3uNs
+read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: 
+read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: 
+read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: 
 //! [read.txt]
-//! [write.txt]
-
-//! [write.txt]
+//! [gen_read.txt]
+read FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt: FILE DNE
+read FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt: FILE DNE
+read FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt: IWfESxC-G%^{1gWUgtGh)rK_$n)*M?BFk7<Cv`lX:9z,nAr
+read FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt: IWfESxC-G%^{1gWUgtGh)rK_$n)*M?BFk7<Cv`lX:9z,nAr
+read FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt: @.A&J?es=3p;?(/8GZQ]y{TW;QTb#+(Z9xr*]s(6Mz=[~%Mtgj_n$&uw?aCB3B^'DgW9$i{r:=#,sbk
+read 0jkLoTOcX.txt: HXY._"S:I1Sl$`e'2zt@Lu%(xUm^!("f#~i:A1
+read 0jkLoTOcX.txt: ~~Tb)4W\8y\0.F_o'OYy'#u,PLKV_[>.6Q$qT5 [dL.+p:}%
+read 0jkLoTOcX.txt: ~~Tb)4W\8y\0.F_o'OYy'#u,PLKV_[>.6Q$qT5 [dL.+p:}%
+read 0jkLoTOcX.txt: 
+read 0jkLoTOcX.txt: 
+read 0jkLoTOcX.txt: 
+read 0jkLoTOcX.txt: NkA5L^}}9wf7
+read 0jkLoTOcX.txt: NkA5L^}}9wf7&Y/WD`reIy~o%Tyl}>
+read 0jkLoTOcX.txt: (d,g1T1~'n5pr&eXia
+read G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt: xWM`P}U`>jV}r+F`a8<*x#Rh@$HTm0uON'JZ?j~[nO"=j>rWH#+J_}UUEa$v5`x
+read G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt: xWM`P}U`>jV}r+F`a8<*x#Rh@$HTm0uON'JZ?j~[nO"=j>rWH#+J_}UUEa$v5`xirfPnkr0QSnQl5iHN@@FH)o$c#h?9N8j0bE 6T9^?<'CmUPKW w:lW.'%-~@3;*eic%nZ@F__9c$D"t6Yez =BVZfe_}asYG30X`ScQ&eS&unEa8t]Ttvfy<({x
+read G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt: 
+read G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt: 
+read G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt: Gr/j11r+($"Xrv>3j:L@ &/=1jdt@\kxZ;"/-%RmyoO%^KquH+pwd'h+C*3jc+]'+ %ltn!Cfmx'!"qPNq<Cz]V-0;_ug%z~|)0-RqlR~\1"ciOvcZpB:qfN
+read pxvN.txt: j\1LN{kW4)Y/{1_Y`f.>JjQlv#Y/)H2;^TA-UIE~qw7"l1r:'=CD,CH?NpZ~'dEx+Ca\2tV/6dE:q_Q1jh[Q`M?vAW||RBsv@<|G@
+read pxvN.txt: 
+read pxvN.txt: aa/];Q.t0mN-F=B`/loW$z[Q~IYj|4w(1%F.tSloeZtW5b1
+read pxvN.txt: 3uNs
+read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: FILE DNE
+read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: FILE DNE
+read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: FILE DNE
+read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: FILE DNE
+read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: 
+read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: 
+read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: 
+read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: 
+read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: 
+read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: 
+//! [gen_read.txt]
+//! [gen_empty.txt]
+empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt: FILE ALREADY EMPTY
+empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt: FILE ALREADY EMPTY
+empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt: FILE ALREADY EMPTY
+empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt: FILE ALREADY EMPTY
+empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt: IWfESxC-G%^{1gWUgtGh)rK_$n)*M?BFk7<Cv`lX:9z,nAr
+empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt: }ZFtjNk^"r&`9a>wp]+IxAg" +V
+empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt: 
+empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt: 
+empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt: @.A&J?es=3p;?(/8GZQ]y{TW;QTb#+(Z9xr*]s(6Mz=[~%Mtgj_n$&uw?aCB3B^'DgW9$i{r:=#,sbkgk/\qA,^Wy=Uh2<ZgaNJ6K'LD7 ?!3&d9i#mWF(eLl!cGR5'q)ZgMfYiV<\<[DZ!UJ'Vo2VB143&-We1rb{j
+empty 0jkLoTOcX.txt: HXY._"S:I1Sl$`e'2zt@Lu%(xUm^!("f#~i:A1
+empty 0jkLoTOcX.txt: ~~Tb)4W\8y\0.F_o'OYy'#u,PLKV_[>.6Q$qT5 [dL.+p:}%
+empty 0jkLoTOcX.txt: NkA5L^}}9wf7&Y/WD`reIy~o%Tyl}>AHa+9o^Ygz
+empty G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt: xWM`P}U`>jV}r+F`a8<*x#Rh@$HTm0uON'JZ?j~[nO"=j>rWH#+J_}UUEa$v5`xirfPnkr0QSnQl5iHN@@FH)o$c#h?9N8j0bE 6T9^?<'CmUPKW w:lW.'%-~@3;*eic%nZ@F__9c$D"t6Yez =BVZfe_}asYG30X`ScQ&eS&unEa8t]Ttvfy<({x
+empty G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt: 
+empty G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt: Gr/j11r+($"Xrv>3j:L@ &/=1jdt@\kxZ;"/-%RmyoO%^KquH+pwd'h+C*3jc+]'+ %ltn!Cfmx'!"qPNq<Cz]V-0;_ug%z~|)0-RqlR~\1"ciOvcZpB:qfN`=KvgCM6RFw|uEU
+empty pxvN.txt: j\1LN{kW4)Y/{1_Y`f.>JjQlv#Y/)H2;^TA-UIE~qw7"l1r:'=CD,CH?NpZ~'dEx+Ca\2tV/6dE:q_Q1jh[Q`M?vAW||RBsv@<|G@
+empty pxvN.txt: i#~A1=A_w,)7e %v;DG<EDonqRG-:,:NF.R
+empty pxvN.txt: aa/];Q.t0mN-F=B`/loW$z[Q~IYj|4w(1%F.tSloeZtW5b19IbC!sP( 1{m25vfMD8U]JEN3~z5D[\AqlsxjE:6C~<kVS_6qpRY+ABi=\zcKo!>e+1[`P0vzh'%}d9{~0):q(}[?OWI&@%pTS2qMt@/lU {?mf>=J'oWVQ|69$D=T8Dw5D=@kUN0;NG8x _5aI0IR,"T"^4Q#n\c2v[#zQ!w>L`j+XN~HP
+empty pxvN.txt: 
+empty ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: FILE ALREADY EMPTY
+empty ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: FILE ALREADY EMPTY
+empty ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: NcQq@mG]QqO/,V#l]
+empty ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: '}MFhgg(-I{dJ"&J@w.W`u-Z3R`x
+empty ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: 
+empty ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: 
+empty ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt: %w8-Sd*>Nq~[jxp36i^cVJD
+//! [gen_empty.txt]
+//! [commands.txt]
+[Fri Jan 14 17:44:11 2022] empty ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+[Fri Jan 14 17:44:11 2022] write 0jkLoTOcX.txt HXY._"S:I1Sl$`e'2zt@Lu%(xUm^!("f#~i:A1
+[Fri Jan 14 17:44:11 2022] write G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt xWM`P}U`>jV}r+F`a8<*x#Rh@$HTm0uO
+[Fri Jan 14 17:44:11 2022] empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt
+[Fri Jan 14 17:44:11 2022] write pxvN.txt j\1LN{kW4)Y/
+[Fri Jan 14 17:44:11 2022] read 0jkLoTOcX.txt
+[Fri Jan 14 17:44:11 2022] empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt
+[Fri Jan 14 17:44:11 2022] write pxvN.txt {1_Y`f.>JjQlv#Y/)H2;^TA-UIE~qw7"l1r:'=
+[Fri Jan 14 17:44:11 2022] read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+[Fri Jan 14 17:44:11 2022] write G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt N'JZ?j~[nO"=j>rWH#+J_}UUEa$v5`x
+[Fri Jan 14 17:44:11 2022] empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt
+[Fri Jan 14 17:44:11 2022] read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+[Fri Jan 14 17:44:11 2022] empty 0jkLoTOcX.txt
+[Fri Jan 14 17:44:11 2022] read G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt
+[Fri Jan 14 17:44:11 2022] write pxvN.txt CD,CH?NpZ~'dEx+Ca\2tV/6dE:q_Q1j
+[Fri Jan 14 17:44:11 2022] write G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt irfPnkr0QSnQl5iHN@@FH)o$c#h?9N
+[Fri Jan 14 17:44:11 2022] read FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt
+[Fri Jan 14 17:44:11 2022] write 0jkLoTOcX.txt ~~Tb)4W\8y\0.F_o'OYy'#u,PLKV_[
+[Fri Jan 14 17:44:11 2022] write pxvN.txt h[Q`M?vAW||RBsv@<|G@
+[Fri Jan 14 17:44:11 2022] read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+[Fri Jan 14 17:44:11 2022] read FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt
+[Fri Jan 14 17:44:11 2022] read pxvN.txt
+[Fri Jan 14 17:44:11 2022] write 0jkLoTOcX.txt >.6Q$qT5 [dL.+p:}%
+[Fri Jan 14 17:44:11 2022] write G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt 8j0bE 6T9^?<'CmUPKW w:lW.'%-~@3;*eic%
+[Fri Jan 14 17:44:11 2022] empty ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+[Fri Jan 14 17:44:11 2022] empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt
+[Fri Jan 14 17:44:11 2022] read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+[Fri Jan 14 17:44:11 2022] empty pxvN.txt
+[Fri Jan 14 17:44:11 2022] write G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt nZ@F__9c$D"t6Yez =BVZfe_}asY
+[Fri Jan 14 17:44:11 2022] read 0jkLoTOcX.txt
+[Fri Jan 14 17:44:11 2022] read 0jkLoTOcX.txt
+[Fri Jan 14 17:44:11 2022] write FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt IWfESxC-G%^{1gWUgtGh)rK_$n)*M?BFk7<Cv`lX:9z,nAr
+[Fri Jan 14 17:44:11 2022] write ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt NcQq@mG]QqO/,V#l]
+[Fri Jan 14 17:44:11 2022] write G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt G30X`ScQ&eS&unEa8t]Ttvfy<
+[Fri Jan 14 17:44:11 2022] read pxvN.txt
+[Fri Jan 14 17:44:11 2022] empty 0jkLoTOcX.txt
+[Fri Jan 14 17:44:11 2022] write G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt ({x
+[Fri Jan 14 17:44:11 2022] read FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt
+[Fri Jan 14 17:44:11 2022] write pxvN.txt i#~A1=A_w,)7e %v;DG<EDonqRG-:,:NF.R
+[Fri Jan 14 17:44:11 2022] empty ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+[Fri Jan 14 17:44:11 2022] read G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt
+[Fri Jan 14 17:44:11 2022] read FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt
+[Fri Jan 14 17:44:11 2022] read 0jkLoTOcX.txt
+[Fri Jan 14 17:44:11 2022] read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+[Fri Jan 14 17:44:11 2022] empty pxvN.txt
+[Fri Jan 14 17:44:11 2022] read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+[Fri Jan 14 17:44:11 2022] empty G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt
+[Fri Jan 14 17:44:11 2022] write pxvN.txt aa/];Q.t0mN-F=B`/loW$z[Q~IYj|4w(1%F.tSloeZtW5b1
+[Fri Jan 14 17:44:11 2022] read 0jkLoTOcX.txt
+[Fri Jan 14 17:44:11 2022] empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt
+[Fri Jan 14 17:44:11 2022] write FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt }ZFtjNk^"r&`9a>wp]+IxAg" +V
+[Fri Jan 14 17:44:11 2022] write ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt '}MFhgg(-I{dJ"&J@w.W`u-Z3R`x
+[Fri Jan 14 17:44:11 2022] read G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt
+[Fri Jan 14 17:44:11 2022] read 0jkLoTOcX.txt
+[Fri Jan 14 17:44:11 2022] read pxvN.txt
+[Fri Jan 14 17:44:11 2022] empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt
+[Fri Jan 14 17:44:11 2022] read G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt
+[Fri Jan 14 17:44:11 2022] write pxvN.txt 9IbC!sP( 1{m25vfMD8U]JEN3~z5D[\AqlsxjE:6C~<kVS_6q
+[Fri Jan 14 17:44:11 2022] empty ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+[Fri Jan 14 17:44:11 2022] write 0jkLoTOcX.txt NkA5L^}}9wf7
+[Fri Jan 14 17:44:11 2022] write pxvN.txt pRY+ABi=\zcKo!>e+1[`P0vzh
+[Fri Jan 14 17:44:11 2022] empty G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt
+[Fri Jan 14 17:44:11 2022] read 0jkLoTOcX.txt
+[Fri Jan 14 17:44:11 2022] empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt
+[Fri Jan 14 17:44:11 2022] empty ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+[Fri Jan 14 17:44:11 2022] empty ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+[Fri Jan 14 17:44:11 2022] write pxvN.txt '%}d9{~0):q(}[?OW
+[Fri Jan 14 17:44:11 2022] write G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt Gr/j11r+($"Xrv>3j:L@ &/=1jdt@\kxZ;"/-%RmyoO%^KquH+
+[Fri Jan 14 17:44:11 2022] write 0jkLoTOcX.txt &Y/WD`reIy~o%Tyl}>
+[Fri Jan 14 17:44:11 2022] empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt
+[Fri Jan 14 17:44:11 2022] write G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt pwd'h+C*3jc+]'+ %ltn!Cfmx'!"qPNq<Cz]V-0
+[Fri Jan 14 17:44:11 2022] read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+[Fri Jan 14 17:44:11 2022] write pxvN.txt I&@%pTS2qMt@/lU {?mf>=J'oWVQ|69$D=T8Dw5D=
+[Fri Jan 14 17:44:11 2022] write FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt @.A&J?es=3p;?(/8GZQ]y{TW;QTb#+(Z9xr*]s(
+[Fri Jan 14 17:44:11 2022] read 0jkLoTOcX.txt
+[Fri Jan 14 17:44:11 2022] write 0jkLoTOcX.txt AHa+9o^Ygz
+[Fri Jan 14 17:44:11 2022] write ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt %w8-Sd*>Nq~[jxp36i^cVJD
+[Fri Jan 14 17:44:11 2022] write G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt ;_ug%z~|)0-RqlR~\1"ciOvcZpB:qfN
+[Fri Jan 14 17:44:11 2022] write pxvN.txt @kUN0;NG8x _5aI0IR,"T"^4Q#n\c2v[#zQ!w>L`j+XN~HP
+[Fri Jan 14 17:44:11 2022] write FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt 6Mz=[~%Mtgj_n$&uw?aCB3B^'DgW9$i{r:=#,sbk
+[Fri Jan 14 17:44:11 2022] read FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt
+[Fri Jan 14 17:44:11 2022] empty ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+[Fri Jan 14 17:44:11 2022] empty 0jkLoTOcX.txt
+[Fri Jan 14 17:44:11 2022] empty pxvN.txt
+[Fri Jan 14 17:44:11 2022] read G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt
+[Fri Jan 14 17:44:11 2022] read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+[Fri Jan 14 17:44:11 2022] write FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt gk/\qA,^Wy=Uh2<ZgaNJ6K'LD7 ?!3&d9i#mW
+[Fri Jan 14 17:44:11 2022] empty pxvN.txt
+[Fri Jan 14 17:44:11 2022] write G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt `=KvgCM6RFw|uEU
+[Fri Jan 14 17:44:11 2022] write 0jkLoTOcX.txt (d,g1T1~'n5
+[Fri Jan 14 17:44:11 2022] write 0jkLoTOcX.txt pr&eXia
+[Fri Jan 14 17:44:11 2022] write FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt F(eLl!cGR5'q)ZgMfYiV<\<[DZ!UJ'Vo2VB143&-We1rb{j
+[Fri Jan 14 17:44:11 2022] write pxvN.txt 3uNs
+[Fri Jan 14 17:44:11 2022] read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+[Fri Jan 14 17:44:11 2022] empty G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt
+[Fri Jan 14 17:44:11 2022] empty FVUgjtnh85wjzdO9hJRwlDN50cHGa17.txt
+[Fri Jan 14 17:44:11 2022] read 0jkLoTOcX.txt
+[Fri Jan 14 17:44:11 2022] write G3WQE95SufNUQOt4tbzKMxzLrNgbspM3IXomEU.txt lnkFhsmbyu-I`=%_
+[Fri Jan 14 17:44:11 2022] read pxvN.txt
+[Fri Jan 14 17:44:11 2022] read ZETdc2cua6Xzph08aSvKIPNBsaDpi9q1nKt1B.txt
+//! [commands.txt]

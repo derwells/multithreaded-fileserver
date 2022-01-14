@@ -134,7 +134,7 @@ The program uses global locks to guard writing to `read.txt` and `empty.txt` (fi
 These files do not have to be ordered - they are non-deterministic. Hence, it sufficies to ensure atomicity.
 
 ## Deadlocks
-Nested locks prone to deadlock. The only nested locks are the global locks for `read.txt` and `empty.txt`. We ensure that all nested lock acesses follow the same ordering. The program always gets the `*in_lock` first before getting the global lock. In other words, we provide a *total ordering* on lock acquisition (OSTEP 32-7).
+Nested locks prone to deadlock. The only nested locks are the global locks for `read.txt` and `empty.txt`. We ensure that all nested lock acesses follow the same ordering. The program always gets the `*in_lock` first before getting the global lock. In other words, we provide a *total ordering* on lock acquisition (OSTEP Chapter 32, pg. 7).
 
 ## Invalid memory locations
 This portion addresses the validity of the freeing mechanism done by the worker threads. Figure \latexonly\ref{mlp2t}\endlatexonly summarizes the interaction between existing worker thread arugments (`t1`) and ones being built (`t2`).

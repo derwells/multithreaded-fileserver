@@ -154,70 +154,49 @@ def test_synchronization():
 
     fault_flag = False
 
-    actual_read = {}
-    read_record = []
-    with open(READ_FILE, "r+") as f:
-        read_record = f.readlines()
-
-    actual_empty = {}
-    empty_record = []
-    with open(EMPTY_FILE, "r+") as f:
-        empty_record = f.readlines()
     cmd_record = []
     with open(CMD_FILE, "r+") as f:
         cmd_record = f.readlines()
 
     # Cleanup
     for path in to_clean:
-        os.remove(path)
+        try:
+            os.remove(path)
+        except:
+            continue
 
     print("[ANALYZING] read.txt")
-    for r in read_record:
-        _, path, input_ = r.split(" ", 2)
-        path = path[:-1]
-        if not path in actual_read.keys():
-            actual_read[path] = []
-        actual_read[path].append(input_)
-    for path in files:
-        if not(path in read_seq.keys()):
-            continue
-        print(path)
-        print(len(read_seq[path]), len(actual_read[path]))
-        for i in range(len(read_seq[path])):
-            if read_seq[path][i] != actual_read[path][i][:-1]:
-                print("[FAULT] Inconsistent read at index {}".format(i))
-                print("[FAULT] generator: {}\n".format(len(read_seq[path][i])), read_seq[path][i])
-                print("[FAULT] read.txt: {}\n".format(len(actual_read[path][i])), actual_read[path][i])
-                fault_flag = True
+    with open(GEN_READ, "w") as f:
+        for path in files:
+            if not (path in read_seq.keys()):
+                continue
+            for l in read_seq[path]:
+                read_record = "read {}: {}\n".format(
+                    path, l
+                )
+                f.write(read_record)
 
     print("[ANALYZING] empty.txt")
-    for r in empty_record:
-        _, path, input_ = r.split(" ", 2)
-        path = path[:-1]
-        if not path in actual_empty.keys():
-            actual_empty[path] = []
-        actual_empty[path].append(input_)
-    for path in files:
-        if not(path in empty_seq.keys()):
-            continue
-        for i in range(len(empty_seq[path])):
-            if empty_seq[path][i] != actual_empty[path][i][:-1]:
-                print("[FAULT] Inconsistent empty at index {}".format(i))
-                print("[FAULT] generator: {}\n".format(len(empty_seq[path][i])), empty_seq[path][i])
-                print("[FAULT] read.txt: {}\n".format(len(actual_empty[path][i])), actual_empty[path][i])
-                fault_flag = True
-    
+    with open(GEN_EMPTY, "w") as f:
+        for path in files:
+            if not (path in empty_seq.keys()):
+                continue
+            for l in empty_seq[path]:
+                empty_record = "empty {}: {}\n".format(
+                    path, l
+                )
+                f.write(empty_record)
+
     print("[ANALYZING] commands.txt")
-    for i, r in enumerate(cmd_record):
-        _cmd = r.split(" ", 5)[-1]
+    for i, actual in enumerate(actual_cmds):
+        _cmd = cmd_record[i].split(" ", 5)[-1]
         _cmd = _cmd[:-1]
-        if _cmd != actual_cmds[i]:
+        if actual != _cmd:
             fault_flag = True
-
-    if not fault_flag:
-        print("[GOOD] All tests passed")
-
-
+    if fault_flag:
+        print("[FAIL] commands.txt")
+    else:
+        print("[PASS] commands.txt")
 
 def main():
     # Cleanup
