@@ -33,7 +33,7 @@ The critical section is bounded by `args_t.in_lock` and `args_t.out_lock` (`file
     - The file-to-be-read is accessed using a `FILE` pointer `from_file`. The filepath is passed using the thread arguments
     - We use `r_simulate_access()` to introduce the specified delay.
 -# [`file_server.c:263-294`] Check if the target file (`from_file`) exists
-    - [`file_server.c:269-274`] Target file does not exists; `read.txt` critical section (uses global lock)
+    - [`file_server.c:269-274`] Target file does not exists; `read.txt` critical section
         - [`file_server.c:270`] Open read.txt (see `open_read()`)
             - Wrapper for opening read.txt
             - `READ_TARGET` is `"read.txt"`

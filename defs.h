@@ -20,12 +20,15 @@
 /** Maximum size of path and input */
 #define MAX_INPUT_SIZE  51
 
+/** Macro for empty.txt */
 #define EMPTY_TARGET    "empty.txt"
 /** Access mode for empty.txt */
 #define EMPTY_MODE      "a"
+/** Macro for read.txt */
 #define READ_TARGET     "read.txt"
 /** Access mode for read.txt */
 #define READ_MODE       "a"
+/** Macro for commands.txt */
 #define CMD_TARGET      "commands.txt"
 /** Access mode for commands.txt */
 #define CMD_MODE        "a"
