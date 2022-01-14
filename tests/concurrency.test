@@ -1,7 +1,7 @@
-write outputs/a.txt 1
-read outputs/b.txt 1
-empty outputs/c.txt 1
-read outputs/d.txt 1
-write outputs/e.txt 1
-empty outputs/f.txt 1
-read outputs/g.txt 1
+write a.txt 1
+read b.txt 1
+empty c.txt 1
+read d.txt 1
+write e.txt 1
+empty f.txt 1
+read g.txt 1
