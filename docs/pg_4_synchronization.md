@@ -4,7 +4,7 @@
 The program ensures synchronization by enforcing a thread run order per target file. This is done using (1) a linked list of file metadata `tracker` (`file_server.c:20,631`; see \ref pg_nonblocking "Non-blocking Master") and (2) a hand-over-hand locking scheme for threads targeting the same file.
 
 # Metadata Tracker
-\snippet{lineno} docs/snippets.c global_vars
+\snippet{lineno} docs/snippets/snippets.c global_vars
 
 `tracker` is a linked list (`lnode_t`) of existing target files and their corresponding `fmeta`. Indexed using filepath.
 
@@ -39,7 +39,7 @@ Line references will be interspersed in the explanation. A full line-by-line exp
 
 Every type of worker thread uses hand-over-hand locking to ensure execution order. Every type of worker thread is passed mutex pointers `in_lock` and `out_lock`. The `*in_lock` guards execution of the whole thread (file_server.c:203,253,325). The `*out_lock` is a shared lock that is released once the thread is finished (file_server.c:227,298,374), allowing the next thread to run (see `args_t`).
 
-\snippet{lineno} docs/snippets.c tracker_check
+\snippet{lineno} docs/snippets/snippets.c tracker_check
 
 Worker threads are built such that their `*out_lock` begins locked (file_server.c:483-487). Their `*in_lock` is the `*out_lock` of the worker thread at the tail of the chain. The tail - or trailing - `*out_lock` is tracked by `fmeta.recent_lock` (file_server.c:584). Everytime a worker thread is built `fmeta.recent_lock` gets overwritten by the new `out_lock` (file_server.c:519).
 

@@ -15,7 +15,7 @@ Here are more detailed steps
 # Master Thread
 All master thread actions are found in `master()`. 
 
-\snippet{lineno} docs/snippets.c master
+\snippet{lineno} docs/snippets/snippets.c master
 
 Note that the master thread also makes use of struct-related functions. Examples of these are `fmeta_init()` and `l_lookup()`.
 

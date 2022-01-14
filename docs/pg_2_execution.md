@@ -3,7 +3,7 @@
 # Write Thread
 All write actions are encapsulated in `worker_write()`. Before the critical section begins, the thread arguments are typecasted into an `args_t` pointer. The user input command is passed using `args_t.cmd` (`file_server.c:199-200`). After the critical section, the thread arguments are freed except for `out_lock` (see \ref pg_nonblocking "non-blocking master").
 
-\snippet{lineno} docs/snippets.c worker_write
+\snippet{lineno} docs/snippets/snippets.c worker_write
 
 Line references will be interspersed in the explanation. For more, refer to the file documentation for `worker_write()` and associated functions. For ease of locating line-by-line explanations, references to the approriate functions will be made.
 
@@ -22,7 +22,7 @@ The critical section is bounded by `args_t.in_lock` and `args_t.out_lock` (`file
 # Read Thread
 All read actions are encapsulated in `worker_read()`. Before the critical section begins, the thread arguments are typecasted into an `args_t` pointer. The user input command is passed using `args_t.cmd` (`file_server.c:249-250`). After the critical section, the thread arguments are freed except for `out_lock` (see \ref pg_nonblocking "non-blocking master").
 
-\snippet{lineno} docs/snippets.c worker_read
+\snippet{lineno} docs/snippets/snippets.c worker_read
 
 Line references will be interspersed in the explanation. For more, refer to the file documentation for `worker_read()` and associated functions.
 
@@ -57,7 +57,7 @@ The critical section is bounded by `args_t.in_lock` and `args_t.out_lock` (`file
 # Empty Thread
 All empty actions are encapsulated in `worker_empty()`. Before the critical section begins, the thread arguments are typecasted into an `args_t` pointer (`file_server.c:321-322`). After the critical section, the thread arguments are freed except for `out_lock` (see \ref pg_nonblocking "non-blocking master").
 
-\snippet{lineno} docs/snippets.c worker_empty
+\snippet{lineno} docs/snippets/snippets.c worker_empty
 
 Line references will be interspersed in the explanation. For more, refer to the file documentation for `worker_empty()` and associated functions.
 
