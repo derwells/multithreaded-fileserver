@@ -34,9 +34,9 @@ Figure \latexonly\ref{mtflcht}\endlatexonly is a flowchart of how the master thr
 Here are more detailed steps
 1. Parse and store user input in `command` struct
     - file_server.c:565-566 Store user input in dynamically allocated struct `command`; uses `get_command()`
-        - file_server.c:396-399 Use scanf to read user commands. Handle file inputs by looping infinitely on EOF.
-            - File inputs are useful for debugging
-        - (`file_server.c:402-403,406-407,410-412`) Parse `scanf` using `strtok` then copy into `cmd`
+        - file_server.c:396-398 Reading user input into `inp`
+            - file_server.c:397 Read command until newline
+        - (file_server.c:402-403,406-407,410-412) Parse `scanf` using `strtok` then copy into `cmd`
 2. Initialize thread arguments (see `args_init`)
     - file_server.c:569-570 Build thread arguments targs (see `args_init`)
         - file_server.c:483-484 Dynamically allocate and initialize new mutex for out_lock

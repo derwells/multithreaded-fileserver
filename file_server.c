@@ -389,14 +389,14 @@ void *worker_empty(void *_args) {
  * @return      Void.
  */
 void get_command(command *cmd) {
-    /** file_server.c:396-399 Reading input
-     * Use scanf to read user commands. Handle file inputs by
-     * looping infinitely on EOF.
-    */
-    char inp[2*MAX_INPUT_SIZE + MAX_ACTION_SIZE];
-    if (scanf("%[^\n]%*c", inp) == EOF) {
-        while (1) {}
-    }
+    /** file_server.c:396-398 Reading user input into `inp`
+     * - Use scanf to read user command
+     * - `inp` is parsed afterwards
+     */
+    char inp[2 * MAX_INPUT_SIZE + MAX_ACTION_SIZE];
+    /** file_server.c:397 Read command until newline */
+    scanf("%[^\n]%*c", inp);
+
 
     /** file_server.c:402-403 Get command action */
     char *ptr = strtok(inp, " ");

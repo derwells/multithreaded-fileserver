@@ -389,24 +389,24 @@ void *worker_empty(void *_args) {
  * @return      Void.
  */ //! [get_command]
 void get_command(command *cmd) {
-    /** Lines 396-399: Reading input
-     * Use scanf to read user commands. Handle file inputs by
-     * loopining infinitely on EOF.
-    */
-    char inp[2*MAX_INPUT_SIZE + MAX_ACTION_SIZE];
-    if (scanf("%[^\n]%*c", inp) == EOF) {
-        while (1) {}
-    }
+    /** file_server.c:396-398 Reading user input into `inp`
+     * - Use scanf to read user command
+     * - `inp` is parsed afterwards
+     */
+    char inp[2 * MAX_INPUT_SIZE + MAX_ACTION_SIZE];
+    /** file_server.c:397 Read command until newline */
+    scanf("%[^\n]%*c", inp);
 
-    /** Lines 402-403: Get command action */
+
+    /** file_server.c:402-403 Get command action */
     char *ptr = strtok(inp, " ");
     strcpy(cmd->action, ptr);
 
-    /** Lines 406-407: Get command path/to/file (aka. target file) */
+    /** file_server.c:406-407 Get command path/to/file (aka. target file) */
     ptr = strtok(NULL, " ");
     strcpy(cmd->path, ptr);
 
-    /** Lines 410-412: Get command input string */
+    /** file_server.c:410-412 Get command input string */
     ptr = strtok(NULL, "");
     if (strcmp(cmd->action, "write") == 0 && ptr != NULL)
         strcpy(cmd->input, ptr);
@@ -641,3 +641,12 @@ int main() {
     return 0;
 }
 //! [main]
+//! [empty.txt]
+
+//! [empty.txt]
+//! [read.txt]
+
+//! [read.txt]
+//! [write.txt]
+
+//! [write.txt]

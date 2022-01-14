@@ -5,5 +5,5 @@
 # Sample test.in {#sampleread}
 
 # Sample empty.txt {#sampleempty}
-\snippet{lineno} docs/snippets.c empty.txt
+\snippet docs/snippets.c empty.txt
 # Sample commands.txt {#samplecommands}

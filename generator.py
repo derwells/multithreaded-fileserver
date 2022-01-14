@@ -51,13 +51,13 @@ def choices(population, weights=None, *, cum_weights=None, k=1):
     return [population[bisect(cum_weights, random.random() * total, 0, hi)]
             for i in _repeat(None, k)]
 
-
+# Use all ASCII printable characters
 def n_rand_chars(n):
     return "".join(
             [   
                 chr(x) for x in
                 choices(
-                    list(range(32, 127 + 1)),
+                    list(range(32, 126 + 1)),
                     k=n
                 )
             ]
