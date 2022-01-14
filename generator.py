@@ -85,10 +85,12 @@ def build_empty(path):
 
 def test_synchronization():
     path_len = 50 - len(".txt")
-    read_seq = {}
-    empty_seq = {}
-    contents = {}
 
+    read_seq = {}   # expected read.txt per file
+    empty_seq = {}  # expected empty.txt per file
+    contents = {}   # expect file contents per file
+
+    # generate filenames
     files = [
         "{}.txt".format(
             n_rand_alnum(
@@ -97,52 +99,77 @@ def test_synchronization():
         ) for i in range(N_FILES)
     ]
 
+    # files that have a write command issued
     to_clean = set()
 
+    ##################
+    # Build test.in
+    ##################
     actual_cmds = []
     for i in range(N_CMDS):
+        # shuffle files - no input pattern
         random.shuffle(files)
+
         for path in files:
+
+            # restrict to alphanumeric?
             if RESTRICT:
                 _input = n_rand_alnum(random.randrange(1, 50 + 1))
             else:
                 _input = n_rand_chars(random.randrange(1, 50 + 1))
+
+            # choose command to issue
             choice = choices([READ, WRITE, EMPTY], k=1)[0]
+
+            # make sure at least 1 write command occurs per file
             if (
                 i == N_CMDS - 1 and
                 (not (path in to_clean))
             ):
                 choice = WRITE
 
+            # if read command is issued
             if choice == READ:
                 if not (path in read_seq.keys()):
-                    read_seq[path] = []
-                c = contents[path][-1] if path in contents.keys() else "FILE DNE"
-                read_seq[path].append(c)
-                cmd = build_read(path)
+                    read_seq[path] = [] # initialize if no read command so far
 
+                # if file has been written to
+                c = contents[path][-1] if path in contents.keys() else "FILE DNE"
+
+                # append to expected read.txt
+                read_seq[path].append(c)
+                cmd = build_read(path) # add to test.in
+
+            # if wrote command is issued
             elif choice == WRITE:
                 to_clean.add(path)
                 if not (path in contents.keys()):
+                    # initialize if no write command so far
                     contents[path] = []
                     tmp = _input
                 else:
+                    # build new file contents
                     tmp = contents[path][-1]  + _input
 
+                # update file contents
                 contents[path].append(tmp)
-                cmd = build_write(path, _input)
 
+                cmd = build_write(path, _input) # add to test.in
+
+            # if read command is issued
             elif choice == EMPTY:
                 if not (path in empty_seq.keys()):
-                    empty_seq[path] = []
+                    empty_seq[path] = [] # initialize
                 if path in contents.keys():
+                    # empty out, save contents in c
                     c = contents[path][-1]
                     contents[path].append("")
                 else:
+                    # file does not exist
                     c = "FILE ALREADY EMPTY"
 
                 empty_seq[path].append(c)
-                cmd = build_empty(path)
+                cmd = build_empty(path) # add to test.in
             
             
             with open(TEST_IN, "a+") as f:
@@ -150,22 +177,28 @@ def test_synchronization():
 
             actual_cmds += [cmd]
 
+    ##################################
+    # Generate expected output files +
+    # Analyze commands.txt
+    ##################################
     input("Press [enter] once file_server has finished execution:")
 
     fault_flag = False
 
+    # read commands.txt
     cmd_record = []
     with open(CMD_FILE, "r+") as f:
         cmd_record = f.readlines()
 
-    # Cleanup
+    # cleanup target files
     for path in to_clean:
         try:
             os.remove(path)
         except:
             continue
-
-    print("[ANALYZING] read.txt")
+    
+    # dump expected read.txt into outputs/gen_read.txt 
+    print("[GENERATING] read.txt")
     with open(GEN_READ, "w") as f:
         for path in files:
             if not (path in read_seq.keys()):
@@ -176,7 +209,8 @@ def test_synchronization():
                 )
                 f.write(read_record)
 
-    print("[ANALYZING] empty.txt")
+    # dump expected empty.txt into outputs/gen_empty.txt 
+    print("[GENERATING] empty.txt")
     with open(GEN_EMPTY, "w") as f:
         for path in files:
             if not (path in empty_seq.keys()):
@@ -187,25 +221,28 @@ def test_synchronization():
                 )
                 f.write(empty_record)
 
+    # parse and compare commands.txt lines 
+    # to sequence of commands issues
     print("[ANALYZING] commands.txt")
-    for i, actual in enumerate(actual_cmds):
+    for i, actual in enumerate(actual_cmds): # per test.in command
         _cmd = cmd_record[i].split(" ", 5)[-1]
         _cmd = _cmd[:-1]
         if actual != _cmd:
             fault_flag = True
+
     if fault_flag:
         print("[FAIL] commands.txt")
     else:
         print("[PASS] commands.txt")
 
 def main():
-    # Cleanup
+    # empty-out logging constructs and test.in
     open(READ_FILE, "w").close()
     open(EMPTY_FILE, "w").close()
     open(CMD_FILE, "w").close()
     open(TEST_IN, "w").close()
 
-    # Run
+    # run test
     test_synchronization()
 
 main()
