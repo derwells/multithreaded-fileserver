@@ -58,7 +58,7 @@ else
 fi
 ```
 
-The `sort ...` inputs sort the logging constructs and generated outputs by filename while retaining their order. The `-s` flag indicated stable sort. The `-k2,2` flag indicates that we sort only the second column. The `-t" "` flag assigns whitespace as the column delimiter.
+The `sort ...` commands sort the logging constructs and generated outputs by filename while retaining their order. The `-s` flag indicated stable sort. The `-k2,2` flag indicates that we sort only the second column. The `-t" "` flag assigns whitespace as the column delimiter.
 
 The bash scripts then gets the `diff` of the logging constructs and the generated outputs. The `diff` output should be empty.
 
@@ -90,161 +90,99 @@ Below is a short integrity test created for testing execution
 and synchronization correctness. We copy paste this into the terminal after running `./file_server`.
 
 ```
-empty a.txt
-write a.txt 1 2
-write a.txt 3 4
+write a.txt the
 read a.txt
-write a.txt 5 6
-write b.txt 1 2
-write b.txt 3 4
-empty a.txt
+write a.txt quick
 read a.txt
-read a.txt
-write a.txt 7 8
+write a.txt brown
+write b.txt the
 read b.txt
+write b.txt quick
 read a.txt
+write a.txt fox
 empty a.txt
-write b.txt 5 6
+write a.txt lazy
+read b.txt
+write a.txt dog
+write b.txt brown
+read b.txt
+write b.txt fox
+read a.txt
 empty b.txt
-read b.txt
-write a.txt 9 10
-write a.txt 11 12
-read b.txt
-write b.txt 7 8
-read b.txt
-empty b.txt
-read c.txt
-write c.txt 5 6
-empty c.txt
-read c.txt
-write a.txt 13 14
-read a.txt
-write b.txt 11 12
-write c.txt 1 2
-write c.txt 3 4
-read c.txt
-write c.txt 7 8
-read c.txt
-write b.txt 13 14
+write b.txt lazy
+write b.txt dog
 read b.txt
 empty a.txt
-write b.txt 9 10
-write c.txt 9 10
 empty b.txt
-empty c.txt
-write c.txt 11 12
-write c.txt 13 14
-read c.txt
-empty c.txt
-write d.txt 9 10
-read d.txt
-empty d.txt
 ```
 
-The same ordering is followed by the sample `command.txt` output below
+This is simply a shuffled version of the input below
 
 ```
-[Thu Dec 30 18:12:57 2021] empty a.txt
-[Thu Dec 30 18:12:57 2021] write a.txt 1 2
-[Thu Dec 30 18:12:57 2021] write a.txt 3 4
-[Thu Dec 30 18:12:57 2021] read a.txt
-[Thu Dec 30 18:12:57 2021] write a.txt 5 6
-[Thu Dec 30 18:12:57 2021] write b.txt 1 2
-[Thu Dec 30 18:12:57 2021] write b.txt 3 4
-[Thu Dec 30 18:12:57 2021] empty a.txt
-[Thu Dec 30 18:12:57 2021] read a.txt
-[Thu Dec 30 18:12:57 2021] read a.txt
-[Thu Dec 30 18:12:57 2021] write a.txt 7 8
-[Thu Dec 30 18:12:57 2021] read b.txt
-[Thu Dec 30 18:12:57 2021] read a.txt
-[Thu Dec 30 18:12:57 2021] empty a.txt
-[Thu Dec 30 18:12:57 2021] write b.txt 5 6
-[Thu Dec 30 18:12:57 2021] empty b.txt
-[Thu Dec 30 18:12:57 2021] read b.txt
-[Thu Dec 30 18:12:57 2021] write a.txt 9 10
-[Thu Dec 30 18:12:57 2021] write a.txt 11 12
-[Thu Dec 30 18:12:57 2021] read b.txt
-[Thu Dec 30 18:12:57 2021] write b.txt 7 8
-[Thu Dec 30 18:12:57 2021] read b.txt
-[Thu Dec 30 18:12:57 2021] empty b.txt
-[Thu Dec 30 18:12:57 2021] read c.txt
-[Thu Dec 30 18:12:57 2021] write c.txt 5 6
-[Thu Dec 30 18:12:57 2021] empty c.txt
-[Thu Dec 30 18:12:57 2021] read c.txt
-[Thu Dec 30 18:12:57 2021] write a.txt 13 14
-[Thu Dec 30 18:12:57 2021] read a.txt
-[Thu Dec 30 18:12:57 2021] write b.txt 11 12
-[Thu Dec 30 18:12:57 2021] write c.txt 1 2
-[Thu Dec 30 18:12:57 2021] write c.txt 3 4
-[Thu Dec 30 18:12:57 2021] read c.txt
-[Thu Dec 30 18:12:57 2021] write c.txt 7 8
-[Thu Dec 30 18:12:57 2021] read c.txt
-[Thu Dec 30 18:12:57 2021] write b.txt 13 14
-[Thu Dec 30 18:12:57 2021] read b.txt
-[Thu Dec 30 18:12:57 2021] empty a.txt
-[Thu Dec 30 18:12:57 2021] write b.txt 9 10
-[Thu Dec 30 18:12:57 2021] write c.txt 9 10
-[Thu Dec 30 18:12:57 2021] empty b.txt
-[Thu Dec 30 18:12:57 2021] empty c.txt
-[Thu Dec 30 18:12:57 2021] write c.txt 11 12
-[Thu Dec 30 18:12:57 2021] write c.txt 13 14
-[Thu Dec 30 18:12:57 2021] read c.txt
-[Thu Dec 30 18:12:57 2021] empty c.txt
-[Thu Dec 30 18:12:57 2021] write d.txt 9 10
-[Thu Dec 30 18:12:57 2021] read d.txt
-[Thu Dec 30 18:12:57 2021] empty d.txt
+write a.txt the
+read a.txt
+write a.txt quick
+read a.txt
+write a.txt brown
+read a.txt
+write a.txt fox
+empty a.txt
+write a.txt lazy
+write a.txt dog
+read a.txt
+write b.txt the
+read b.txt
+write b.txt quick
+read b.txt
+write b.txt brown
+read b.txt
+write b.txt fox
+empty b.txt
+write b.txt lazy
+write b.txt dog
+read b.txt
+empty a.txt
+empty b.txt
 ```
 
-By analyzing the input we can see the expected `read.txt` and `empty.txt` output of each file
- 
-`read.txt`
- - `a.txt`: 1 23 4, empty read, empty read, 7 8, 9 1011 1213 14
- - `b.txt`: 12 34, empty read, empty read, 7 8, 11 1213 14
- - `c.txt`: FILE DNE, empty read, 1 23 4, 1 23 47 8, 9 1011 1213 14
- - `d.txt`: 9 10
-
-Inspecting the sample `read.txt` output below, we see that these orderings are reflected
+We sort the read.txt and empty.txt outputs using the following command.
 
 ```
-read c.txt: FILE DNE
-read d.txt: 9 10
-read b.txt: 1 23 4
-read a.txt: 1 23 4
-read c.txt: 
-read b.txt: 
-read b.txt: 
-read c.txt: 1 23 4
-read b.txt: 7 8
-read c.txt: 1 23 47 8
-read a.txt: 
-read a.txt: 
-read a.txt: 7 8
-read b.txt: 11 1213 14
-read c.txt: 11 1213 14
-read a.txt: 9 1011 1213 14
+sort -t" " -s -k2,2 <read or empty>.txt
 ```
 
-`empty.txt`
- - `a.txt`: FILE ALREADY EMPTY, 1 23 45 6, 7 8, 9 1011 1213 14
- - `b.txt`: 1 23 45 6, 7 8, 11 1213 149 10
- - `c.txt`: 5 6, 1 23 47 89 10, 11 1213 14
- - `d.txt`: 9 10
+This allows us to standardize their sequence.
 
-Inspecting the sample `empty.txt` output below, we see that these orderings are reflected
+The `sort ...` command sorts the logging constructs by filename while retaining their order. The `-s` flag indicated stable sort. The `-k2,2` flag indicates that we sort only the second column. The `-t" "` flag assigns whitespace as the column delimiter.
+
+## read.txt Expected Output
+read.txt should have the standardized output below
 
 ```
-empty a.txt: FILE ALREADY EMPTY
-empty c.txt: 5 6
-empty d.txt: 9 10
-empty b.txt: 1 23 45 6
-empty a.txt: 1 23 45 6
-empty b.txt: 7 8
-empty c.txt: 1 23 47 89 10
-empty a.txt: 7 8
-empty b.txt: 11 1213 149 10
-empty c.txt: 11 1213 14
-empty a.txt: 9 1011 1213 14
+read a.txt: the
+read a.txt: thequick
+read a.txt: thequickbrown
+read a.txt: lazydog
+read b.txt: the
+read b.txt: thequick
+read b.txt: thequickbrown
+read b.txt: lazydog
 ```
+
+## empty.txt Expected Output
+empty.txt should have the standardized output below
+
+```
+empty a.txt: thequickbrownfox
+empty a.txt: lazydog
+empty b.txt: thequickbrownfox
+empty b.txt: lazydog
+```
+
+## Sample Run
+
+@image latex integritytest.png
+
 
 # Testing Level 3
 Refer to the \ref level3_proof "Concurrency Proof" found in \ref pg_concurrency "Concurrency".

@@ -1,64 +1,24 @@
-write outputs/a.txt 1 2
-write outputs/a.txt 3 4
-read outputs/a.txt
-write outputs/a.txt 5 6
-write outputs/b.txt 1 2
-write outputs/b.txt 3 4
-empty outputs/a.txt
-read outputs/a.txt
-read outputs/a.txt
-write outputs/a.txt 7 8
-read outputs/b.txt
-read outputs/a.txt
-empty outputs/a.txt
-write outputs/b.txt 5 6
-empty outputs/b.txt
-read outputs/b.txt
-write outputs/a.txt 9 10
-write outputs/a.txt 11 12
-read outputs/b.txt
-write outputs/b.txt 7 8
-read outputs/b.txt
-empty outputs/b.txt
-write outputs/a.txt 13 14
-read outputs/a.txt
-write outputs/b.txt 11 12
-write outputs/b.txt 13 14
-read outputs/b.txt
-empty outputs/a.txt
-write outputs/b.txt 9 10
-empty outputs/b.txt
-write outputs/c.txt 1 2
-write outputs/c.txt 3 4
-read outputs/c.txt
-write outputs/c.txt 5 6
-write outputs/d.txt 1 2
-write outputs/d.txt 3 4
-empty outputs/c.txt
-read outputs/c.txt
-read outputs/c.txt
-write outputs/c.txt 7 8
-read outputs/d.txt
-read outputs/c.txt
-empty outputs/c.txt
-write outputs/d.txt 5 6
-empty outputs/d.txt
-read outputs/d.txt
-write outputs/c.txt 9 10
-write outputs/c.txt 11 12
-read outputs/d.txt
-write outputs/d.txt 7 8
-read outputs/d.txt
-empty outputs/d.txt
-write outputs/c.txt 13 14
-read outputs/c.txt
-write outputs/d.txt 11 12
-write outputs/d.txt 13 14
-read outputs/d.txt
-empty outputs/c.txt
-write outputs/d.txt 9 10
-read outputs/d.txt
-empty outputs/d.txt
-write outputs/e.txt 9 10
-read outputs/e.txt
-empty outputs/e.txt
+write a.txt the
+read a.txt
+write a.txt quick
+read a.txt
+write a.txt brown
+write b.txt the
+read b.txt
+write b.txt quick
+read a.txt
+write a.txt fox
+empty a.txt
+write a.txt lazy
+read b.txt
+write a.txt dog
+write b.txt brown
+read b.txt
+write b.txt fox
+read a.txt
+empty b.txt
+write b.txt lazy
+write b.txt dog
+read b.txt
+empty a.txt
+empty b.txt
