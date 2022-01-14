@@ -180,7 +180,7 @@ void fdump(FILE* to_file, FILE* from_file) {
  * @return      Void.
  */
 void empty_file(char *path) {
-    FILE *target_file = fopen(path, "w");
+    FILE *target_file = fopen(path, "w"); /** file_server.c:183 Empty target file */
     fclose(target_file); /** file_server.c:184 Close target file */
 }
 
@@ -199,7 +199,7 @@ void *worker_write(void *_args) {
     args_t *args = (args_t *)_args;
     command *cmd = args->cmd;
 
-    /** file_server.c:202-227 Critical section for target file */
+    /** file_server.c:203-226 Critical section for target file */
     pthread_mutex_lock(args->in_lock);
 
 
@@ -215,16 +215,16 @@ void *worker_write(void *_args) {
         debug_mode(fprintf(stderr, "[ERR] worker_write fopen\n"));
         exit(1);
     }
-    /** file_server.c:219-223 Write to target file (with sleep) */
-    int i;
-    for(i = 0; i < strlen(cmd->input); i++) {
-        fputc(cmd->input[i], target_file);
-        usleep(25*1000); /** file_server.c:222 Sleep for 25 ms */
-    }
+
+    /** file_server.c:220-222 Write to target file (with sleep) */
+    usleep(25 * 1000 * strlen(cmd->input));
+    fprintf(target_file, "%s", cmd->input);
     fclose(target_file);
+
     debug_mode(fprintf(stderr, "[END] %s %s %s\n", cmd->action, cmd->path, cmd->input));
 
     pthread_mutex_unlock(args->out_lock);
+
     /** file_server.c:229-231 Free unneeded args and struct args */
     free(args->cmd);
     free(args->in_lock);
@@ -366,7 +366,7 @@ void *worker_empty(void *_args) {
         fclose(from_file);
         empty_file(cmd->path);
 
-        /** file_server.c:370: Sleep after appending and emptying */
+        /** file_server.c:370: Sleep after appending and emptying (in microseconds) */
         r_sleep_range(7*1000000, 10*1000000);
     }
     debug_mode(fprintf(stderr, "[END] %s %s\n", cmd->action, cmd->path));

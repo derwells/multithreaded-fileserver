@@ -195,37 +195,37 @@ void empty_file(char *path) {
  * Unlocks args.out_lock on exit, allowing next thread to run.
  */ //! [worker_write]
 void *worker_write(void *_args) {
-    /** Lines 199-200: Typecast void into args_t */
-    args_t *args = (args_t *)_args; // wew
+    /** file_server.c:199-200 Typecast void into args_t */
+    args_t *args = (args_t *)_args;
     command *cmd = args->cmd;
 
-    /** Lines 202-227: Critical section for target file */
+    /** file_server.c:203-226 Critical section for target file */
     pthread_mutex_lock(args->in_lock);
 
 
     debug_mode(fprintf(stderr, "[START] %s %s %s\n", cmd->action, cmd->path, cmd->input));
     
-    /** Lines 209-211: Access target file */
+    /** file_server.c:209-211 Access target file */
     r_simulate_access();
     FILE *target_file;
     target_file = fopen(cmd->path, "a");
 
-    /** Lines 214-217: Error handling */
+    /** file_server.c:214-217 Error handling */
     if (target_file == NULL) {
         debug_mode(fprintf(stderr, "[ERR] worker_write fopen\n"));
         exit(1);
     }
-    /** Lines 219-223: Write to target file (with sleep) */
-    int i;
-    for(i = 0; i < strlen(cmd->input); i++) {
-        fputc(cmd->input[i], target_file);
-        usleep(25*1000); /** Line 222: Sleep for 25 ms */
-    }
+
+    /** file_server.c:220-222 Write to target file (with sleep) */
+    usleep(25 * 1000 * strlen(cmd->input));
+    fprintf(target_file, "%s", cmd->input);
     fclose(target_file);
+
     debug_mode(fprintf(stderr, "[END] %s %s %s\n", cmd->action, cmd->path, cmd->input));
 
     pthread_mutex_unlock(args->out_lock);
-    /** Lines 229-231: Free unneeded args and struct args */
+
+    /** file_server.c:229-231 Free unneeded args and struct args */
     free(args->cmd);
     free(args->in_lock);
     free(args);
@@ -391,7 +391,7 @@ void *worker_empty(void *_args) {
 void get_command(command *cmd) {
     /** Lines 396-399: Reading input
      * Use scanf to read user commands. Handle file inputs by
-     * Loopining infinitely on EOF.
+     * loopining infinitely on EOF.
     */
     char inp[2*MAX_INPUT_SIZE + MAX_ACTION_SIZE];
     if (scanf("%[^\n]%*c", inp) == EOF) {

@@ -2,6 +2,7 @@ import os
 import subprocess
 import string    
 import random
+import sys
 
 from itertools import accumulate as _accumulate, repeat as _repeat
 from bisect import bisect as _bisect
@@ -21,8 +22,9 @@ EMPTY_STR = "empty {}"
 READ, WRITE, EMPTY = 0, 1, 2
 
 # INPUTS
-N_FILES = 3
-N_CMDS = 10
+N_FILES = int(sys.argv[1])
+N_CMDS = int(sys.argv[2])
+RESTRICT = True if sys.argv[3] == 'y' else False
 
 # For Python 3.4
 # Acquired from https://stackoverflow.com/questions/58915023
@@ -101,11 +103,16 @@ def test_synchronization():
     for i in range(N_CMDS):
         random.shuffle(files)
         for path in files:
-            _input = n_rand_chars(random.randrange(1, 50 + 1))
-            if not (path in to_clean):
-                choice = WRITE
+            if RESTRICT:
+                _input = n_rand_alnum(random.randrange(1, 50 + 1))
             else:
-                choice = choices([READ, WRITE, EMPTY], k=1)[0]
+                _input = n_rand_chars(random.randrange(1, 50 + 1))
+            choice = choices([READ, WRITE, EMPTY], k=1)[0]
+            if (
+                i == N_CMDS - 1 and
+                (not (path in to_clean))
+            ):
+                choice = WRITE
 
             if choice == READ:
                 if not (path in read_seq.keys()):

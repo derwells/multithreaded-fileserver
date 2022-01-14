@@ -8,13 +8,13 @@ All write actions are encapsulated in `worker_write()`. Before the critical sect
 Line references will be interspersed in the explanation. For more, refer to the file documentation for `worker_write()` and associated functions. For ease of locating line-by-line explanations, references to the approriate functions will be made.
 
 ## Critical section
-The critical section is bounded by `args_t.in_lock` and `args_t.out_lock` (`file_server.c:202-227`). A detailed explanation can be found in \ref pg_synchronization "synchronization". The user input command is passed using `args_t.cmd`. Below are the steps taken by the worker thread in executing a write command.
+The critical section is bounded by `args_t.in_lock` and `args_t.out_lock` (`file_server.c:203-226`). A detailed explanation can be found in \ref pg_synchronization "synchronization". The user input command is passed using `args_t.cmd`. Below are the steps taken by the worker thread in executing a write command.
 -# [`file_server.c:209-211`] Access target file
     - We use the append mode. This creates the file if it does not exist.
 -# [`file_server.c:214-217`] Error handling
--# [file_server.c:219-223] Write to target file (with sleep)
+-# [file_server.c:220-222] Write to target file (with sleep) 
     - The file is accessed using a `FILE` pointer `target_file`. The filepath is passed using the thread arguments
-    - [file_server.c:222] We use `r_simulate_access()` to introduce the specified delay.
+    - [file_server.c:220] We use `usleep()` to introduce the specified delay of 25ms
 -# [file_server.c:229-231] Free unneeded args and struct args
     - Free dynamically allocated memory
 
@@ -64,12 +64,12 @@ Line references will be interspersed in the explanation. For more, refer to the 
 ## Critical section
 The critical section is bounded by `args_t.in_lock` and `args_t.out_lock` (`file_server.c:325-322`). A detailed explanation can be found in \ref pg_synchronization "synchronization". Below are the steps taken by the worker thread in executing a read command.
 
--# [`file_server.c:330-332`] Access target file
+-# [file_server.c:330-332] Access target file
     - The file-to-be-read is accessed using a `FILE` pointer `from_file`. The filepath is passed using the thread arguments
     - We use `r_simulate_access()` to introduce the specified delay.
--# [`file_server.c:335-371`] Check if the target file (`from_file`) exists
-    - [`file_server.c:341-346`] Target file does not exists; `empty.txt` critical section (uses global lock)
-        - [`file_server.c:342`] Open empty.txt (see `open_read()`)
+-# [file_server.c:335-371] Check if the target file (`from_file`) exists
+    - [file_server.c:341-346] Target file does not exists; `empty.txt` critical section (uses global lock)
+        - [file_server.c:342] Open empty.txt (see `open_read()`)
             - Wrapper for opening read.txt
             - `EMPTY_TARGET` is `"empty.txt"`
             - `EMPTY_MODE` is `"a"`
@@ -87,6 +87,7 @@ The critical section is bounded by `args_t.in_lock` and `args_t.out_lock` (`file
                 - file_server.c:172 Place newline
             - file_server.c:362 Close empty.txt
         - file_server.c:366-367 Empty target file then close it (see `empty_file()`)
+            - file_server.c:183 Empty target file with mode `w`
             - file_server.c:184 Close target file
         - file_server.c:370: Sleep 7-10 seconds after appending and emptying (see `r_sleep_range`)
             - file_server.c:118 Translate random number to range
