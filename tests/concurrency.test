@@ -1,2 +1,7 @@
-write outputs/test.txt 1 21 21 21 21 21 21 21 21 21 21 21 21 211 21 21 21
-write outputs/anothertest.txt 1 21 21 21 21 21 21 21 21 21 21 21 21 211 21 21 21
+write outputs/a.txt 1
+read outputs/b.txt 1
+empty outputs/c.txt 1
+read outputs/d.txt 1
+write outputs/e.txt 1
+empty outputs/f.txt 1
+read outputs/g.txt 1

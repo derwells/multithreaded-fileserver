@@ -38,7 +38,7 @@ The critical section is bounded by `args_t.in_lock` and `args_t.out_lock` (`file
             - Wrapper for opening read.txt
             - `READ_TARGET` is `"read.txt"`
             - `READ_MODE` is `"a"`
-        - file_server.c:272 Record "FILE DNE" to read.txt
+        - file_server.c:271 Record "FILE DNE" to read.txt
             - See `FMT_READ_MISS` in `defs.h:36`
         - file_server.c:273 Close read.txt
     - file_server.c:281-291 Target file exists; `read.txt` critical section (uses global lock)
@@ -68,12 +68,12 @@ The critical section is bounded by `args_t.in_lock` and `args_t.out_lock` (`file
     - The file-to-be-read is accessed using a `FILE` pointer `from_file`. The filepath is passed using the thread arguments
     - We use `r_simulate_access()` to introduce the specified delay.
 -# [file_server.c:335-371] Check if the target file (`from_file`) exists
-    - [file_server.c:341-346] Target file does not exists; `empty.txt` critical section (uses global lock)
-        - [file_server.c:342] Open empty.txt (see `open_read()`)
+    - [file_server.c:340-346] Target file does not exists; `empty.txt` critical section (uses global lock)
+        - [file_server.c:343] Open empty.txt (see `open_read()`)
             - Wrapper for opening read.txt
             - `EMPTY_TARGET` is `"empty.txt"`
             - `EMPTY_MODE` is `"a"`
-        - file_server.c:344 Record "FILE ALREADY EMPTY" to empty.txt
+        - file_server.c:343 Record "FILE ALREADY EMPTY" to empty.txt
             - See `FMT_EMPTY_MISS` in `defs.h:38`
         - file_server.c:345 Close empty.txt
     - file_server.c:353-363 Target file exists

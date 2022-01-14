@@ -4,4 +4,4 @@ break 259
 break 296
 break 332
 break 372
-run < conctest.txt
+run

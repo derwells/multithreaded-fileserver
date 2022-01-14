@@ -144,55 +144,55 @@ empty d.txt
 The same ordering is followed by the sample `command.txt` output below
 
 ```
-   [Thu Dec 30 18:12:57 2021] empty a.txt
-   [Thu Dec 30 18:12:57 2021] write a.txt 1 2
-   [Thu Dec 30 18:12:57 2021] write a.txt 3 4
-   [Thu Dec 30 18:12:57 2021] read a.txt
-   [Thu Dec 30 18:12:57 2021] write a.txt 5 6
-   [Thu Dec 30 18:12:57 2021] write b.txt 1 2
-   [Thu Dec 30 18:12:57 2021] write b.txt 3 4
-   [Thu Dec 30 18:12:57 2021] empty a.txt
-   [Thu Dec 30 18:12:57 2021] read a.txt
-   [Thu Dec 30 18:12:57 2021] read a.txt
-   [Thu Dec 30 18:12:57 2021] write a.txt 7 8
-   [Thu Dec 30 18:12:57 2021] read b.txt
-   [Thu Dec 30 18:12:57 2021] read a.txt
-   [Thu Dec 30 18:12:57 2021] empty a.txt
-   [Thu Dec 30 18:12:57 2021] write b.txt 5 6
-   [Thu Dec 30 18:12:57 2021] empty b.txt
-   [Thu Dec 30 18:12:57 2021] read b.txt
-   [Thu Dec 30 18:12:57 2021] write a.txt 9 10
-   [Thu Dec 30 18:12:57 2021] write a.txt 11 12
-   [Thu Dec 30 18:12:57 2021] read b.txt
-   [Thu Dec 30 18:12:57 2021] write b.txt 7 8
-   [Thu Dec 30 18:12:57 2021] read b.txt
-   [Thu Dec 30 18:12:57 2021] empty b.txt
-   [Thu Dec 30 18:12:57 2021] read c.txt
-   [Thu Dec 30 18:12:57 2021] write c.txt 5 6
-   [Thu Dec 30 18:12:57 2021] empty c.txt
-   [Thu Dec 30 18:12:57 2021] read c.txt
-   [Thu Dec 30 18:12:57 2021] write a.txt 13 14
-   [Thu Dec 30 18:12:57 2021] read a.txt
-   [Thu Dec 30 18:12:57 2021] write b.txt 11 12
-   [Thu Dec 30 18:12:57 2021] write c.txt 1 2
-   [Thu Dec 30 18:12:57 2021] write c.txt 3 4
-   [Thu Dec 30 18:12:57 2021] read c.txt
-   [Thu Dec 30 18:12:57 2021] write c.txt 7 8
-   [Thu Dec 30 18:12:57 2021] read c.txt
-   [Thu Dec 30 18:12:57 2021] write b.txt 13 14
-   [Thu Dec 30 18:12:57 2021] read b.txt
-   [Thu Dec 30 18:12:57 2021] empty a.txt
-   [Thu Dec 30 18:12:57 2021] write b.txt 9 10
-   [Thu Dec 30 18:12:57 2021] write c.txt 9 10
-   [Thu Dec 30 18:12:57 2021] empty b.txt
-   [Thu Dec 30 18:12:57 2021] empty c.txt
-   [Thu Dec 30 18:12:57 2021] write c.txt 11 12
-   [Thu Dec 30 18:12:57 2021] write c.txt 13 14
-   [Thu Dec 30 18:12:57 2021] read c.txt
-   [Thu Dec 30 18:12:57 2021] empty c.txt
-   [Thu Dec 30 18:12:57 2021] write d.txt 9 10
-   [Thu Dec 30 18:12:57 2021] read d.txt
-   [Thu Dec 30 18:12:57 2021] empty d.txt
+[Thu Dec 30 18:12:57 2021] empty a.txt
+[Thu Dec 30 18:12:57 2021] write a.txt 1 2
+[Thu Dec 30 18:12:57 2021] write a.txt 3 4
+[Thu Dec 30 18:12:57 2021] read a.txt
+[Thu Dec 30 18:12:57 2021] write a.txt 5 6
+[Thu Dec 30 18:12:57 2021] write b.txt 1 2
+[Thu Dec 30 18:12:57 2021] write b.txt 3 4
+[Thu Dec 30 18:12:57 2021] empty a.txt
+[Thu Dec 30 18:12:57 2021] read a.txt
+[Thu Dec 30 18:12:57 2021] read a.txt
+[Thu Dec 30 18:12:57 2021] write a.txt 7 8
+[Thu Dec 30 18:12:57 2021] read b.txt
+[Thu Dec 30 18:12:57 2021] read a.txt
+[Thu Dec 30 18:12:57 2021] empty a.txt
+[Thu Dec 30 18:12:57 2021] write b.txt 5 6
+[Thu Dec 30 18:12:57 2021] empty b.txt
+[Thu Dec 30 18:12:57 2021] read b.txt
+[Thu Dec 30 18:12:57 2021] write a.txt 9 10
+[Thu Dec 30 18:12:57 2021] write a.txt 11 12
+[Thu Dec 30 18:12:57 2021] read b.txt
+[Thu Dec 30 18:12:57 2021] write b.txt 7 8
+[Thu Dec 30 18:12:57 2021] read b.txt
+[Thu Dec 30 18:12:57 2021] empty b.txt
+[Thu Dec 30 18:12:57 2021] read c.txt
+[Thu Dec 30 18:12:57 2021] write c.txt 5 6
+[Thu Dec 30 18:12:57 2021] empty c.txt
+[Thu Dec 30 18:12:57 2021] read c.txt
+[Thu Dec 30 18:12:57 2021] write a.txt 13 14
+[Thu Dec 30 18:12:57 2021] read a.txt
+[Thu Dec 30 18:12:57 2021] write b.txt 11 12
+[Thu Dec 30 18:12:57 2021] write c.txt 1 2
+[Thu Dec 30 18:12:57 2021] write c.txt 3 4
+[Thu Dec 30 18:12:57 2021] read c.txt
+[Thu Dec 30 18:12:57 2021] write c.txt 7 8
+[Thu Dec 30 18:12:57 2021] read c.txt
+[Thu Dec 30 18:12:57 2021] write b.txt 13 14
+[Thu Dec 30 18:12:57 2021] read b.txt
+[Thu Dec 30 18:12:57 2021] empty a.txt
+[Thu Dec 30 18:12:57 2021] write b.txt 9 10
+[Thu Dec 30 18:12:57 2021] write c.txt 9 10
+[Thu Dec 30 18:12:57 2021] empty b.txt
+[Thu Dec 30 18:12:57 2021] empty c.txt
+[Thu Dec 30 18:12:57 2021] write c.txt 11 12
+[Thu Dec 30 18:12:57 2021] write c.txt 13 14
+[Thu Dec 30 18:12:57 2021] read c.txt
+[Thu Dec 30 18:12:57 2021] empty c.txt
+[Thu Dec 30 18:12:57 2021] write d.txt 9 10
+[Thu Dec 30 18:12:57 2021] read d.txt
+[Thu Dec 30 18:12:57 2021] empty d.txt
 ```
 
 By analyzing the input we can see the expected `read.txt` and `empty.txt` output of each file
@@ -206,22 +206,22 @@ By analyzing the input we can see the expected `read.txt` and `empty.txt` output
 Inspecting the sample `read.txt` output below, we see that these orderings are reflected
 
 ```
-   read c.txt: FILE DNE
-   read d.txt: 9 10
-   read b.txt: 1 23 4
-   read a.txt: 1 23 4
-   read c.txt: 
-   read b.txt: 
-   read b.txt: 
-   read c.txt: 1 23 4
-   read b.txt: 7 8
-   read c.txt: 1 23 47 8
-   read a.txt: 
-   read a.txt: 
-   read a.txt: 7 8
-   read b.txt: 11 1213 14
-   read c.txt: 11 1213 14
-   read a.txt: 9 1011 1213 14
+read c.txt: FILE DNE
+read d.txt: 9 10
+read b.txt: 1 23 4
+read a.txt: 1 23 4
+read c.txt: 
+read b.txt: 
+read b.txt: 
+read c.txt: 1 23 4
+read b.txt: 7 8
+read c.txt: 1 23 47 8
+read a.txt: 
+read a.txt: 
+read a.txt: 7 8
+read b.txt: 11 1213 14
+read c.txt: 11 1213 14
+read a.txt: 9 1011 1213 14
 ```
 
 `empty.txt`
@@ -233,17 +233,17 @@ Inspecting the sample `read.txt` output below, we see that these orderings are r
 Inspecting the sample `empty.txt` output below, we see that these orderings are reflected
 
 ```
-   empty a.txt: FILE ALREADY EMPTY
-   empty c.txt: 5 6
-   empty d.txt: 9 10
-   empty b.txt: 1 23 45 6
-   empty a.txt: 1 23 45 6
-   empty b.txt: 7 8
-   empty c.txt: 1 23 47 89 10
-   empty a.txt: 7 8
-   empty b.txt: 11 1213 149 10
-   empty c.txt: 11 1213 14
-   empty a.txt: 9 1011 1213 14
+empty a.txt: FILE ALREADY EMPTY
+empty c.txt: 5 6
+empty d.txt: 9 10
+empty b.txt: 1 23 45 6
+empty a.txt: 1 23 45 6
+empty b.txt: 7 8
+empty c.txt: 1 23 47 89 10
+empty a.txt: 7 8
+empty b.txt: 11 1213 149 10
+empty c.txt: 11 1213 14
+empty a.txt: 9 1011 1213 14
 ```
 
 # Testing Level 3
@@ -253,8 +253,8 @@ Refer to the \ref level3_proof "Concurrency Proof" found in \ref pg_concurrency 
 We can test inputs with newlines by issuing the commands
 
 ```
-   read generator.py
-   read <file that does not exist>
+read generator.py
+read <file that does not exist>
 ```
 
 Make sure that `read.txt` is cleared beforehand. We can run `diff` to confirm that the only differences are the records on the command issued

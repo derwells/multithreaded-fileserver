@@ -38,13 +38,13 @@ void l_init(list_t *l) {
  * @param value Value. Pointer to file metadata.
  */
 void l_insert(list_t *l, char *key, fmeta *value) {
-    lnode_t *new = malloc(sizeof(lnode_t)); /** file_server.c:41 Dynamically allocate new node */
+    /** file_server.c:42 Dynamically allocate new node */
+    lnode_t *new = malloc(sizeof(lnode_t));
     /** file_server.c:43-56 Error handling */
     if (new == NULL) {
         perror("malloc");
         return;
     }
-
     /** file_server.c:49-53 Build node and insert to linked list */
     new->key = key;
     new->value = value;
@@ -262,15 +262,15 @@ void *worker_read(void *_args) {
     /** file_server.c:263-294 Attempt to read target file */
     if (from_file == NULL) {
         /** 
-         * file_server.c:269-274 
-         * - Target file does not exists 
+         * file_server.c:269-274 If target file does not exist
          * - read.txt critical section 
          */
         pthread_mutex_lock(&glocks[READ_GLOCK]);
-        to_file = open_read(); /** file_server.c:270 Open read.txt */
-        /** file_server.c:272 Record FILE DNE to read.txt */
+        to_file = open_read(); // Open read.txt
+        /** file_server.c:271 Record FILE DNE to read.txt */
         fprintf(to_file, FMT_READ_MISS, cmd->action, cmd->path);
-        fclose(to_file); /** file_server.c:273 Close read.txt */
+        /** file_server.c:273 Close read.txt */
+        fclose(to_file);
         pthread_mutex_unlock(&glocks[READ_GLOCK]);
     } else {
         /** 
@@ -279,7 +279,7 @@ void *worker_read(void *_args) {
          * - read.txt critical section 
          */
         pthread_mutex_lock(&glocks[READ_GLOCK]);
-        to_file = open_read(); /** file_server.c:282 Access read.txt using pointer */
+        to_file = open_read(); // Open read.txt
         
         /** file_server.c:285 Write the corresponding record header */
         header_2cmd(to_file, cmd);
@@ -295,7 +295,7 @@ void *worker_read(void *_args) {
 
     debug_mode(fprintf(stderr, "[END] %s %s\n", cmd->action, cmd->path));
 
-    pthread_mutex_unlock(args->out_lock); /** file_server.c:298 End critical section */
+    pthread_mutex_unlock(args->out_lock); // End critical section
 
     /** file_server.c:301-303 Free unneeded args and struct args */
     free(args->cmd);
@@ -334,15 +334,15 @@ void *worker_empty(void *_args) {
     /** file_server.c:335-371: Atempt to empty target file */
     if (from_file == NULL) {
         /** 
-         * file_server.c:341-346 
-         * - If target does not exist
+         * file_server.c:340-346 If target does not exist
          * - Contains empty.txt critical section 
          */
         pthread_mutex_lock(&glocks[EMPTY_GLOCK]);
-        to_file = open_empty(); /** file_server.c:342 Open empty.txt */
-        /** file_server.c:344 Record FILE ALR. EMPTY to empty.txt */
+        to_file = open_empty(); // Open empty.txt
+        /** file_server.c:343 Record FILE ALR. EMPTY to empty.txt */
         fprintf(to_file, FMT_EMPTY_MISS, cmd->action, cmd->path);
-        fclose(to_file); /** file_server.c:345 Close empty.txt */
+        /** file_server.c:345 Close empty.txt */
+        fclose(to_file);
         pthread_mutex_unlock(&glocks[EMPTY_GLOCK]);
     } else {
         /** 
@@ -351,7 +351,7 @@ void *worker_empty(void *_args) {
          * - Contains empty.txt critical section 
          */
         pthread_mutex_lock(&glocks[EMPTY_GLOCK]);
-        to_file = open_empty(); /** file_server.c:354 Access empty.txt using pointer */
+        to_file = open_empty(); // Open empty.txt
 
         /** file_server.c:356 Write the corresponding record header to empty.txt */
         header_2cmd(to_file, cmd);
@@ -442,7 +442,7 @@ void command_record(command *cmd) {
     time(&rawtime);
     struct tm *timeinfo = localtime(&rawtime);
     char *cleaned_timestamp = asctime(timeinfo);
-    cleaned_timestamp[24] = '\0';  /** file_server.c:447 Replace newline with null-terminator */
+    cleaned_timestamp[24] = '\0'; // Remove newline
 
     /** file_server.c:448 Open commands.txt */
     FILE *commands_file = fopen(CMD_TARGET, CMD_MODE);
@@ -532,7 +532,7 @@ void spawn_worker(args_t *targs) {
     command *cmd = targs->cmd;
 
     /** file_server.c:535-549 Spawn worker thread depending on cmd */
-    pthread_t tid; /** file_server.c:535 Declare tid variable; tids are not saved */
+    pthread_t tid;
     if (strcmp(cmd->action, "write") == 0) {
         /** file_server.c:538 If write command, spawn worker_write */
         pthread_create(&tid, NULL, worker_write, targs);

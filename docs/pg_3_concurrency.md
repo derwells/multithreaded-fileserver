@@ -11,112 +11,42 @@ A complete picture of this can be found in the \ref pg_synchronization "Synchron
 
 # Concurrency Proof
 \anchor level3_proof
-We can show that commands associated with different files can run concurrently using `gdb`. By examining thread states, we can ascertain that threads indeed run concurrently.
+We can show that commands associated with different files can run concurrently using `gdb`. By examining thread states, we can ascertain that threads indeed run concurrently. **When performing this test, add the `-g` flag to the compilation of `./file_server`**.
 
 We do this by setting two breakpoints within the critical section. We do this by setting breakpoints in `.gdbinit`
 
 \code{.unparsed}
-    break 222
-    break 296
-    break 372
-    run < conctest.txt
+
+break 210
+break 222
+break 259
+break 296
+break 332
+break 372
+run
+
 \endcode
 
-From the top, these are for write, read, and empty respectively.
+Each pair from the top are for write, read, and empty respectively.
 
-The input file `conctest.txt` will contains two lines of input. These will target two different files `a.txt` and `b.txt`.
+After running, we input the commands below (last line is a newline). Once the breakpoints are reached, we run `info threads` in gdb. This shows that the threads are executing concurrently.
 
-Note that there are three types of commands. For completion, we show that every combination of two commands can run concurrently with each other.
-
-For brevity, we look for test outputs that explicitly show the thread working within the `worker_*` function. We avoid outputs where either one of the threads is sleeping.
-
-## write & write
-For testing write command concurreny with another write, we use the `contest.txt` below
 \code{.unparsed}
-    write a.txt A
-    write b.txt B
+
+write outputs/a.txt 1
+read outputs/b.txt 1
+empty outputs/c.txt 1
+read outputs/d.txt 1
+write outputs/e.txt 1
+empty outputs/f.txt 1
+read outputs/g.txt 1
+
 \endcode
 
-Indeed, we see that the spawned threads are executing `worker_write()` at the same time.
+This outputted
 
-\latexonly
-\begin{figure}[H]
-    \centering
-	\includegraphics[scale=1]{sync_overview.png}
-	\caption{`write`, `write` concurrency}
-	\label{overview}
-\end{figure}
-\endlatexonly
+@image latex conctest.png
 
-## write & read
-\code{.unparsed}
-    write a.txt A
-    read b.txt
-\endcode
-
-\latexonly
-\begin{figure}[H]
-    \centering
-	\includegraphics[scale=1]{sync_overview.png}
-	\caption{`write`, `read` concurrency}
-	\label{overview}
-\end{figure}
-\endlatexonly
-## write & empty
-\code{.unparsed}
-    write a.txt A
-    empty b.txt
-\endcode
-
-\latexonly
-\begin{figure}[H]
-    \centering
-	\includegraphics[scale=1]{sync_overview.png}
-	\caption{`write`, `empty` concurrency}
-	\label{overview}
-\end{figure}
-\endlatexonly
-## read & read
-\code{.unparsed}
-    read a.txt
-    read b.txt
-\endcode
-
-\latexonly
-\begin{figure}[H]
-    \centering
-	\includegraphics[scale=1]{sync_overview.png}
-	\caption{`read`, `read` concurrency}
-	\label{overview}
-\end{figure}
-\endlatexonly
-## read & empty
-\code{.unparsed}
-    read a.txt
-    empty b.txt
-\endcode
-
-\latexonly
-\begin{figure}[H]
-    \centering
-	\includegraphics[scale=1]{sync_overview.png}
-	\caption{`read`, `empty` concurrency}
-	\label{overview}
-\end{figure}
-\endlatexonly
-## empty & empty
-\code{.unparsed}
-    empty a.txt
-    empty b.txt
-\endcode
-
-\latexonly
-\begin{figure}[H]
-    \centering
-	\includegraphics[scale=1]{sync_overview.png}
-	\caption{`empty`, `empty` concurrency}
-	\label{overview}
-\end{figure}
-\endlatexonly
+Indeed the threads are executing concurrently. Note that nanosleep is triggered by access simulation. This is within the critical section.
 
 Program correctness is proven in \ref pg_synchronization "Synchronization".

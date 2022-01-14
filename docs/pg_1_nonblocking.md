@@ -54,7 +54,7 @@ Here are more detailed steps
         - file_server.c:594-595 Dynamically allocate and initialize new file metadata fmeta (see `fmeta_init()`)
             - file_server.c:505 fmeta.path is the only initialization step
         - file_server.c:598 Insert new fmeta to the file metadata tracker(see `l_insert()`)
-            - file_server.c:41 Dynamically allocate new node
+            - file_server.c:42 Dynamically allocate new node
             - file_server.c:43-56 Error handling
             - file_server.c:49-53 Build node and insert to linked list
 4. Update file metadata
@@ -63,6 +63,8 @@ Here are more detailed steps
 5. Spawn worker thread
     - file_server.c:604 Spawn worker thread (see `spawn_worker()`)
         - file_server.c:532 Use separate pointer for args_t.cmd for brevity
+        - file_server.c:535 Declare tid variable
+            - Thread ids are not saved
         - [`file_server.c:535-549`] Spawn appropriate thread based on action
             - [`file_server.c:538,541,544`] Pass thread arguments as void pointer
 6. Record command in commands.txt
