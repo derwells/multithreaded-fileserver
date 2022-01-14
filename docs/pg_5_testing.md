@@ -92,11 +92,11 @@ and synchronization correctness. We copy paste this into the terminal after runn
 ```
 write a.txt the
 read a.txt
+write b.txt the
+read b.txt
 write a.txt quick
 read a.txt
 write a.txt brown
-write b.txt the
-read b.txt
 write b.txt quick
 read a.txt
 write a.txt fox
