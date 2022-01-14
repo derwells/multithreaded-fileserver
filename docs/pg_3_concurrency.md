@@ -43,10 +43,12 @@ read outputs/g.txt 1
 
 \endcode
 
-This outputted
+@image latex conctest_1.png
 
-@image latex conctest.png
+Note that we can `continue` until another breakpoint is reached.
 
-Indeed the threads are executing concurrently. Note that nanosleep is triggered by access simulation. This is within the critical section.
+@image latex conctest_2.png
+
+Indeed the threads are executing concurrently. Note that nanosleep is triggered by `r_simulate_access()`. This is within the critical section.
 
 Program correctness is proven in \ref pg_synchronization "Synchronization".
