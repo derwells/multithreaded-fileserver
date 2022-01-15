@@ -196,12 +196,3 @@ read <file that does not exist>
 ```
 
 Make sure that `read.txt` is cleared beforehand. We can run `diff` to confirm that the only differences are the records on the command issued
-!!!
-\latexonly
-\begin{figure}[H]
-   \centering
-	\includegraphics[scale=1]{sync_overview.png}
-	\caption{`write`, `write` concurrency}
-	\label{overview}
-\end{figure}
-\endlatexonly
