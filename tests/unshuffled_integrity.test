@@ -1,0 +1,43 @@
+write a.txt the
+read a.txt
+write a.txt quick
+read a.txt
+write a.txt brown
+read a.txt
+write a.txt fox
+empty a.txt
+write a.txt lazy
+write a.txt dog
+read a.txt
+write b.txt the
+read b.txt
+write b.txt quick
+read b.txt
+write b.txt brown
+read b.txt
+write b.txt fox
+empty b.txt
+write b.txt lazy
+write b.txt dog
+read b.txt
+empty a.txt
+empty b.txt
+
+// Standardization sort
+sort -t" " -s -k2,2 <read or empty>.txt
+
+// Standardized read.txt
+read a.txt: the
+read a.txt: thequick
+read a.txt: thequickbrown
+read a.txt: lazydog
+read b.txt: the
+read b.txt: thequick
+read b.txt: thequickbrown
+read b.txt: lazydog
+
+// Standardized empty.txt
+empty a.txt: thequickbrownfox
+empty a.txt: lazydog
+empty b.txt: thequickbrownfox
+empty b.txt: lazydog

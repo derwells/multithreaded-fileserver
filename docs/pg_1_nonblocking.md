@@ -6,11 +6,12 @@ For more line-by-line explanations, refer to the file documentation `main()`, `m
 Entrypoint `main()` initializes global variables and spawns the master thread. There will always at be at least 2 threads.
 
 Here are more detailed steps
-1. file_server.c:626-628 Initialize global mutexes
-2. file_server.c:631-632 Initialize metadata tracker (see `l_init()`)
+1. [file_server.c:664] Set the random number generator seed
+2. [file_server.c:667-669] Initialize global locks
+3. [file_server.c:672-673] Initialize metadata tracker (see `l_init()`)
     - Sets `list_t.head` to NULL
-3. file_server.c:635-636 Spawn master thread
-4. file_server.c:639 Wait for master thread
+4. [file_server.c:676-677] Spawn master thread
+5. [file_server.c:680] Wait for master thread
 
 # Master Thread
 All master thread actions are found in `master()`. 
@@ -33,36 +34,36 @@ Figure \latexonly\ref{mtflcht}\endlatexonly is a flowchart of how the master thr
 
 Here are more detailed steps
 1. Parse and store user input in `command` struct
-    - file_server.c:565-566 Store user input in dynamically allocated struct `command`; uses `get_command()`
-        - file_server.c:396-398 Reading user input into `inp`
-            - file_server.c:397 Read command until newline
-        - (file_server.c:402-403,406-407,410-412) Parse `scanf` using `strtok` then copy into `cmd`
-2. Initialize thread arguments (see `args_init`)
-    - file_server.c:569-570 Build thread arguments targs (see `args_init`)
-        - file_server.c:483-484 Dynamically allocate and initialize new mutex for out_lock
-        - file_server.c:487 Ensure next thread can't run immediately by locking out_lock
-        - [`file_server.c:490-491`] Command information is deep-copied into other locations (e.g. file trackers `fmeta` and thread arguments `args_t`; see `command_copy()`)
+    - [file_server.c:602-603] Store user input in dynamically allocated struct `command`; uses `get_command()`
+        - [file_server.c:428-436] Reading user input into `inp`
+            - file_server.c:435-436 Read command until newline
+        - [file_server.c:438-439,442-443,446-448] Parse `inp` using `strtok` then copy into `cmd`
+2. Initialize thread arguments (see `args_init()`)
+    - [file_server.c:606-607] Build thread args targs (see `args_init()`)
+        - [file_server.c:520-521] Dynamically allocate and initialize new mutex for out_lock
+        - [file_server.c:524] Ensure next thread can't run immediately by locking out_lock
+        - [file_server.c:527-528] Command information is deep-copied into other locations (e.g. file trackers `fmeta` and thread arguments `args_t`; see `command_copy()`)
 3. Check file metadata tracker
-    - This operation is a part of \ref pg_synchronization "*synchronization*"
+    - This operation is a part of \ref pg_synchronization "*Synchronization*"
     - See `l_lookup()`
-        -  file_server.c:73-76 Compare file path as key; save lookup value and exit
-    - file_server.c:578-601 Check if target file has been tracked
-    - file_server.c:582-584 Metadata found, update respective fmeta.recent_lock 
-        - file_server.c:583 Pass most recent `out_lock` as new thread's `in_lock`
-    - file_server.c:587-598 Metadata not found, insert to file metadata tracker
-        - file_server.c:590-591 Dynamically allocate and initialize new in_lock mutex
-        - file_server.c:594-595 Dynamically allocate and initialize new file metadata fmeta (see `fmeta_init()`)
-            - file_server.c:505 fmeta.path is the only initialization step
-        - file_server.c:598 Insert new fmeta to the file metadata tracker(see `l_insert()`)
-            - file_server.c:42 Dynamically allocate new node
-            - file_server.c:43-56 Error handling
-            - file_server.c:49-53 Build node and insert to linked list
+        -  file_server.c:84-89 Compare file path as key; save lookup value and exit
+    - file_server.c:615-636 Check if target file has been tracked
+    - file_server.c:619-621 Metadata found, update respective fmeta.recent_lock
+        - file_server.c:621 Pass most recent out_lock as new thread's in_lock
+    - file_server.c:624-635 Metadata not found, insert to file tracker
+        - file_server.c:627-628 Dynamically allocate and initialize new in_lock mutex
+        - file_server.c:631-632 Dynamically allocate and initialize new file metadata fmeta (see `fmeta_init()`)
+            - file_server.c:542 fmeta.path is the only initialization step
+        - file_server.c:635 Insert new fmeta to the file tracker(see `l_insert()`)
+            - file_server.c:51 Dynamically allocate new node 
+            - file_server.c:54-57 Error handling
+            - file_server.c:60-64 Build node and insert to linked list
 4. Update file metadata
-    - file_server.c:601 Whether newly-created or not, update target file's fmeta (see `fmeta_update()`)
-        - file_server.c:519 Overwrite respective `fmeta.recent_lock` with new thread's `out_lock`
+    - This operation is a part of \ref pg_synchronization "*Synchronization*"
+    - file_server.c:638 Whether newly-created or not, update target file's fmeta (see `fmeta_update()`)
+        - file_server.c:556 Overwrite target file's fmeta.recent_lock with new out_lock
 5. Spawn worker thread
-    - file_server.c:604 Spawn worker thread (see `spawn_worker()`)
-        - file_server.c:532 Use separate pointer for args_t.cmd for brevity
+    - file_server.c:641 Spawn worker thread (see `spawn_worker()`)
         - file_server.c:535 Declare tid variable
             - Thread ids are not saved
         - [`file_server.c:535-549`] Spawn appropriate thread based on action

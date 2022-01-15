@@ -425,7 +425,7 @@ void *worker_empty(void *_args) {
  */
 void get_command(command *cmd) {
     /** 
-     * file_server.c:428-435 Reading user input into `inp`
+     * file_server.c:428-436 Reading user input into `inp`
      * - Use fgets to read user command
      * - Use strtok to parse afterwards
      */
