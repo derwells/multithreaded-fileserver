@@ -31,7 +31,7 @@
 /** Macro for commands.txt */
 #define CMD_TARGET      "commands.txt"
 /** Access mode for commands.txt */
-#define CMD_MODE        "w+"
+#define CMD_MODE        "a"
 
 /** Format when writing found file to read.txt, empty.txt */
 #define FMT_2HIT        "%s %s: "
