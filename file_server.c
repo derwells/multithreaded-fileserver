@@ -426,14 +426,14 @@ void *worker_empty(void *_args) {
 void get_command(command *cmd) {
     /** 
      * file_server.c:428-435 Reading user input into `inp`
-     * - Use scanf to read user command
-     * - `inp` is parsed afterwards
+     * - Use fgets to read user command
+     * - Use strtok to parse afterwards
      */
     char inp[2 * MAX_INPUT_SIZE + MAX_ACTION_SIZE];
 
-    /** file_server.c:435 Read command until newline */
-    scanf("%[^\n]%*c", inp);
-
+    /** file_server.c:435-436 Read command until newline */
+    fgets(inp, sizeof(inp), stdin);
+    inp[strcspn(inp, "\n")] = 0;
     /** file_server.c:438-439 Get command action */
     char *ptr = strtok(inp, " ");
     strcpy(cmd->action, ptr);
