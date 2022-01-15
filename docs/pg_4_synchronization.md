@@ -1,7 +1,7 @@
 \page pg_synchronization Synchronization
 
 # Overview
-The program ensures synchronization by enforcing a thread run order per target file. This is done using (1) a linked list of file metadata `tracker` (`file_server.c:20,631`; see \ref pg_nonblocking "Non-blocking Master") and (2) a hand-over-hand locking scheme for threads targeting the same file.
+The program ensures synchronization by enforcing a thread run order per target file. This is done using (1) a linked list of file metadata `tracker` (file_server.c:13,672; see \ref pg_nonblocking "Non-blocking Master") and (2) a hand-over-hand locking scheme for threads targeting the same file.
 
 # Metadata Tracker
 \snippet{lineno} docs/snippets/snippets.c global_vars
@@ -11,10 +11,10 @@ The program ensures synchronization by enforcing a thread run order per target f
 This is not threadsafe. However, only the master thread accesses this data structure. Hence, it is non-blocking.
 
 ## Tracker node
-`lnode_t` (`defs.h:108`) contains key, value mapping for filepath to corresponding file metadata.
+`lnode_t` (defs.h:111-115) contains key, value mapping for filepath to corresponding file metadata.
  
 ## Metadata
-`fmeta` (`defs.h:91`) is a key component of hand-over-hand locking and building worker threads. This keeps track of the most recent `out_lock` in `fmeta.recent_lock`.
+`fmeta` (defs.h:91) is a key component of hand-over-hand locking and building worker threads. This keeps track of the most recent `out_lock` in `fmeta.recent_lock`.
 
 # Hand-over-hand locking
 ## Rationale
@@ -24,7 +24,7 @@ Note that these "chain" of locks are only associated to a single file path. They
 
 The only mutually exclusive operations between worker threads of different files the write operations to `read.txt` or `empty.txt`. The program uses global locks to guard these files.
 
-Line references will be interspersed in the explanation. A full line-by-line explanation can be found in the `file_server.c` section of the File Documentation. For ease of locating line-by-line explanations, references to the approriate functions will be made.
+Line references will be interspersed in the explanation. A full line-by-line explanation can be found in the file_server.c section of the File Documentation. For ease of locating line-by-line explanations, references to the approriate functions will be made.
 
 ## Explanation
 
@@ -37,17 +37,19 @@ Line references will be interspersed in the explanation. A full line-by-line exp
 \end{figure}
 \endlatexonly
 
-Every type of worker thread uses hand-over-hand locking to ensure execution order. Every type of worker thread is passed mutex pointers `in_lock` and `out_lock`. The `*in_lock` guards execution of the whole thread (file_server.c:203,253,325). The `*out_lock` is a shared lock that is released once the thread is finished (file_server.c:227,298,374), allowing the next thread to run (see `args_t`).
+Every type of worker thread uses hand-over-hand locking to ensure execution order. Every type of worker thread is passed mutex pointers `in_lock` and `out_lock`. The `*in_lock` guards execution of the whole thread (file_server.c:212,264,347). The `*out_lock` is a shared lock that is released once the thread is finished (file_server.c:237,312,409), allowing the next thread to run (see `args_t`).
+
 
 \snippet{lineno} docs/snippets/snippets.c tracker_check
 
-Worker threads are built such that their `*out_lock` begins locked (file_server.c:483-487). Their `*in_lock` is the `*out_lock` of the worker thread at the tail of the chain. The tail - or trailing - `*out_lock` is tracked by `fmeta.recent_lock` (file_server.c:584). Everytime a worker thread is built `fmeta.recent_lock` gets overwritten by the new `out_lock` (file_server.c:519).
+Worker threads are built such that their `*out_lock` begins locked (file_server.c:524). Their `*in_lock` is the `*out_lock` of the worker thread at the tail of the chain. The tail - or trailing - `*out_lock` is tracked by `fmeta.recent_lock` (file_server.c:556). Everytime a worker thread is built `fmeta.recent_lock` gets overwritten by the new `out_lock` (file_server.c:638->556).
 
 A worker thread's `in_lock` is unlocked **if and only if** any of the following conditions are met
- -# It is the first thread associated with a target file (file_server.c:590-591)
- 	This means there have been no previous commands to the target file
+ -# It is the first thread associated with a target file (file_server.c:619-621)
+ 	- This means there have been no previous commands to the target file
  -# The thread before it has finished executing
-	This means the shared mutex has been unlocked
+	- This means the shared mutex has been unlocked
+	- Can occur before the new worker thread is built
 
 \latexonly
 \begin{figure}[H]
@@ -65,7 +67,7 @@ Say a new user input `cmd n+1` gets passed.
 
 *If the file tracker exists*, the program passes the most recent lock `fmeta.recent_lock` as the `in_lock` of `cmd n+1`. In Figure \latexonly\ref{hoh}\endlatexonly, the `in_lock` of `cmd n+1` would be mutex a10.
 
-The program initializes a new mutex for `out_lock` (file_server.c:483-487). This overwrites the respective `fmeta.recent_lock`.
+The program initializes a new mutex for `out_lock` (file_server.c:520-524). This overwrites the target file's `fmeta.recent_lock` (file_server.c:556).
 
 Figure \latexonly\ref{hoh_update_exists}\endlatexonly is what happens after the update.
 
@@ -94,10 +96,11 @@ Figure \latexonly\ref{hoh_update_exists}\endlatexonly is what happens after the 
 ## Race conditions
 ### Per target file
 The HoH locking mechanism ensures that a thread can run only if
- -# It is the first thread associated with a target file (file_server.c:590-591)
- 	This means there have been no previous commands to the target file
+ -# It is the first thread associated with a target file (file_server.c:619-621)
+ 	- This means there have been no previous commands to the target file
  -# The thread before it has finished executing
-	This means the shared mutex has been unlocked
+	- This means the shared mutex has been unlocked
+	- Can occur before the new worker thread is built
 
 
 \latexonly
@@ -126,10 +129,10 @@ Suppose other threads aside from `cmd 1` execute first. Remember that all shared
 
 Once `cmd 1` finishes, the order is maintain as `cmd 2` is allowed to run next. Again, only `cmd 2`'s `in_lock` in unlocked. Other worker threads that were barred from execution in `cmd 1` are still barred while `cmd 2` is executing.
 
-Through induction, we can see that the shared locks are opened one at a time.
+This goes on until all the "queued" threads complete in sequence. Note that a thread's `out_lock` does not need to be the `in_lock` of another thread.
 
 ### Accessing read.txt and empty.txt
-The program uses global locks to guard writing to `read.txt` and `empty.txt` (file_server.c:269-274,281-291,341-346,353-363). These global locks are shared across every thread (not just per file path). Hence, no two threads can be writing to these output files at the same time. Worker threads will block in the middle of their execution and wait their turn.
+The program uses global locks to guard writing to `read.txt` and `empty.txt` (file_server.c:280-291,298-312,363-374,381-395). These global locks are shared across every thread (not just per file path). Hence, no two threads can be writing to these output files at the same time. Worker threads will block in the middle of their execution and wait their turn.
 
 These files do not have to be ordered - they are non-deterministic. Hence, it sufficies to ensure atomicity.
 
@@ -139,4 +142,4 @@ Nested locks prone to deadlock. The only nested locks are the global locks for `
 ## Invalid memory locations
 This portion addresses the validity of the freeing mechanism done by the worker threads. Figure \latexonly\ref{mlp2t}\endlatexonly summarizes the interaction between existing worker thread arugments (`t1`) and ones being built (`t2`).
 
-Once a worker thread completes, it frees uneeded dynamic memory (file_server.c:229-231,301-303,377-379). This includes its `*in_lock` (in Figure \latexonly\ref{mlp2t}\endlatexonly, this is LOCK 0). This may seem like a problem because `*in_lock` starts out as a shared lock - it was an older thread's `*out_lock`. However by the time the current worker thread completes, the `*in_lock` is not shared anymore. The older worker thread would have already completed and freed its `out_lock` pointer. This ensures that `recent_lock` and `t2.in_lock` never point to invalid memory locations. Figure \latexonly\ref{mlp1t}\endlatexonly shows the lock pointer states when `t1` completes.
+Once a worker thread completes, it frees uneeded dynamic memory (file_server.c:240-242,323-325,412-414). This includes its `*in_lock` (in Figure \latexonly\ref{mlp2t}\endlatexonly, this is LOCK 0). This may seem like a problem because `*in_lock` starts out as a shared lock - it was an older thread's `*out_lock`. However by the time the current worker thread completes, the `*in_lock` is not shared anymore. The older worker thread would have already completed and freed its `out_lock` pointer. This ensures that `recent_lock` and `t2.in_lock` never point to invalid memory locations. Figure \latexonly\ref{mlp1t}\endlatexonly shows the lock pointer states when `t1` completes.

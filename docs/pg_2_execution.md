@@ -82,7 +82,7 @@ The critical section is bounded by `args_t.in_lock` and `args_t.out_lock` (file_
             - file_server.c:384 Open empty.txt
             - file_server.c:386 Write the corresponding record header to empty.txt (see `header2_cmd()`)
                 - file_server.c:141-146 Writes a 2-input header
-                - See `FMT_2CMD` in `defs.h:40`
+                - See `FMT_2CMD` in `defs.h:43`
             - file_server.c:390 Append file contents to empty.txt(see `fdump()`)
                 - file_server.c:177-179 Read contents per character
                 - file_server.c:182 Place newline
