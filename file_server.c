@@ -452,7 +452,7 @@ void get_command(command *cmd) {
 
 /**
  * @relates     __command
- * Deep copy of command contents from one command to another. Line 419.
+ * Deep copy of command contents from one command to another.
  * 
  * @param to    Command to copy to.
  * @param from  Command to copy from.
@@ -590,7 +590,7 @@ void spawn_worker(args_t *targs) {
 }
 
 /**
- * Master thread function. Line 562.
+ * Master thread function.
  * 
  * @param _args     Arguments passed to worker thread. 
  *                  Typecasted back into args_t.
