@@ -144,7 +144,7 @@ This portion addresses the validity of the freeing mechanism done by the worker 
 
 Once a worker thread completes, it frees uneeded dynamic memory (file_server.c:240-242,323-325,412-414). This includes its `*in_lock` (in Figure \latexonly\ref{mlp2t}\endlatexonly, this is LOCK 0). This may seem like a problem because `*in_lock` starts out as a shared lock - it was an older thread's `*out_lock`. However by the time the current worker thread completes, the `*in_lock` is not shared anymore. The older worker thread would have already completed and freed its `out_lock` pointer. This ensures that `recent_lock` and `t2.in_lock` never point to invalid memory locations. Figure \latexonly\ref{mlp1t}\endlatexonly shows the lock pointer states when `t1` completes.
 
-Valgrind shows that these memory locations do not become unreachable (see [Valgrind output](@ref sampleval)). The "possible lost" memory locations are not related to freeing dynamically allocated memory.
+Valgrind shows that these memory locations do not become unreachable (see [Valgrind output](@ref sampleval)). The "possible lost" memory locations are not related to freeing dynamically allocated memory. "Still reachable" are from the `tracker` linked list and trailing `*out_lock` mutexes. The latter will not be freed because it is not an `in_lock` for any thread.
 
 This was the command used to run valgrind
 
