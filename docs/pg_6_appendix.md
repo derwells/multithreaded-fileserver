@@ -13,6 +13,7 @@
 # Automated test commands.txt {#samplecommands}
 \snippet docs/snippets/snippets.txt commands.txt
 # Valgrind output {#sampleval}
+```
 ==13176== Memcheck, a memory error detector
 ==13176== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
 ==13176== Using Valgrind-3.15.0-608cb11914-20190413 and LibVEX; rerun with -h for copyright info
@@ -192,3 +193,4 @@
 ==13176==         suppressed: 0 bytes in 0 blocks
 ==13176== 
 ==13176== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
+```

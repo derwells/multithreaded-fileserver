@@ -429,7 +429,7 @@ void get_command(command *cmd) {
      * - Use fgets to read user command
      * - Use strtok to parse afterwards
      */
-    char inp[2 * MAX_INPUT_SIZE + MAX_ACTION_SIZE];
+    char inp[2 * MAX_INPUT_SIZE + MAX_ACTION_SIZE + 10];
 
     /** file_server.c:435-436 Read command until newline */
     fgets(inp, sizeof(inp), stdin);

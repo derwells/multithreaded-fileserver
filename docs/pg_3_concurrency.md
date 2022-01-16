@@ -13,7 +13,13 @@ A complete picture of this can be found in the \ref pg_synchronization "Synchron
 \anchor level3_proof
 We can show that commands associated with different files can run concurrently using `gdb`. By examining thread states, we can ascertain that threads indeed run concurrently. **When performing this test, add the `-g` flag to the compilation of `./file_server`**.
 
-We do this by setting two breakpoints within the critical section. We do this by setting breakpoints in `.gdbinit`
+Make sure that `~/.gdbinit` has the follow content
+
+```
+set auto-load safe-path /
+```
+
+We test by setting two breakpoints within the critical section using `./.gdbinit`
 
 \code{.unparsed}
 
