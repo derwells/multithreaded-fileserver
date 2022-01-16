@@ -242,11 +242,10 @@ def main():
     open(CMD_FILE, "w").close()
     open(TEST_IN, "w").close()
 
-    # make outputs directory
-    if not os.path.exists("outputs"):
-        os.makedirs("outputs")
-
     # run test
     test_synchronization()
 
+# make outputs directory
+if not os.path.exists("outputs"):
+    os.makedirs("outputs")
 main()
