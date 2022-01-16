@@ -14,8 +14,8 @@ The critical section is bounded by `args_t.in_lock` and `args_t.out_lock` (file_
 -# [file_server.c:222-226] Error handling
 -# [file_server.c:229-233] Write to target file (with sleep)
     - See `ms2ts()`
-        - [file_server.c:25 ]Convert ms to s
-        - [file_server.c:28 ]Convert ms to ns
+        - [file_server.c:25] Convert ms to s
+        - [file_server.c:28] Convert ms to ns
 -# [file_server.c:240-242] Free unneeded args and struct args
     - Does not include out_lock
 
@@ -90,7 +90,7 @@ The critical section is bounded by `args_t.in_lock` and `args_t.out_lock` (file_
         - [file_server.c:398-399] Empty target file (see `empty_file()`)
             - [file_server.c:193] Empty target file with mode `w`
             - [file_server.c:194] Close target file
-        - [file_server.c:405]: After appending to read.txt and emptying the target file, sleep after for random time in the range 7000ms-10000ms (see `r_sleep_range()`)
+        - [file_server.c:405] After appending to read.txt and emptying the target file, sleep after for random time in the range 7000ms-10000ms (see `r_sleep_range()`)
             - [file_server.c:123] Translate random number to range
             - [file_server.c:126-128] Convert ms to ns and sleep
 -# [file_server.c:412-414] Free unneeded args and struct args

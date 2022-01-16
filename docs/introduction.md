@@ -1,6 +1,6 @@
 \mainpage Introduction
 
-This project is made for the completion of CS 140 21.1 Project 2.
+This project is made for the completion of CS 140 21.1 Project 2. It is a **Level 4** implementation.
 
 The implementation is divided into two files:
  - `defs.h`: contains `typedef struct` definitions and other useful macros.
