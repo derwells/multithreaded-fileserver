@@ -19,7 +19,7 @@ Make sure that `~/.gdbinit` has the follow content
 set auto-load safe-path /
 ```
 
-We test by setting two breakpoints within the critical section using `./.gdbinit`
+We test by setting two breakpoints within the critical section using `./.gdbinit` (see `.gdbinit-sample`)
 
 \code{.unparsed}
 
