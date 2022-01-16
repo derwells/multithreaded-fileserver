@@ -54,7 +54,7 @@ Here are more detailed steps
         - [file_server.c:627-628] Dynamically allocate and initialize new `in_lock` mutex
         - [file_server.c:631-632] Dynamically allocate and initialize new file metadata fmeta (see `fmeta_init()`)
             - [file_server.c:542] fmeta.path is the only initialization step
-        - [file_server.c:635] Insert new fmeta to the file tracker(see `l_insert()`)
+        - [file_server.c:635] Insert new fmeta to the file tracker (see `l_insert()`)
             - [file_server.c:51] Dynamically allocate new node 
             - [file_server.c:54-57] Error handling
             - [file_server.c:60-64] Build node and insert to linked list
@@ -94,7 +94,7 @@ Figure \latexonly\ref{mlp2t}\endlatexonly summarizes the interaction between exi
 \end{figure}
 \endlatexonly
 
-Once a worker thread completes, it frees both `&`in_lock`` and `*`in_lock`` (in the Figure above, this is LOCK 0 - `*t1.`in_lock``). By the time a worker thread completes, the `*`in_lock`` is not shared. It has reached the end of its life cycle. This ensures that `recent_lock` and `t2.`in_lock`` never point to invalid memory locations. Figure \latexonly\ref{mlp1t}\endlatexonly shows the lock pointer states when `t1` completesw.
+Once a worker thread completes, it frees both `&in_lock` and `*in_lock` (in the Figure above, this is LOCK 0 - `*t1.in_lock`). By the time a worker thread completes, the `*in_lock` is not shared. It has reached the end of its life cycle. This ensures that `recent_lock` and `t2.in_lock` never point to invalid memory locations. Figure \latexonly\ref{mlp1t}\endlatexonly shows the lock pointer states when `t1` completesw.
 
 \latexonly
 \begin{figure}[H]
