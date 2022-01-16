@@ -81,16 +81,15 @@ python3 generator.py 5 20 n
 Attached is a [sample generated `test.in`](@ref sampletestin) accessing 5 files with 20 commands each. We copy paste this into the terminal after running `./file_server`.
 
 Refer to the Appendix the following outputs
-   - [`read.txt`](@ref sampleread)
-   - [`empty.txt`](@ref sampleempty)
-   - [`commands.txt`](@ref samplecommands)
-   - [`outputs/gen_read.txt`](@ref genread)
-   - [`outputs/gen_empty.txt`](@ref genempty)
+   - [read.txt](@ref sampleread)
+   - [empty.txt](@ref sampleempty)
+   - [commands.txt](@ref samplecommands)
+   - [outputs/gen_read.txt](@ref genread)
+   - [outputs/gen_empty.txt](@ref genempty)
 
 # Integrity Test for Level 2, 4
 
-Below is a short integrity test created for testing execution 
-and synchronization correctness. We copy paste this into the terminal after running `./file_server`.
+Below is a short integrity test created for testing execution and synchronization correctness (see `integrity.test`). We copy paste this into the terminal after running `./file_server`.
 
 ```
 write a.txt the

@@ -2,17 +2,18 @@
 
 This project is made for the completion of CS 140 21.1 Project 2. It is a **Level 4** implementation.
 
-The documentation was made using Doxygen.
+The documentation was made using Doxygen. See `README.md` for a quick guide.
 
 The implementation is divided into two files:
- - `defs.h`: contains `typedef struct` definitions and other useful macros.
- - `file_server.c`: driver program.
+ - `defs.h`: Dontains `typedef struct` definitions and other useful macros.
+ - `file_server.c`: Driver program.
 Additional files are included. They are used in testing.
-- `generator.py`: Python script used for semi-automated testing
-- `autotest.sh`: Entrypoint for automated testing
-- `.gdbinit-sample`: GDB commands for testing Level 3
-- `concurrency.test`: Input for testing concurrency
-- `integrity.test`: Small integrity test input
+- `generator.py`: Python script used for semi-automated testing.
+- `autotest.sh`: Entrypoint for automated testing.
+- `.gdbinit-sample`: GDB commands for testing Level 3.
+- `concurrency.test`: Input for testing concurrency.
+- `integrity.test`: Small integrity test input.
+- `valgrind-out.txt`: Used to show dynamic memory is safely freed.
 
 Refer to the program documentation for a detailed description of each file.
 
@@ -61,7 +62,9 @@ Debugging can be enabled by setting
 
 in `defs.h`.
 
-***All logging files are assumed to be empty.***
+## Important Notes
+- Include a trailing newline `\n` when copy-pasting inputs
+- Only valid inputs are accepted
 
 # Testing
 Logging files can be standardized by running the command below
@@ -72,9 +75,9 @@ This groups and sorts each line by their target file while retaining the order t
 
 Note that `./file_server` will run until manually terminated. To check whether all the worker threads have completed, run
 
-```
+@code
 htop -p `pidof ./file_server`
-```
+@endcode
 
 and wait until there are only *two threads left*. These are the `main` and `master` threads.
 
@@ -156,3 +159,6 @@ empty b.txt: thequickbrownfox
 empty b.txt: lazydog
 
 ```
+
+## Memory Usage
+See `valgrind-out.txt`. Used for proving dynamic memory allocations are safely freed.

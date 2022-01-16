@@ -35,7 +35,7 @@ run
 
 Each pair from the top are for write, read, and empty respectively.
 
-After running, we input the commands below (last line is a newline). Once the breakpoints are reached, we run `info threads` in gdb. This shows that the threads are executing concurrently.
+After running, we input the commands below (see `concurrency.test`; last line is a newline). Once the breakpoints are reached, we run `info threads` in gdb. This shows that the threads are executing concurrently.
 
 \code{.unparsed}
 

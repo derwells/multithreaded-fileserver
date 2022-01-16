@@ -1,8 +1,7 @@
-# Documentation
-The documentation was made using Doxygen.
+# Introduction
+This is a *Level 4* file server made for the completion of CS 140 Project 2.
 
-See the link below for the *video documentation*
-
+Made by: WELLS, William Frederic SN 201803155
 
 # Implementation
 
@@ -25,7 +24,12 @@ Debugging can be enabled by setting
 
 in `defs.h`.
 
-***All logging files are assumed to be empty.***
+## Important Notes
+- Include a trailing newline `\n` when copy-pasting inputs
+- Only valid inputs are accepted
+- All logging files are assumed to be empty
+
+
 
 # Testing
 Logging files can be standardized by running the command below

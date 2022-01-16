@@ -35,7 +35,7 @@ Figure \latexonly\ref{mtflcht}\endlatexonly is a flowchart of how the master thr
 Here are more detailed steps
 1. Parse and store user input in `command` struct
     - [file_server.c:602-603] Store user input in dynamically allocated struct `command`; uses `get_command()`
-        - [file_server.c:428-436] Reading user input into `inp`
+        - [file_server.c:428-436] Reading user input into `inp` (max size 118 chars)
             - [file_server.c:435-436] Read command until newline
         - [file_server.c:438-439,442-443,446-448] Parse `inp` using `strtok` then copy into `cmd`
 2. Initialize thread arguments (see `args_init()`)
@@ -48,10 +48,10 @@ Here are more detailed steps
     - See `l_lookup()`
         - [file_server.c:84-89] Compare file path as key; save lookup value and exit
     - [file_server.c:615-636] Check if target file has been tracked
-    - [file_server.c:619-621] Metadata found, update respective fmeta.recent_lock
-        - [file_server.c:621] Pass most recent out_lock as new thread's in_lock
+    - [file_server.c:619-621] Metadata found, update respective `fmeta.recent_lock`
+        - [file_server.c:621] Pass most recent out_lock as new thread's `in_lock`
     - [file_server.c:624-635] Metadata not found, insert to file tracker
-        - [file_server.c:627-628] Dynamically allocate and initialize new in_lock mutex
+        - [file_server.c:627-628] Dynamically allocate and initialize new `in_lock` mutex
         - [file_server.c:631-632] Dynamically allocate and initialize new file metadata fmeta (see `fmeta_init()`)
             - [file_server.c:542] fmeta.path is the only initialization step
         - [file_server.c:635] Insert new fmeta to the file tracker(see `l_insert()`)
@@ -61,7 +61,7 @@ Here are more detailed steps
 4. Update file metadata
     - This operation is a part of \ref pg_synchronization "*Synchronization*"
     - [file_server.c:638] Whether newly-created or not, update target file's fmeta (see `fmeta_update()`)
-        - [file_server.c:556] Overwrite target file's fmeta.recent_lock with new out_lock
+        - [file_server.c:556] Overwrite target file's `fmeta.recent_lock` with new out_lock
 5. Spawn worker thread
     - [file_server.c:641] Spawn worker thread (see `spawn_worker()`)
         - [file_server.c:572-586] Spawn appropriate worker thread depending on action
@@ -94,7 +94,7 @@ Figure \latexonly\ref{mlp2t}\endlatexonly summarizes the interaction between exi
 \end{figure}
 \endlatexonly
 
-Once a worker thread completes, it frees both `&in_lock` and `*in_lock` (in the Figure above, this is LOCK 0 - `*t1.in_lock`). By the time a worker thread completes, the `*in_lock` is not shared. It has reached the end of its life cycle. This ensures that `recent_lock` and `t2.in_lock` never point to invalid memory locations. Figure \latexonly\ref{mlp1t}\endlatexonly shows the lock pointer states when `t1` completesw.
+Once a worker thread completes, it frees both `&`in_lock`` and `*`in_lock`` (in the Figure above, this is LOCK 0 - `*t1.`in_lock``). By the time a worker thread completes, the `*`in_lock`` is not shared. It has reached the end of its life cycle. This ensures that `recent_lock` and `t2.`in_lock`` never point to invalid memory locations. Figure \latexonly\ref{mlp1t}\endlatexonly shows the lock pointer states when `t1` completesw.
 
 \latexonly
 \begin{figure}[H]
