@@ -424,7 +424,7 @@ void *worker_empty(void *_args) {
  * @return      Void.
  */
 void get_command(command *cmd) {
-    /** 
+    /**
      * file_server.c:428-436 Reading user input into `inp`
      * - Use fgets to read user command
      * - Use strtok to parse afterwards
@@ -442,11 +442,11 @@ void get_command(command *cmd) {
     ptr = strtok(NULL, " ");
     strcpy(cmd->path, ptr);
 
-    /** file_server.c:446-448 Get command input string */
+    /** file_server.c:446-449 Get command input string */
     ptr = strtok(NULL, "");
+    cmd->input[0] = '\0';
     if (strcmp(cmd->action, "write") == 0 && ptr != NULL)
         strcpy(cmd->input, ptr);
-
     return;
 }
 

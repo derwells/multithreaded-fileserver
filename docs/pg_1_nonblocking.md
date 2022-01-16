@@ -71,12 +71,12 @@ Here are more detailed steps
         - [file_server.c:477-481] Build timestamp using system time
             - [file_server.c:481] Replace newline with null-terminator
         - [file_server.c:484] Open commands.txt
-        - file_server.c:487-490 Error handling if commands.txt does not exist
-        - file_server.c:493-499 Record to commands.txt based on type of action
-            - file_server.c:495 If recording write action, use 3 inputs
-            - file_server.c:498 If not recording write action, use 2 inputs
+        - [file_server.c:487-490] Error handling if commands.txt does not exist
+        - [file_server.c:493-499] Record to commands.txt based on type of action
+            - [file_server.c:495] If recording write action, use 3 inputs
+            - [file_server.c:498] If not recording write action, use 2 inputs
 7. Free `cmd`
-    - file_server.c:650 Free cmd struct; copy of user input already in thread args
+    - [file_server.c:650] Free cmd struct; copy of user input already in thread args
 
 ## Non-blocking Proof
 It is never the case that the master thread gets blocked. The data structures used - `fmeta`, `command`, `list_t` - do not involve locks nor synchronization features.
