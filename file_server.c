@@ -141,7 +141,7 @@ void *worker_write(void *_args) {
     pthread_mutex_lock(args->in_lock);
 
 
-    debug_print("[START] %s %s %s\n", cmd->action, cmd->path, cmd->input));
+    debug_print("[START] %s %s %s\n", cmd->action, cmd->path, cmd->input);
     
     r_simulate_access();
     FILE *target_file;
@@ -158,7 +158,7 @@ void *worker_write(void *_args) {
     fprintf(target_file, "%s", cmd->input);
     fclose(target_file);
 
-    debug_print("[END] %s %s %s\n", cmd->action, cmd->path, cmd->input));
+    debug_print("[END] %s %s %s\n", cmd->action, cmd->path, cmd->input);
 
     pthread_mutex_unlock(args->out_lock);
 
