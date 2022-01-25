@@ -6,11 +6,13 @@
 #include <time.h>
 
 #include "defs.h"
+#include "llist.h"
 
-/** Stores file locks for read.txt and empty.txt */
+// Global locks for read.txt, empty.txt
 pthread_mutex_t glocks[N_GLOCKS];
-/** Linked list of existing target files and their corresponding `fmeta` */
-list_t *tracker;
+
+// Linked list of existing target files + metadata
+llist *tracker;
 
 
 
@@ -22,65 +24,6 @@ list_t *tracker;
 void ms2ts(struct timespec *ts, unsigned long ms) {
     ts->tv_sec = ms / 1000;
     ts->tv_nsec = (ms % 1000) * 1000000L;
-}
-
-/**
- * @relates __list_t
- * Initializes a list_t.
- * 
- * @param l Target list_t to initialize.
- */
-void l_init(list_t *l) {
-    l->head = NULL;
-}
-
-/**
- * @relates __list_t
- * Insert key, value pair into a list_t.
- * 
- * @param l     Target list_t.
- * @param key   Key. Pointer to file path stored in corresponding fmeta.
- * @param value Value. Pointer to file metadata.
- */
-void l_insert(list_t *l, char *key, fmeta *value) {
-    lnode_t *new = malloc(sizeof(lnode_t));
-
-    if (new == NULL) {
-        perror("malloc");
-        return;
-    }
-
-    new->key = key;
-    new->value = value;
-
-    new->next = l->head;
-    l->head = new;
-}
-
-/**
- * @relates __list_t
- * Returns pointer to file metadata for 
- * file path equal to key. Iterates through nodes
- * until match is found.
- * 
- * @param l     Target list_t.
- * @param key   Key to match. Pointer to file path 
- *              stored in corresponding fmeta.
- * @return      Pointer to corresponding file metadata.
- */
-fmeta *l_lookup(list_t *l, char *key) {
-    fmeta *value = NULL;
-
-    lnode_t *curr = l->head;
-    while (curr) {
-        if (strcmp(curr->key, key) == 0) {
-            value = curr->value;
-            break;
-        }
-        curr = curr->next;
-    }
-
-    return value;
 }
 
 /**
@@ -558,7 +501,7 @@ int main() {
     for (i = 0; i < N_GLOCKS; i++)
         pthread_mutex_init(&glocks[i], NULL);
 
-    tracker = malloc(sizeof(list_t));
+    tracker = malloc(sizeof(llist));
     l_init(tracker);
 
     pthread_t tid;
