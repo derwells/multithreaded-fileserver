@@ -7,6 +7,7 @@
 
 #include "defs.h"
 #include "llist.h"
+#include "fmeta.h"
 
 // Global locks for read.txt, empty.txt
 pthread_mutex_t glocks[N_GLOCKS];
@@ -134,7 +135,7 @@ void *worker_write(void *_args) {
     target_file = fopen(cmd->path, "a");
 
     if (target_file == NULL) {
-        debug_print("[ERR] worker_write fopen\n", NULL);
+        debug_print("[ERR] worker_write %s fopen\n", cmd->path);
         exit(1);
     }
 
@@ -342,7 +343,7 @@ void command_record(command *cmd) {
     FILE *commands_file = fopen(CMD_TARGET, CMD_MODE);
 
     if (commands_file == NULL) {
-        debug_print("[ERR] worker_write fopen\n", NULL);
+        debug_print("[ERR] worker_write %s fopen\n", cmd->path);
         exit(1);
     }
 
@@ -435,7 +436,7 @@ void spawn_worker(args_t *targs) {
     } else if (strcmp(cmd->action, "empty") == 0) {
         pthread_create(&tid, NULL, worker_empty, targs);
     } else {
-        debug_print("[ERR] Invalid `action`\n", NULL);
+        debug_print("[ERR] Invalid action %s\n", cmd->action);
         exit(1);
     }
 
