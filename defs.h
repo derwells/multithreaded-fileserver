@@ -6,7 +6,7 @@
 /** Debugging messages off by default */
 #define DEBUGGING   0
 /** Wrapper for stderr print */
-#define debug_mode(x) { if (DEBUGGING) x; } 
+#define debug_mode(x) { if (DEBUGGING) x; }
 
 /** Number of global file locks (glocks). */
 #define N_GLOCKS    2
@@ -33,15 +33,10 @@
 /** Access mode for commands.txt */
 #define CMD_MODE        "a"
 
-/** Format when writing found file to read.txt, empty.txt */
-#define FMT_2HIT        "%s %s: "
-/** Format when writing miss to read.txt */
+#define FMT_2LOG        "%s %s: "
 #define FMT_READ_MISS   "%s %s: FILE DNE\n"
-/** Format when writing miss to empty.txt */
 #define FMT_EMPTY_MISS  "%s %s: FILE ALREADY EMPTY\n"
-/** Format when writing read, empty to commands.txt */
 #define FMT_2CMD        "[%s] %s %s\n"
-/** Format when writing write to commands.txt */
 #define FMT_3CMD        "[%s] %s %s %s\n"
 
 
