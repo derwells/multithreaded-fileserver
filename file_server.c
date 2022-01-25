@@ -391,32 +391,6 @@ void args_init(args_t *targs, command *cmd) {
 }
 
 /**
- * @relates     __fmeta
- * Initialize file metadata based on user 
- * input described by command cmd.
- * 
- * @param fc    File metadata to initialize.
- * @param cmd   Struct command to read from.
- * @return      Void.
- */
-void fmeta_init(fmeta *fc, command *cmd) {
-    strcpy(fc->path, cmd->path);
-}
-
-/**
- * @relates     __fmeta
- * Update file metadata based on built
- * thread arguments.
- * 
- * @param fc    File metadata to update.
- * @param targs Thread arguments to read from.
- * @return      Void.
- */
-void fmeta_update(fmeta *fc, args_t *targs) {
-    fc->recent_lock = targs->out_lock; 
-}
-
-/**
  * Wrapper for deciding what thread to spawn
  * 
  * @see         worker_read(), worker_write(), worker_empty()
@@ -445,6 +419,46 @@ void spawn_worker(args_t *targs) {
 }
 
 /**
+ * @relates     __fmeta
+ * Update file metadata based on built
+ * thread arguments.
+ * 
+ * @param targs     New thread arguments
+ * @param cmd       User command
+ * @return      Void.
+ */
+void build_hoh(
+    args_t *targs,
+    command *cmd
+) {
+    debug_print("[TRACKER CHECK] %s\n", cmd->path);
+    fmeta *fc = l_lookup(tracker, cmd->path);
+
+    if (fc != NULL) {
+        debug_print("[TRACKER HIT] %s\n", cmd->path);
+
+        // Update fmeta
+        targs->in_lock = fc->recent_lock;
+    } else if (fc == NULL) {
+        debug_print("[TRACKER ADD] %s\n", cmd->path);
+
+        // Init new in_lock
+        targs->in_lock = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
+        pthread_mutex_init(targs->in_lock, NULL);
+
+        // Init new fmeta
+        fc = malloc(sizeof(fmeta));
+        strcpy(fc->path, cmd->path);
+
+        // Insert (path, fmeta) key-value pair
+        l_insert(tracker, fc->path, fc);
+    }
+
+    // Ensure recent_lock is newest out_lock
+    fc->recent_lock = targs->out_lock; 
+}
+
+/**
  * Master thread function.
  * 
  * @param _args     Arguments passed to worker thread. 
@@ -454,31 +468,16 @@ void spawn_worker(args_t *targs) {
 void *master() {
     // Master thread loop
     while (1) {
+        // Get user input
         command *cmd = malloc(sizeof(command));
         get_command(cmd);
 
+        // Build thread arguments
         args_t *targs = (args_t *) malloc(sizeof(args_t));
         args_init(targs, cmd);
 
-        // Check if target file has been tracked
-        debug_print("[METADATA CHECK] %s\n", cmd->path);
-        fmeta *fc = l_lookup(tracker, cmd->path);
-
-        if (fc != NULL) {
-            debug_print("[METADATA HIT] %s\n", cmd->path);
-            targs->in_lock = fc->recent_lock;
-        } else if (fc == NULL) {
-            debug_print("[METADATA ADD] %s\n", cmd->path);
-
-            targs->in_lock = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
-            pthread_mutex_init(targs->in_lock, NULL);
-
-            fc = malloc(sizeof(fmeta));
-            fmeta_init(fc, cmd);
-
-            l_insert(tracker, fc->path, fc);
-        }
-        fmeta_update(fc, targs);
+        // Build HoH locks based on tracker
+        build_hoh(targs, cmd);
 
         spawn_worker(targs);
         command_record(cmd);

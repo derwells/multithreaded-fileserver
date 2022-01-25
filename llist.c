@@ -1,4 +1,9 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
 #include "llist.h"
+#include "fmeta.h"
 
 /**
  * @relates __llist
