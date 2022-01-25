@@ -1,126 +1,54 @@
-# Introduction
-This is a *Level 4* file server made for the completion of CS 140 Project 2.
+# Multithreaded File Server
 
-Made by: WELLS, William Frederic SN 201803155
+Naive concurrent file server implementation. Made for the completion of CS 140 AY 21-22.
 
-# Implementation
+# Get Started
 
-The implementation contains two files
-- `file_server.c`: the file server program
-- `defs.h`: headers and structs used by the file server
-
-Compile the code using
-```
-gcc -o file_server file_server.c -pthread
-```
-
-and run `./file_server`. Logging files are generated relative to the current directory.
-
-Debugging can be enabled by setting
+Run the following bash command
 
 ```
-#define DEBUGGING   1
+$ gcc -o file_server src/file_server.c src/llist.c -pthread
+$ ./file_server
 ```
 
-in `defs.h`.
+The program accepts three (3) instructions
+ - `write <path> <string>`
+   - append `<string>` to file defined by `<path>`
+ - `read <path>`
+   - read contents of `<path>` to `read.txt`
+ - `empty <path>`
+   - read contents of `<path>` to `empty.txt` then erase contents
 
-## Important Notes
-- Include a trailing newline `\n` when copy-pasting inputs
-- Only valid inputs are accepted
-- All logging files are assumed to be empty
+# Synchronization
 
+As per project specs, each command has an associated worker thread. Worker threads are grouped by their target filepath `<path>`. *Worker threads in a group are organized using hand-over-hand locking. This ensures that older threads in a group **must** run first before newer threads can.*
 
+*Worker threads in different groups can run concurrently.*
 
 # Testing
-Logging files can be standardized by running the command below
-```
-sort -t" " -s -k2,2 <read or empty>.txt
-```
-This groups and sorts each line by their target file while retaining the order they were written within the grouping.
 
-Note that `./file_server` will run until manually terminated. To check whether all the worker threads have completed, run
-
+Testing was done using `autotest.sh`. Set-up exec permissions using
 ```
-htop -p `pidof ./file_server`
+chmod +x autotest.sh
 ```
 
-and wait until there are only *two threads left*. These are the `main` and `master` threads.
-
-## Automated Testing
-Below are the files used in automated testing
-- `generator.py`: script for generating sample inputs `test.in` and expected outputs `outputs/gen_read.txt` and `outputs/gen_write.txt`
-   - Run using `python3 generator.py <N_FILES> <N_CMDS> <ALNUM?>`
-   - `N_FILES`: number of target files
-   - `N_CMDS`: number of commands to issue per file
-   - `ALNUM?`: `y` or `n`; restrict write inputs to alphanumeric characters?
-   - Analyzes commands.txt to see if it is consistent with `test.in`
-- `autotesh.sh`: script for running `generator.py` and comparing `read.txt` and `empty.txt` to `outputs/gen_read.txt` and `outputs/gen_write.txt` respectively
-    - Done using `diff` on the standardized outputs
-
-Setup and run the scripts using the commands below
+and run it using
 
 ```
-$ chmod +x autotest.sh
-$ ./autotest.sh (depends on OS)
+autotest.sh <N_FILES> <N_CMDS> <USE_ALPHANUMERIC_FILENAMES>
 ```
 
-On a different terminal, run the `./file_server` in the same folder.
+This writes a randomly-generated sequence of commands to `test.in`. Note that the number of generated commands is `N_FILES * N_CMDS`.
 
-Copy-paste the `test.in` file into the `./file_server` terminal. When the file server has finished executing all the test input commands, respond to the `autotest.sh` prompt. This will generate `outputs/gen_read.txt` and `outputs/gen_write.txt` as well as compare `commands.txt` to `test.in`. 
-
-## Concurrency Test
-Testing concurrency was done using GDB and `.gdbinit-sample`. The latter sets breakpoints within the critical sections of the worker threads. The threads are inspected using `info threads`. This should show that several threads are executing at once.
-
-Make sure that `~/.gdbinit` has the follow content
+Run `./file_server` in a separate terminal then copy-paste `test.in`. Once the commands have finished executing, respond to the `autotest.sh` prompt
 
 ```
-set auto-load safe-path /
+Press [enter] once file_server has finished execution:
 ```
 
-The concurrency test steps are show below
+## Example
+The command below generates 100 commmands with complicated filenames.
 
 ```
-$ cp .gdbinit-sample .gdbinit
-$ gcc -o file_server file_server.c -pthread -g
-$ gdb file_server
-```
-
-Once in GDB, copy paste the sample input in `concurrency.test` and wait until the thread arrive at breakpoints. Once paused, run
-
-```
-(gdb) info threads
-```
-
-to view the thread states. To continue to the next breakpoint, run
-
-```
-(gdb) continue
-```
-
-## Integrity Test
-
-The integrity test uses a predictable input in `integrity.test`.
-
-Below is expected *standardized output* for `read.txt`
-
-```
-read a.txt: the
-read a.txt: thequick
-read a.txt: thequickbrown
-read a.txt: lazydog
-read b.txt: the
-read b.txt: thequick
-read b.txt: thequickbrown
-read b.txt: lazydog
-
-```
-
-Below expected *standardized output* for `empty.txt`
-
-```
-empty a.txt: thequickbrownfox
-empty a.txt: lazydog
-empty b.txt: thequickbrownfox
-empty b.txt: lazydog
-
+autotest.sh 5 20 n
 ```
