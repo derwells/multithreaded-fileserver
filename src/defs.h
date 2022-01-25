@@ -3,17 +3,21 @@
 
 #include <pthread.h>
 
+// Debugging
 #define DEBUG   0
 #define debug_print(fmt, ...) \
         do { if (DEBUG) fprintf(stderr, fmt, __VA_ARGS__); } while (0)
 
+// Global locks
 #define N_GLOCKS    2
 #define READ_GLOCK  0
 #define EMPTY_GLOCK 1
 
+// Input sizes
 #define MAX_ACTION_SIZE 6
 #define MAX_INPUT_SIZE  51
 
+// Logging targets
 #define EMPTY_TARGET    "empty.txt"
 #define EMPTY_MODE      "a"
 #define READ_TARGET     "read.txt"
@@ -21,6 +25,7 @@
 #define CMD_TARGET      "commands.txt"
 #define CMD_MODE        "a"
 
+// Logging
 #define FMT_2LOG        "%s %s: "
 #define FMT_READ_MISS   "%s %s: FILE DNE\n"
 #define FMT_EMPTY_MISS  "%s %s: FILE ALREADY EMPTY\n"
