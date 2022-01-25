@@ -1,4 +1,4 @@
-python3 generator.py 5 3 n
+python3 generator.py $1 $2 $3
 
 read_test=$(diff <(sort -t" " -s -k2,2 read.txt) <(sort -t" " -s -k2,2 gen_read.txt))
 
