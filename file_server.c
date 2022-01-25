@@ -124,7 +124,6 @@ void *worker_write(void *_args) {
 
     pthread_mutex_lock(args->in_lock);
 
-
     debug_print(
         "[START] %s %s %s\n", 
         cmd->action, cmd->path, cmd->input
@@ -419,13 +418,12 @@ void spawn_worker(args_t *targs) {
 }
 
 /**
- * @relates     __fmeta
- * Update file metadata based on built
- * thread arguments.
+ * Builds hand-over-hand (HoH) locks based
+ * on tracker.
  * 
  * @param targs     New thread arguments
  * @param cmd       User command
- * @return      Void.
+ * @return          Void
  */
 void build_hoh(args_t *targs, command *cmd) {
     debug_print("[TRACKER CHECK] %s\n", cmd->path);
