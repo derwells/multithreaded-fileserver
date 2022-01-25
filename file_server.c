@@ -63,23 +63,6 @@ void r_sleep_range(int min, int max) {
 }
 
 /**
- * Generates header in record files. Used for
- * inputs with 2 parameters (read, empty).
- * 
- * @param to_file   Target record file.
- * @param cmd       Issued command to be recorded.
- * @return          Void.
- */
-void header_2cmd(FILE* to_file, command *cmd) {
-    fprintf(
-        to_file, 
-        FMT_2LOG,
-        cmd->action,
-        cmd->path
-    );
-}
-
-/**
  * Wrapper for opening read.txt.
  * 
  * @return  FILE pointer to read.txt.
@@ -158,6 +141,7 @@ void *worker_write(void *_args) {
     struct timespec ts;
     ms2ts(&ts, 25 * strlen(cmd->input));
     nanosleep(&ts, NULL);
+
     fprintf(target_file, "%s", cmd->input);
     fclose(target_file);
 
@@ -212,7 +196,12 @@ void *worker_read(void *_args) {
         pthread_mutex_lock(&glocks[READ_GLOCK]);
 
         to_file = open_read();
-        header_2cmd(to_file, cmd);
+        fprintf(
+            to_file, 
+            FMT_2LOG,
+            cmd->action,
+            cmd->path
+        );
         fdump(to_file, from_file);
         fclose(to_file);
 
@@ -267,7 +256,12 @@ void *worker_empty(void *_args) {
         pthread_mutex_lock(&glocks[EMPTY_GLOCK]);
 
         to_file = open_empty();
-        header_2cmd(to_file, cmd);
+        fprintf(
+            to_file, 
+            FMT_2LOG,
+            cmd->action,
+            cmd->path
+        );
         fdump(to_file, from_file);
         fclose(to_file); 
 
