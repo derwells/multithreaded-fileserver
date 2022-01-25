@@ -3,8 +3,9 @@
 
 #include <pthread.h>
 
-#define DEBUGGING   0
-#define debug_mode(x) { if (DEBUGGING) x; }
+#define DEBUG   0
+#define debug_print(fmt, ...) \
+        do { if (DEBUG) fprintf(stderr, fmt, __VA_ARGS__); } while (0)
 
 #define N_GLOCKS    2
 #define READ_GLOCK  0
