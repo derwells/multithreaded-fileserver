@@ -68,7 +68,7 @@ void r_sleep_range(int min, int max) {
  * 
  * @return  FILE pointer to read.txt.
  */
-FILE *open_read() {
+FILE *open_read_log() {
     return fopen(READ_TARGET, READ_MODE);
 }
 
@@ -77,7 +77,7 @@ FILE *open_read() {
  * 
  * @return  FILE pointer to empty.txt.
  */
-FILE *open_empty() {
+FILE *open_empty_log() {
     return fopen(EMPTY_TARGET, EMPTY_MODE);
 }
 
@@ -104,7 +104,7 @@ void fdump(FILE* to_file, FILE* from_file) {
  * @param path  Filepath of file to empty.
  * @return      Void.
  */
-void empty_file(char *path) {
+void fempty(char *path) {
     FILE *target_file = fopen(path, "w");
     fclose(target_file);
 }
@@ -186,7 +186,7 @@ void *worker_read(void *_args) {
     if (from_file == NULL) {
         pthread_mutex_lock(&glocks[READ_GLOCK]);
 
-        to_file = open_read();
+        to_file = open_read_log();
 
         fprintf(to_file, FMT_READ_MISS, cmd->action, cmd->path);
 
@@ -196,7 +196,7 @@ void *worker_read(void *_args) {
     } else {
         pthread_mutex_lock(&glocks[READ_GLOCK]);
 
-        to_file = open_read();
+        to_file = open_read_log();
         fprintf(
             to_file, 
             FMT_2LOG,
@@ -248,7 +248,7 @@ void *worker_empty(void *_args) {
     if (from_file == NULL) {
         pthread_mutex_lock(&glocks[EMPTY_GLOCK]);
 
-        to_file = open_empty();
+        to_file = open_empty_log();
         fprintf(to_file, FMT_EMPTY_MISS, cmd->action, cmd->path);
         fclose(to_file);
 
@@ -256,7 +256,7 @@ void *worker_empty(void *_args) {
     } else {
         pthread_mutex_lock(&glocks[EMPTY_GLOCK]);
 
-        to_file = open_empty();
+        to_file = open_empty_log();
         fprintf(
             to_file, 
             FMT_2LOG,
@@ -269,7 +269,7 @@ void *worker_empty(void *_args) {
         pthread_mutex_unlock(&glocks[EMPTY_GLOCK]);
 
         fclose(from_file);
-        empty_file(cmd->path);
+        fempty(cmd->path);
 
         r_sleep_range(7 * 1000, 10 * 1000);
     }
@@ -427,10 +427,7 @@ void spawn_worker(args_t *targs) {
  * @param cmd       User command
  * @return      Void.
  */
-void build_hoh(
-    args_t *targs,
-    command *cmd
-) {
+void build_hoh(args_t *targs, command *cmd) {
     debug_print("[TRACKER CHECK] %s\n", cmd->path);
     fmeta *fc = l_lookup(tracker, cmd->path);
 
@@ -504,6 +501,11 @@ int main() {
 
     tracker = malloc(sizeof(llist));
     l_init(tracker);
+
+    // Empty-out log files
+    fempty(READ_TARGET);
+    fempty(EMPTY_TARGET);
+    fempty(CMD_TARGET);
 
     pthread_t tid;
     pthread_create(&tid, NULL, master, NULL);
