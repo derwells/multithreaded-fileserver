@@ -1,6 +1,6 @@
 # Multithreaded File Server
 
-Naive concurrent file server implementation. Made for the completion of CS 140 AY 21-22.
+Naive concurrent file server implementation.
 
 # Get Started
 
